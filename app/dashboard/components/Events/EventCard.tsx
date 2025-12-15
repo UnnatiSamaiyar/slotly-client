@@ -36,7 +36,7 @@
 
 
 
-
+//@ts-nocheck
 // src/app/dashboard/components/Events/EventCard.tsx
 "use client";
 

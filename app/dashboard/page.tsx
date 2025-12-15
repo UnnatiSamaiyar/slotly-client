@@ -1620,7 +1620,7 @@
 
 import React, { useState, useEffect } from "react";
 import Sidebar from "./components/Sidebar/Sidebar";
-import Topbar from "./components/Topbar/Topbar.tsx";
+import Topbar from "./components/Topbar/Topbar";
 import CalendarGrid from "./components/Calendar/CalendarGrid";
 import EventList from "./components/Events/EventList";
 import UpcomingEvents from "./components/Events/UpcomingEvents";
