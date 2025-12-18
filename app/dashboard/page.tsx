@@ -277,11 +277,11 @@
 //         "https://www.googleapis.com/auth/calendar.events",
 //       ].join(" "),
 //       ux_mode: "popup",
-//       redirect_uri: "http://localhost:3000/auth/callback/google",
+//       redirect_uri: "https://slotly.io/auth/callback/google",
 //       callback: async (response) => {
 //         const code = response.code;
 
-//         await fetch("http://localhost:8000/auth/google", {
+//         await fetch("https://api.slotly.io/auth/google", {
 //           method: "POST",
 //           headers: { "Content-Type": "application/json" },
 //           body: JSON.stringify({ code }),
@@ -312,7 +312,7 @@
 
 //   const loadStatus = async () => {
 //     const res = await fetch(
-//       `http://localhost:8000/auth/calendar-status?user_sub=${userSub}`
+//       `https://api.slotly.io/auth/calendar-status?user_sub=${userSub}`
 //     );
 //     const data = await res.json();
 //     setStatus(data.calendar_connected);
@@ -752,7 +752,7 @@
 //       setLoadingEvents(true);
 //       setEventsError(null);
 //       try {
-//         const res = await fetch(`http://localhost:8000/auth/calendar/events?user_sub=${USER_SUB}`);
+//         const res = await fetch(`https://api.slotly.io/auth/calendar/events?user_sub=${USER_SUB}`);
 //         if (!res.ok) {
 //           const txt = await res.text();
 //           throw new Error(txt || `HTTP ${res.status}`);
@@ -1063,7 +1063,7 @@
 //       setEventsError(null);
 //       try {
 //         const res = await fetch(
-//           `http://localhost:8000/auth/calendar/events?user_sub=${encodeURIComponent(
+//           `https://api.slotly.io/auth/calendar/events?user_sub=${encodeURIComponent(
 //             USER_SUB
 //           )}`
 //         );

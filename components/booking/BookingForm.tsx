@@ -35,7 +35,7 @@
 //     console.log("Sending payload:", payload);
 
 //     try {
-//       const res = await fetch("http://localhost:8000/bookings/create", {
+//       const res = await fetch("https://api.slotly.io/bookings/create", {
 //         method: "POST",
 //         headers: { "Content-Type": "application/json" },
 //         body: JSON.stringify(payload),
@@ -164,7 +164,7 @@
 //     };
 
 //     try {
-//       const res = await fetch("http://localhost:8000/bookings/create", {
+//       const res = await fetch("https://api.slotly.io/bookings/create", {
 //         method: "POST",
 //         headers: { "Content-Type": "application/json" },
 //         body: JSON.stringify(payload),
@@ -395,7 +395,7 @@
 //     const startISO = new Date(`${date}T${time}:00`).toISOString();
 
 //     try {
-//       const res = await fetch("http://localhost:8000/bookings/create", {
+//       const res = await fetch("https://api.slotly.io/bookings/create", {
 //         method: "POST",
 //         headers: { "Content-Type": "application/json" },
 //         body: JSON.stringify({
@@ -609,7 +609,7 @@
 //   useEffect(() => {
 //     if (!date) return;
 
-//     fetch(`http://localhost:8000/bookings/availability/${PROFILE_SLUG}?date=${date}`)
+//     fetch(`https://api.slotly.io/bookings/availability/${PROFILE_SLUG}?date=${date}`)
 //       .then((res) => res.json())
 //       .then((data) => setSlots(data.slots || []))
 //       .catch(() => setSlots([]));
@@ -653,7 +653,7 @@
 //     const startISO = new Date(`${date}T${time}:00`).toISOString();
 
 //     try {
-//       const res = await fetch("http://localhost:8000/bookings/create", {
+//       const res = await fetch("https://api.slotly.io/bookings/create", {
 //         method: "POST",
 //         headers: { "Content-Type": "application/json" },
 //         body: JSON.stringify({
@@ -882,7 +882,7 @@
 //   // -----------------------------
 //   useEffect(() => {
 //     if (!date) return;
-//     fetch(`http://localhost:8000/bookings/availability/${PROFILE_SLUG}?date=${date}`)
+//     fetch(`https://api.slotly.io/bookings/availability/${PROFILE_SLUG}?date=${date}`)
 //       .then((res) => res.json())
 //       .then((data) => setSlots(data.slots || []))
 //       .catch(() => setSlots([]));
@@ -945,7 +945,7 @@
 //     const startISO = new Date(`${date}T${time}:00`).toISOString();
 
 //     try {
-//       const res = await fetch("http://localhost:8000/bookings/create", {
+//       const res = await fetch("https://api.slotly.io/bookings/create", {
 //         method: "POST",
 //         headers: { "Content-Type": "application/json" },
 //         body: JSON.stringify({
@@ -1216,7 +1216,7 @@ export default function BookingForm() {
   // -----------------------------
   useEffect(() => {
     if (!date) return;
-    fetch(`http://localhost:8000/bookings/availability/${PROFILE_SLUG}?date=${date}`)
+    fetch(`https://api.slotly.io/bookings/availability/${PROFILE_SLUG}?date=${date}`)
       .then((res) => res.json())
       .then((data) => setSlots(data.slots || []))
       .catch(() => setSlots([]));
@@ -1282,7 +1282,7 @@ export default function BookingForm() {
     const startISO = new Date(`${date}T${time}:00`).toISOString();
 
     try {
-      const res = await fetch("http://localhost:8000/bookings/create", {
+      const res = await fetch("https://api.slotly.io/bookings/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

@@ -136,7 +136,7 @@ export default function EventTypeCard({
 }) {
   // Public booking link (username will come from future profile page)
   const username = "tushar"; // TODO: replace with real dynamic user.username
-  const bookingUrl = `http://localhost:3000/${username}/${item.slug}`;
+  const bookingUrl = `https://slotly.io/${username}/${item.slug}`;
 
   function copyToClipboard() {
     navigator.clipboard.writeText(bookingUrl);

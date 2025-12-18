@@ -24,7 +24,7 @@
 //   useEffect(() => {
 //     const load = async () => {
 //       const res = await fetch(
-//         `http://localhost:8000/booking/profile/${profileSlug}`
+//         `https://api.slotly.io/booking/profile/${profileSlug}`
 //       );
 //       const data = await res.json();
 //       setProfileData(data);
@@ -118,7 +118,7 @@ export default function PublicBookingPage({
   useEffect(() => {
     const load = async () => {
       const res = await fetch(
-        `http://localhost:8000/booking/profile/${event_slug}`
+        `https://api.slotly.io/booking/profile/${event_slug}`
       );
       const data = await res.json();
       setEventData(data);
