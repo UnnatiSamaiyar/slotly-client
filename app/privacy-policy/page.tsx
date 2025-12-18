@@ -2,23 +2,17 @@
 
 import { useEffect, useState } from "react";
 
-export default function TermsAndConditionsPage() {
+export default function PrivacyPolicyPage() {
   const sections = [
-    { id: "acceptance", label: "Acceptance of Terms" },
-    { id: "eligibility", label: "Eligibility" },
-    { id: "service", label: "Service Overview" },
-    { id: "responsibilities", label: "User Responsibilities" },
-    { id: "accounts", label: "Accounts & Termination" },
-    { id: "bookings", label: "Bookings & Disputes" },
-    { id: "payments", label: "Payments" },
-    { id: "ip", label: "Intellectual Property" },
-    { id: "thirdparty", label: "Third-Party Services" },
-    { id: "privacy", label: "Privacy" },
-    { id: "disclaimer", label: "Disclaimers" },
-    { id: "liability", label: "Limitation of Liability" },
-    { id: "indemnity", label: "Indemnification" },
-    { id: "changes", label: "Changes to Terms" },
-    { id: "law", label: "Governing Law" },
+    { id: "collect", label: "Information We Collect" },
+    { id: "usage", label: "How We Use Information" },
+    { id: "cookies", label: "Cookies & Tracking" },
+    { id: "sharing", label: "Data Sharing" },
+    { id: "security", label: "Data Security" },
+    { id: "retention", label: "Data Retention" },
+    { id: "rights", label: "User Rights" },
+    { id: "children", label: "Children’s Privacy" },
+    { id: "updates", label: "Policy Updates" },
     { id: "contact", label: "Contact" },
   ];
 
@@ -48,12 +42,13 @@ export default function TermsAndConditionsPage() {
         {/* HEADER */}
         <header className="mb-20">
           <h1 className="text-5xl font-bold tracking-tight text-slate-900">
-            Terms & Conditions
+            Privacy Policy
           </h1>
           <p className="mt-6 text-xl text-slate-600 max-w-3xl leading-relaxed">
-            These Terms and Conditions (“Terms”) govern your access to and use of
-            Slotly’s website, applications, and services (“Service”). Please
-            read them carefully before using the platform.
+            Slotly (“we”, “our”, “us”) respects your privacy and is committed to
+            protecting your personal information. This Privacy Policy explains
+            how we collect, use, store, and protect data when you use our
+            website, applications, and services (collectively, the “Service”).
           </p>
           <p className="mt-4 text-base text-slate-500">
             Effective Date: [15 December 2025]
@@ -88,100 +83,87 @@ export default function TermsAndConditionsPage() {
 
           {/* CONTENT */}
           <div className="bg-white border border-slate-200 rounded-3xl shadow-sm p-12">
-            <Section id="acceptance" title="1. Acceptance of Terms">
-              By accessing or using Slotly, you confirm that you have read,
-              understood, and agree to be bound by these Terms. If you do not
-              agree, you must not use the Service.
-            </Section>
-
-            <Section id="eligibility" title="2. Eligibility">
-              You must be at least 18 years old (or have legal parental or
-              guardian consent) to use Slotly. You agree to provide accurate,
-              current, and complete information during registration.
-            </Section>
-
-            <Section id="service" title="3. Service Overview">
-              Slotly is a booking and scheduling platform that allows users to
-              create booking pages, share availability, and schedule
-              appointments or events. Slotly acts solely as a technology
-              provider and does not guarantee bookings or outcomes.
-            </Section>
-
-            <Section id="responsibilities" title="4. User Responsibilities">
+            <Section id="collect" title="1. Information We Collect">
+              <SubTitle>a) Personal Information</SubTitle>
               <ul className="list-disc pl-6">
-                <li>Use the Service for lawful purposes only</li>
-                <li>Provide accurate and up-to-date information</li>
-                <li>Respect other users and their time</li>
-                <li>Avoid misuse, abuse, or disruption of the Service</li>
-                <li>Not attempt unauthorized access to the platform</li>
+                <li>Name</li>
+                <li>Email address</li>
+                <li>Phone number</li>
+                <li>Username</li>
+                <li>Booking and scheduling details</li>
+                <li>Profile or business information (if provided)</li>
               </ul>
+
+              <SubTitle>b) Technical & Usage Data</SubTitle>
+              <ul className="list-disc pl-6">
+                <li>IP address</li>
+                <li>Device and browser information</li>
+                <li>Pages visited and interactions</li>
+                <li>Date and time of access</li>
+                <li>Cookies and similar technologies</li>
+              </ul>
+
+              <SubTitle>c) Third-Party Authentication</SubTitle>
+              <p>
+                If you sign in using Google or another third-party provider, we
+                may receive your name, email address, and profile image (if
+                permitted). Slotly does not access passwords or private
+                third-party data beyond what you explicitly authorize.
+              </p>
             </Section>
 
-            <Section id="accounts" title="5. Accounts & Termination">
-              Slotly reserves the right to suspend or terminate accounts that
-              violate these Terms, pose security risks, or misuse the Service.
-              You may request account deletion at any time.
+            <Section id="usage" title="2. How We Use Information">
+              <ul className="list-disc pl-6">
+                <li>Provide and operate the Service</li>
+                <li>Manage bookings and user accounts</li>
+                <li>Communicate service-related updates</li>
+                <li>Improve performance and user experience</li>
+                <li>Maintain security and prevent misuse</li>
+                <li>Comply with legal obligations</li>
+              </ul>
+              <p className="font-medium">
+                We do not sell or rent personal data.
+              </p>
             </Section>
 
-            <Section id="bookings" title="6. Bookings & Disputes">
-              Slotly is not a party to booking agreements. All responsibilities,
-              cancellations, refunds, disputes, and outcomes are strictly
-              between the users involved.
+            <Section id="cookies" title="3. Cookies & Tracking">
+              Slotly uses cookies to maintain user sessions, improve platform
+              performance, and analyze usage patterns. You can manage cookies
+              through your browser settings.
             </Section>
 
-            <Section id="payments" title="7. Payments (If Enabled)">
-              Payments, if supported, are processed by third-party payment
-              providers. Slotly does not store sensitive payment information and
-              is not responsible for payment disputes.
+            <Section id="sharing" title="4. Data Sharing">
+              We may share limited data only with trusted third parties such as
+              hosting providers, analytics services, notification services, and
+              payment processors (if applicable). All third parties are required
+              to protect your data.
             </Section>
 
-            <Section id="ip" title="8. Intellectual Property">
-              All content, software, branding, and design on Slotly are the
-              intellectual property of Slotly or its licensors. Unauthorized
-              use, reproduction, or distribution is prohibited.
+            <Section id="security" title="5. Data Security">
+              We use industry-standard safeguards including HTTPS encryption,
+              secure servers, and access controls. No system is completely
+              secure.
             </Section>
 
-            <Section id="thirdparty" title="9. Third-Party Services">
-              Slotly may integrate or link to third-party services. Slotly does
-              not control and is not responsible for their content, policies, or
-              practices.
+            <Section id="retention" title="6. Data Retention">
+              We retain personal data only as long as necessary to provide the
+              Service, meet legal obligations, and resolve disputes.
             </Section>
 
-            <Section id="privacy" title="10. Privacy">
-              Your use of Slotly is governed by our Privacy Policy. These Terms
-              and the Privacy Policy are intended to be consistent and
-              complementary.
+            <Section id="rights" title="7. User Rights">
+              You may request access, correction, or deletion of your personal
+              data by contacting us.
             </Section>
 
-            <Section id="disclaimer" title="11. Disclaimers">
-              The Service is provided “as is” and “as available” without
-              warranties of any kind, whether express or implied.
+            <Section id="children" title="8. Children’s Privacy">
+              Slotly is not intended for children under the age of 13.
             </Section>
 
-            <Section id="liability" title="12. Limitation of Liability">
-              To the maximum extent permitted by law, Slotly shall not be liable
-              for indirect, incidental, or consequential damages, including
-              missed bookings or disputes between users.
+            <Section id="updates" title="9. Policy Updates">
+              We may update this Privacy Policy from time to time.
             </Section>
 
-            <Section id="indemnity" title="13. Indemnification">
-              You agree to indemnify and hold harmless Slotly from any claims,
-              damages, losses, or liabilities arising from your use of the
-              Service or violation of these Terms.
-            </Section>
-
-            <Section id="changes" title="14. Changes to Terms">
-              Slotly may update these Terms at any time. Continued use of the
-              Service after changes constitutes acceptance of the updated
-              Terms.
-            </Section>
-
-            <Section id="law" title="15. Governing Law">
-              These Terms are governed by and interpreted in accordance with the
-              laws of India.
-            </Section>
-
-            <Section id="contact" title="16. Contact">
+            <Section id="contact" title="10. Contact">
               <strong>Email:</strong> support@slotly.io <br />
               <strong>Website:</strong> https://slotly.io
             </Section>
@@ -211,5 +193,13 @@ function Section({
         {children}
       </div>
     </section>
+  );
+}
+
+function SubTitle({ children }: { children: React.ReactNode }) {
+  return (
+    <h3 className="text-2xl font-medium text-slate-800 mt-8 mb-3">
+      {children}
+    </h3>
   );
 }
