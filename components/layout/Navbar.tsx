@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Menu, X, Search } from "lucide-react";
 import { CommandPalette } from "./commandpallete";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -18,7 +19,6 @@ export function Navbar() {
     setIsScrolled(latest > 20);
   });
 
-  
   const router = useRouter();
   return (
     <>
@@ -35,12 +35,16 @@ export function Navbar() {
         <div className="container mx-auto flex items-center justify-between px-6">
           {/* Brand */}
           <Link href="/" className="flex items-center gap-2">
-            <motion.span
-              whileHover={{ scale: 1.05 }}
-              className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent"
-            >
-              Slotly
-            </motion.span>
+            <motion.div whileHover={{ scale: 1.05 }}>
+              <Image
+                src="/assets/slotly-logo.png"
+                alt="Slotly Logo"
+                width={120}
+                height={40}
+                priority
+                className="object-contain"
+              />
+            </motion.div>
           </Link>
 
           {/* Desktop Nav */}
@@ -70,7 +74,7 @@ export function Navbar() {
 
             {/* CTA button */}
             <Button
-            onClick={() => router.push("/login")}
+              onClick={() => router.push("/login")}
               className="rounded-full text-sm font-semibold px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:shadow-[0_0_25px_-5px_rgba(37,99,235,0.5)] transition-all"
             >
               Get Started

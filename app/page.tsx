@@ -4,6 +4,7 @@ import { Testimonials } from "../components/sections/Testimonials";
 import { CTA } from "../components/sections/CTA";
 import { HowItWorks } from "@/components/sections/HowItWorks";
 import { Navbar } from "@/components/layout/Navbar";
+import Footer from "@/components/layout/Footer";
 
 export default function HomePage() {
   return (
@@ -14,6 +15,7 @@ export default function HomePage() {
       <HowItWorks />
       {/* <Testimonials /> */}
       <CTA />
+      <Footer />
     </main>
   );
 }
