@@ -79,7 +79,7 @@ export default function BookingForm() {
         setSlotsError(null);
 
         const res = await fetch(
-          `http://localhost:8000/bookings/availability/${PROFILE_SLUG}?date=${date}`
+          `https://api.slotly.io/bookings/availability/${PROFILE_SLUG}?date=${date}`
         );
 
         if (!res.ok) {
@@ -179,7 +179,7 @@ export default function BookingForm() {
     const startISO = new Date(`${date}T${time}:00`).toISOString();
 
     try {
-      const res = await fetch("http://localhost:8000/bookings/create", {
+      const res = await fetch("https://api.slotly.io/bookings/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

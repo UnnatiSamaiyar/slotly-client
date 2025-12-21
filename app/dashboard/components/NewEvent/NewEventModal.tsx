@@ -22,7 +22,7 @@ export default function NewEventModal({ open, onClose, user }) {
   const handleSubmit = async () => {
     const startISO = new Date(`${form.date}T${form.time}`).toISOString();
 
-    const res = await fetch("http://localhost:8000/calendar/create", {
+    const res = await fetch("https://api.slotly.io/calendar/create", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

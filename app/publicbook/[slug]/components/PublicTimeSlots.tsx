@@ -22,7 +22,7 @@ export default function PublicTimeSlots({ slug, date, onSelectSlot, selectedSlot
     setLoading(true);
     setError(null);
 
-    fetch(`http://localhost:8000/bookings/availability/${encodeURIComponent(slug)}?date=${date}`)
+    fetch(`https://api.slotly.io/bookings/availability/${encodeURIComponent(slug)}?date=${date}`)
       .then((r) => r.json())
       .then((payload) => {
         // Expecting payload.slots array like [{time: "09:00", available: true}]

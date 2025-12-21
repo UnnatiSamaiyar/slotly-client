@@ -120,7 +120,7 @@ export default function PublicBookingForm({ slug, profile, selectedSlotISO, onBo
         location: meetingMode === "in_person" ? location : null
       };
 
-      const res = await fetch("http://localhost:8000/public/book", {
+      const res = await fetch("https://api.slotly.io/public/book", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

@@ -21,7 +21,7 @@ export function useCalendarEvents(userSub: string | null) {
 
       try {
         const res = await fetch(
-          `http://localhost:8000/auth/calendar/events?user_sub=${encodeURIComponent(userSub)}`
+          `https://api.slotly.io/auth/calendar/events?user_sub=${encodeURIComponent(userSub)}`
         );
 
         if (!res.ok) {
