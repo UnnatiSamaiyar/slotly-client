@@ -55,7 +55,7 @@ export default function BookingForm({ userSub }: { userSub: string }) {
    * For now: fallback to "testing1"
    * If you want: later we can make this come from URL or list event types.
    */
-  const PROFILE_SLUG = profileSlug;
+ 
 
   // -----------------------------
   // Fetch backend availability
@@ -113,7 +113,7 @@ export default function BookingForm({ userSub }: { userSub: string }) {
     return () => {
       cancelled = true;
     };
-  }, [date, PROFILE_SLUG]);
+  }, [date]);
 
   // -----------------------------
   // Smart availability
@@ -237,7 +237,6 @@ export default function BookingForm({ userSub }: { userSub: string }) {
           />
 
           <Preview label="Meeting Title" value={title} />
-          <Preview label="Event Slug" value={PROFILE_SLUG} />
 
           {availabilityStatus && (
             <div className="pt-2">
