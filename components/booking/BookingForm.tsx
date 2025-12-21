@@ -2,7 +2,6 @@
 
 import React, { useState, useMemo, useEffect } from "react";
 
-
 // Meeting Type Options
 const MEETING_TYPES = [
   { label: "Introductory", color: "bg-blue-500" },
@@ -27,7 +26,7 @@ function toBool(v: any) {
   return v === true || v === "true" || v === 1 || v === "1";
 }
 
-export default function BookingForm({ profileSlug }: { profileSlug: string }) {
+export default function BookingForm({ userSub }: { userSub: string }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
 
@@ -79,7 +78,9 @@ export default function BookingForm({ profileSlug }: { profileSlug: string }) {
         setSlotsError(null);
 
         const res = await fetch(
-          `https://api.slotly.io/bookings/availability/${PROFILE_SLUG}?date=${date}`
+          `https://api.slotly.io/bookings/availability?user_sub=${encodeURIComponent(
+            userSub
+          )}&date=${date}`
         );
 
         if (!res.ok) {
@@ -133,11 +134,9 @@ export default function BookingForm({ profileSlug }: { profileSlug: string }) {
   // Meeting Link Preview
   // -----------------------------
   const meetingLink = useMemo(() => {
-    const base = `https://slotly.com/book/${encodeURIComponent(PROFILE_SLUG)}`;
-    const raw = name.trim() || title.trim() || "guest";
-    const safe = encodeURIComponent(raw.toLowerCase().replace(/\s+/g, "-"));
-    return `${base}?for=${safe}`;
-  }, [name, title, PROFILE_SLUG]);
+  return `https://slotly.com/dashboard/book?user_sub=${encodeURIComponent(userSub)}`;
+}, [userSub]);
+
 
   // -----------------------------
   // Add attendee
@@ -179,20 +178,24 @@ export default function BookingForm({ profileSlug }: { profileSlug: string }) {
     const startISO = new Date(`${date}T${time}:00`).toISOString();
 
     try {
-      const res = await fetch("https://api.slotly.io/bookings/create", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          profile_slug: PROFILE_SLUG,
-          guest_name: name,
-          attendees: validAttendees,
-          start_iso: startISO,
-          title,
-          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-          meeting_mode: meetingMode.value,
-          location: meetingMode.value === "in_person" ? location : null,
-        }),
-      });
+      const res = await fetch(
+        `https://api.slotly.io/bookings/create?user_sub=${encodeURIComponent(
+          userSub
+        )}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            guest_name: name,
+            attendees: validAttendees,
+            start_iso: startISO,
+            title,
+            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+            meeting_mode: meetingMode.value,
+            location: meetingMode.value === "in_person" ? location : null,
+          }),
+        }
+      );
 
       if (!res.ok) {
         setMessage("Error: " + (await res.text()));
@@ -268,7 +271,9 @@ export default function BookingForm({ profileSlug }: { profileSlug: string }) {
       {/* RIGHT FORM PANEL */}
       <div className="flex-1 p-14 overflow-y-auto">
         <h1 className="text-3xl font-bold mb-1">Create a Meeting</h1>
-        <p className="text-gray-600 mb-10">Add details below for your invite.</p>
+        <p className="text-gray-600 mb-10">
+          Add details below for your invite.
+        </p>
 
         <div className="grid grid-cols-2 gap-10 max-w-4xl">
           <FormField label="Your Name" value={name} setValue={setName} />

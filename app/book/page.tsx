@@ -1,9 +1,14 @@
 "use client";
 
-import React from "react";
+
+import { useSearchParams } from "next/navigation";
 import BookingForm from "../../components/booking/BookingForm";
 
-export default function BookingPage({ params }: { params: { slug: string } }) {
+export default function BookingPage() {
+  const sp = useSearchParams();
+  const userSub = sp.get("user_sub") || "";
+
+  if (!userSub) return <div className="p-6">Missing user_sub</div>;
   return (
     <div className="min-h-screen w-full flex bg-gray-100">
 
@@ -21,7 +26,7 @@ export default function BookingPage({ params }: { params: { slug: string } }) {
 
         {/* RIGHT SIDE FORM (FULL WIDTH NOW) */}
         <div className="flex-1 px-10 pb-10">
-          <BookingForm profileSlug={params.slug} />
+          <BookingForm userSub={userSub} />
         </div>
       </div>
     </div>
