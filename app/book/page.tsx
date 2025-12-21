@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // "use client";
 
 // import React from "react";
@@ -27,6 +28,8 @@
 
 
 
+=======
+>>>>>>> ed9d3d7 (public booking, participants data and  meeting link fetch, profile photo fetch)
 "use client";
 
 import React from "react";

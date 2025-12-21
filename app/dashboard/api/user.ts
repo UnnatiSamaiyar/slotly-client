@@ -1,7 +1,11 @@
 // src/app/dashboard/api/user.ts
 import { UserProfile } from "../types";
 
+<<<<<<< HEAD
 const AUTH_BASE = process.env.NEXT_PUBLIC_AUTH_API || "https://api.slotly.io";
+=======
+const AUTH_BASE = process.env.NEXT_PUBLIC_AUTH_API || "http://localhost:8000";
+>>>>>>> ed9d3d7 (public booking, participants data and  meeting link fetch, profile photo fetch)
 
 export async function fetchUserProfile(userSub: string): Promise<UserProfile> {
   const res = await fetch(`${AUTH_BASE}/user/me?user_sub=${encodeURIComponent(userSub)}`);

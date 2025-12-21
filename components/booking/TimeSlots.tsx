@@ -20,7 +20,11 @@ export default function TimeSlots({
 
     const loadSlots = async () => {
       const res = await fetch(
+<<<<<<< HEAD
         `https://api.slotly.io/booking/slots?date=${date}&duration=${duration}&timezone=${timezone}`
+=======
+        `http://localhost:8000/booking/slots?date=${date}&duration=${duration}&timezone=${timezone}`
+>>>>>>> ed9d3d7 (public booking, participants data and  meeting link fetch, profile photo fetch)
       );
       const data = await res.json();
       setSlots(data.slots || []);

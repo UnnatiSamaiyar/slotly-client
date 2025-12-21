@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // "use client";
 
 // import React, { useState } from "react";
@@ -1172,10 +1173,16 @@
 
 
 //@ts-nocheck
+=======
+>>>>>>> ed9d3d7 (public booking, participants data and  meeting link fetch, profile photo fetch)
 "use client";
 
 import React, { useState, useMemo, useEffect } from "react";
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> ed9d3d7 (public booking, participants data and  meeting link fetch, profile photo fetch)
 // Meeting Type Options
 const MEETING_TYPES = [
   { label: "Introductory", color: "bg-blue-500" },
@@ -1190,6 +1197,19 @@ const MEETING_MODES = [
   { label: "In-Person Meeting", value: "in_person" },
 ];
 
+<<<<<<< HEAD
+=======
+type Slot = {
+  time: string; // "09:00"
+  iso?: string;
+  available: boolean | string | number | null | undefined;
+};
+
+function toBool(v: any) {
+  return v === true || v === "true" || v === 1 || v === "1";
+}
+
+>>>>>>> ed9d3d7 (public booking, participants data and  meeting link fetch, profile photo fetch)
 export default function BookingForm() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -1198,29 +1218,106 @@ export default function BookingForm() {
   const [attendees, setAttendees] = useState([""]);
 
   const [title, setTitle] = useState("Intro Call");
+<<<<<<< HEAD
   const [date, setDate] = useState("");
+=======
+  const [date, setDate] = useState(""); // from <input type="date"> => YYYY-MM-DD
+>>>>>>> ed9d3d7 (public booking, participants data and  meeting link fetch, profile photo fetch)
   const [time, setTime] = useState("");
   const [duration, setDuration] = useState(30);
   const [message, setMessage] = useState("");
   const [meetingType, setMeetingType] = useState(MEETING_TYPES[0]);
 
+<<<<<<< HEAD
   const [meetingMode, setMeetingMode] = useState(MEETING_MODES[0]); // ⭐ New
   const [location, setLocation] = useState(""); // ⭐ Only used for in-person
 
   const [slots, setSlots] = useState([]);
 
   const PROFILE_SLUG = "intro-call";
+=======
+  const [meetingMode, setMeetingMode] = useState(MEETING_MODES[0]);
+  const [location, setLocation] = useState("");
+
+  const [slots, setSlots] = useState<Slot[]>([]);
+  const [slotsLoading, setSlotsLoading] = useState(false);
+  const [slotsError, setSlotsError] = useState<string | null>(null);
+
+  /**
+   * IMPORTANT:
+   * Your DB currently has event_types.slug = "testing1".
+   * You had "intro-call", which returns 404 => no slots.
+   *
+   * For now: fallback to "testing1"
+   * If you want: later we can make this come from URL or list event types.
+   */
+  const PROFILE_SLUG = "testing1";
+>>>>>>> ed9d3d7 (public booking, participants data and  meeting link fetch, profile photo fetch)
 
   // -----------------------------
   // Fetch backend availability
   // -----------------------------
   useEffect(() => {
+<<<<<<< HEAD
     if (!date) return;
     fetch(`https://api.slotly.io/bookings/availability/${PROFILE_SLUG}?date=${date}`)
       .then((res) => res.json())
       .then((data) => setSlots(data.slots || []))
       .catch(() => setSlots([]));
   }, [date]);
+=======
+    // reset time whenever date changes (prevents stale selection)
+    setTime("");
+
+    if (!date) {
+      setSlots([]);
+      setSlotsError(null);
+      return;
+    }
+
+    let cancelled = false;
+
+    async function loadSlots() {
+      try {
+        setSlotsLoading(true);
+        setSlotsError(null);
+
+        const res = await fetch(
+          `http://localhost:8000/bookings/availability/${PROFILE_SLUG}?date=${date}`
+        );
+
+        if (!res.ok) {
+          const txt = await res.text().catch(() => "");
+          throw new Error(
+            `Availability API failed (${res.status}). ${
+              txt ? `Response: ${txt}` : ""
+            }`
+          );
+        }
+
+        const data = await res.json();
+        const incoming = Array.isArray(data?.slots) ? data.slots : [];
+
+        if (!cancelled) {
+          setSlots(incoming);
+        }
+      } catch (e: any) {
+        if (!cancelled) {
+          setSlots([]);
+          setSlotsError(e?.message || "Failed to load slots");
+        }
+      } finally {
+        if (!cancelled) setSlotsLoading(false);
+      }
+    }
+
+    loadSlots();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [date, PROFILE_SLUG]);
+>>>>>>> ed9d3d7 (public booking, participants data and  meeting link fetch, profile photo fetch)
 
   // -----------------------------
   // Smart availability
@@ -1230,7 +1327,13 @@ export default function BookingForm() {
     const slot = slots.find((s) => s.time === time);
     if (!slot) return null;
 
+<<<<<<< HEAD
     return slot.available
+=======
+    const ok = toBool(slot.available);
+
+    return ok
+>>>>>>> ed9d3d7 (public booking, participants data and  meeting link fetch, profile photo fetch)
       ? { text: "Available", color: "text-green-600", icon: "✔" }
       : { text: "Unavailable", color: "text-red-600", icon: "⚠" };
   }, [date, time, slots]);
@@ -1243,14 +1346,22 @@ export default function BookingForm() {
     const raw = name.trim() || title.trim() || "guest";
     const safe = encodeURIComponent(raw.toLowerCase().replace(/\s+/g, "-"));
     return `${base}?for=${safe}`;
+<<<<<<< HEAD
   }, [name, title]);
+=======
+  }, [name, title, PROFILE_SLUG]);
+>>>>>>> ed9d3d7 (public booking, participants data and  meeting link fetch, profile photo fetch)
 
   // -----------------------------
   // Add attendee
   // -----------------------------
   const addAttendee = () => setAttendees([...attendees, ""]);
 
+<<<<<<< HEAD
   const updateAttendee = (index, value) => {
+=======
+  const updateAttendee = (index: number, value: string) => {
+>>>>>>> ed9d3d7 (public booking, participants data and  meeting link fetch, profile photo fetch)
     const copy = [...attendees];
     copy[index] = value;
     setAttendees(copy);
@@ -1258,6 +1369,12 @@ export default function BookingForm() {
 
   // -----------------------------
   // Create Booking
+<<<<<<< HEAD
+=======
+  // NOTE: You are posting to /bookings/create but earlier your working
+  // public booking route is /public/book. We can align later.
+  // This UI fix focuses on time slot selection.
+>>>>>>> ed9d3d7 (public booking, participants data and  meeting link fetch, profile photo fetch)
   // -----------------------------
   const createBooking = async () => {
     setMessage("");
@@ -1267,8 +1384,12 @@ export default function BookingForm() {
       return;
     }
 
+<<<<<<< HEAD
     const validAttendees = attendees.filter(a => a.trim() !== "");
 
+=======
+    const validAttendees = attendees.filter((a) => a.trim() !== "");
+>>>>>>> ed9d3d7 (public booking, participants data and  meeting link fetch, profile photo fetch)
     if (validAttendees.length === 0) {
       setMessage("Please enter at least one attendee email.");
       return;
@@ -1279,10 +1400,18 @@ export default function BookingForm() {
       return;
     }
 
+<<<<<<< HEAD
     const startISO = new Date(`${date}T${time}:00`).toISOString();
 
     try {
       const res = await fetch("https://api.slotly.io/bookings/create", {
+=======
+    // local date + time => Date => ISO (UTC). This can shift dates if backend assumes UTC.
+    const startISO = new Date(`${date}T${time}:00`).toISOString();
+
+    try {
+      const res = await fetch("http://localhost:8000/bookings/create", {
+>>>>>>> ed9d3d7 (public booking, participants data and  meeting link fetch, profile photo fetch)
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -1292,8 +1421,11 @@ export default function BookingForm() {
           start_iso: startISO,
           title,
           timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+<<<<<<< HEAD
 
           // ⭐ NEW FIELDS
+=======
+>>>>>>> ed9d3d7 (public booking, participants data and  meeting link fetch, profile photo fetch)
           meeting_mode: meetingMode.value,
           location: meetingMode.value === "in_person" ? location : null,
         }),
@@ -1304,9 +1436,15 @@ export default function BookingForm() {
         return;
       }
 
+<<<<<<< HEAD
       setMessage("🎉 Meeting created successfully!");
     } catch (error) {
       setMessage("Request failed: " + error.message);
+=======
+      setMessage("Meeting created successfully!");
+    } catch (error: any) {
+      setMessage("Request failed: " + (error?.message || String(error)));
+>>>>>>> ed9d3d7 (public booking, participants data and  meeting link fetch, profile photo fetch)
     }
   };
 
@@ -1315,22 +1453,36 @@ export default function BookingForm() {
   // -----------------------------
   return (
     <div className="min-h-screen w-full flex bg-gray-50">
+<<<<<<< HEAD
 
+=======
+>>>>>>> ed9d3d7 (public booking, participants data and  meeting link fetch, profile photo fetch)
       {/* LEFT PREVIEW PANEL */}
       <div className="w-[32%] bg-white border-r shadow-lg p-10">
         <h2 className="text-xl font-bold text-gray-900 mb-6">Live Preview</h2>
 
         <div className="space-y-6 bg-gray-50 rounded-xl p-6 border shadow-inner">
+<<<<<<< HEAD
           
           {/* Meeting Type */}
           <div>
             <p className="text-xs text-gray-500 uppercase">Meeting Type</p>
             <span className={`inline-block mt-1 px-3 py-1 text-sm text-white rounded-full ${meetingType.color}`}>
+=======
+          <div>
+            <p className="text-xs text-gray-500 uppercase">Meeting Type</p>
+            <span
+              className={`inline-block mt-1 px-3 py-1 text-sm text-white rounded-full ${meetingType.color}`}
+            >
+>>>>>>> ed9d3d7 (public booking, participants data and  meeting link fetch, profile photo fetch)
               {meetingType.label}
             </span>
           </div>
 
+<<<<<<< HEAD
           {/* Meeting Mode Preview */}
+=======
+>>>>>>> ed9d3d7 (public booking, participants data and  meeting link fetch, profile photo fetch)
           <Preview
             label="Meeting Mode"
             value={
@@ -1341,33 +1493,59 @@ export default function BookingForm() {
           />
 
           <Preview label="Meeting Title" value={title} />
+<<<<<<< HEAD
+=======
+          <Preview label="Event Slug" value={PROFILE_SLUG} />
+>>>>>>> ed9d3d7 (public booking, participants data and  meeting link fetch, profile photo fetch)
 
           {availabilityStatus && (
             <div className="pt-2">
               <p className="text-xs text-gray-500 uppercase">Availability</p>
+<<<<<<< HEAD
               <p className={`text-sm font-semibold flex items-center gap-2 ${availabilityStatus.color}`}>
+=======
+              <p
+                className={`text-sm font-semibold flex items-center gap-2 ${availabilityStatus.color}`}
+              >
+>>>>>>> ed9d3d7 (public booking, participants data and  meeting link fetch, profile photo fetch)
                 {availabilityStatus.icon} {availabilityStatus.text}
               </p>
             </div>
           )}
 
           <Preview label="Host" value={name || "—"} />
+<<<<<<< HEAD
 
           <Preview
             label="Attendees"
             value={attendees.filter(a => a.trim() !== "").join(", ") || "—"}
           />
 
+=======
+          <Preview
+            label="Attendees"
+            value={attendees.filter((a) => a.trim() !== "").join(", ") || "—"}
+          />
+>>>>>>> ed9d3d7 (public booking, participants data and  meeting link fetch, profile photo fetch)
           <Preview label="Date" value={date || "—"} />
           <Preview label="Time" value={time || "—"} />
           <Preview label="Duration" value={`${duration} minutes`} />
 
+<<<<<<< HEAD
           {/* Meeting Link */}
           <div className="pt-3">
             <p className="text-xs text-gray-500 uppercase">Meeting Link</p>
             <p className="text-blue-600 underline break-all text-sm">{meetingLink}</p>
           </div>
 
+=======
+          <div className="pt-3">
+            <p className="text-xs text-gray-500 uppercase">Meeting Link</p>
+            <p className="text-blue-600 underline break-all text-sm">
+              {meetingLink}
+            </p>
+          </div>
+>>>>>>> ed9d3d7 (public booking, participants data and  meeting link fetch, profile photo fetch)
         </div>
       </div>
 
@@ -1377,20 +1555,34 @@ export default function BookingForm() {
         <p className="text-gray-600 mb-10">Add details below for your invite.</p>
 
         <div className="grid grid-cols-2 gap-10 max-w-4xl">
+<<<<<<< HEAD
 
+=======
+>>>>>>> ed9d3d7 (public booking, participants data and  meeting link fetch, profile photo fetch)
           <FormField label="Your Name" value={name} setValue={setName} />
           <FormField label="Your Email" value={email} setValue={setEmail} />
           <FormField label="Meeting Title" value={title} setValue={setTitle} />
 
+<<<<<<< HEAD
           {/* Meeting Type */}
           <div>
             <label className="block text-sm text-gray-600 mb-1">Meeting Type</label>
+=======
+          <div>
+            <label className="block text-sm text-gray-600 mb-1">
+              Meeting Type
+            </label>
+>>>>>>> ed9d3d7 (public booking, participants data and  meeting link fetch, profile photo fetch)
             <select
               className="p-3 w-full rounded-xl border bg-white shadow-sm"
               onChange={(e) =>
                 setMeetingType(
                   MEETING_TYPES.find((t) => t.label === e.target.value) ??
+<<<<<<< HEAD
                   MEETING_TYPES[0]
+=======
+                    MEETING_TYPES[0]
+>>>>>>> ed9d3d7 (public booking, participants data and  meeting link fetch, profile photo fetch)
                 )
               }
             >
@@ -1400,14 +1592,28 @@ export default function BookingForm() {
             </select>
           </div>
 
+<<<<<<< HEAD
           {/* Meeting Mode Dropdown */}
           <div>
             <label className="block text-sm text-gray-600 mb-1">Meeting Mode</label>
+=======
+          <div>
+            <label className="block text-sm text-gray-600 mb-1">
+              Meeting Mode
+            </label>
+>>>>>>> ed9d3d7 (public booking, participants data and  meeting link fetch, profile photo fetch)
             <select
               className="p-3 w-full rounded-xl border bg-white shadow-sm"
               value={meetingMode.value}
               onChange={(e) =>
+<<<<<<< HEAD
                 setMeetingMode(MEETING_MODES.find((m) => m.value === e.target.value))
+=======
+                setMeetingMode(
+                  MEETING_MODES.find((m) => m.value === e.target.value) ??
+                    MEETING_MODES[0]
+                )
+>>>>>>> ed9d3d7 (public booking, participants data and  meeting link fetch, profile photo fetch)
               }
             >
               {MEETING_MODES.map((m) => (
@@ -1418,7 +1624,10 @@ export default function BookingForm() {
             </select>
           </div>
 
+<<<<<<< HEAD
           {/* In-Person Location Input */}
+=======
+>>>>>>> ed9d3d7 (public booking, participants data and  meeting link fetch, profile photo fetch)
           {meetingMode.value === "in_person" && (
             <div className="col-span-2">
               <FormField
@@ -1429,9 +1638,16 @@ export default function BookingForm() {
             </div>
           )}
 
+<<<<<<< HEAD
           {/* Attendees */}
           <div className="col-span-2">
             <label className="block text-sm text-gray-600 mb-1">Invitee Emails</label>
+=======
+          <div className="col-span-2">
+            <label className="block text-sm text-gray-600 mb-1">
+              Invitee Emails
+            </label>
+>>>>>>> ed9d3d7 (public booking, participants data and  meeting link fetch, profile photo fetch)
 
             <div className="space-y-3">
               {attendees.map((email, idx) => (
@@ -1458,6 +1674,7 @@ export default function BookingForm() {
 
           {/* Time Slot Selector */}
           <div>
+<<<<<<< HEAD
             <label className="block text-sm text-gray-600 mb-1">Select Time</label>
 
             <div className="grid grid-cols-4 gap-3 mt-2">
@@ -1485,6 +1702,57 @@ export default function BookingForm() {
           </div>
 
           {/* Duration */}
+=======
+            <label className="block text-sm text-gray-600 mb-1">
+              Select Time
+            </label>
+
+            <div className="mt-2">
+              {!date && (
+                <p className="text-gray-500 text-sm">Select a date first</p>
+              )}
+
+              {date && slotsLoading && (
+                <p className="text-gray-500 text-sm">Loading slots…</p>
+              )}
+
+              {date && !slotsLoading && slotsError && (
+                <p className="text-red-600 text-sm">{slotsError}</p>
+              )}
+
+              {date && !slotsLoading && !slotsError && slots.length === 0 && (
+                <p className="text-gray-500 text-sm">
+                  No slots returned for this date.
+                </p>
+              )}
+
+              <div className="grid grid-cols-4 gap-3">
+                {slots.map((s) => {
+                  const ok = toBool(s.available);
+                  return (
+                    <button
+                      key={s.time}
+                      disabled={!ok}
+                      onClick={() => ok && setTime(s.time)}
+                      className={`
+                        p-2 text-center rounded-lg border text-sm
+                        ${
+                          ok
+                            ? "bg-white hover:bg-indigo-100 border-indigo-300"
+                            : "bg-gray-200 text-gray-500 cursor-not-allowed border-gray-300"
+                        }
+                        ${time === s.time ? "ring-2 ring-indigo-500" : ""}
+                      `}
+                    >
+                      {s.time}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+>>>>>>> ed9d3d7 (public booking, participants data and  meeting link fetch, profile photo fetch)
           <div>
             <label className="block text-sm text-gray-600 mb-1">Duration</label>
             <select
@@ -1519,7 +1787,11 @@ export default function BookingForm() {
 // ---------------------------
 // Extra Components
 // ---------------------------
+<<<<<<< HEAD
 function Preview({ label, value }) {
+=======
+function Preview({ label, value }: { label: string; value: any }) {
+>>>>>>> ed9d3d7 (public booking, participants data and  meeting link fetch, profile photo fetch)
   return (
     <div>
       <p className="text-xs text-gray-500 uppercase tracking-wide">{label}</p>
@@ -1528,10 +1800,29 @@ function Preview({ label, value }) {
   );
 }
 
+<<<<<<< HEAD
 function FormField({ label, value, setValue, type = "text" }) {
   return (
     <div>
       <label className="block text-sm font-medium text-gray-600 mb-1">{label}</label>
+=======
+function FormField({
+  label,
+  value,
+  setValue,
+  type = "text",
+}: {
+  label: string;
+  value: string;
+  setValue: (v: string) => void;
+  type?: string;
+}) {
+  return (
+    <div>
+      <label className="block text-sm font-medium text-gray-600 mb-1">
+        {label}
+      </label>
+>>>>>>> ed9d3d7 (public booking, participants data and  meeting link fetch, profile photo fetch)
       <input
         type={type}
         className="p-3 w-full rounded-xl border bg-white shadow-sm hover:bg-indigo-50/40 focus:ring-2 focus:ring-indigo-400"

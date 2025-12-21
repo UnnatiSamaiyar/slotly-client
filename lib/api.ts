@@ -1,5 +1,9 @@
 // lib/api.ts
+<<<<<<< HEAD
 export const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "https://api.slotly.io";
+=======
+export const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8000";
+>>>>>>> ed9d3d7 (public booking, participants data and  meeting link fetch, profile photo fetch)
 
 export type CalendarEvent = {
   id: string;

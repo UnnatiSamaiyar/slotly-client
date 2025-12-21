@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 //@ts-nocheck
+=======
+>>>>>>> ed9d3d7 (public booking, participants data and  meeting link fetch, profile photo fetch)
 "use client";
 
 import { useState } from "react";
@@ -22,7 +25,11 @@ export default function NewEventModal({ open, onClose, user }) {
   const handleSubmit = async () => {
     const startISO = new Date(`${form.date}T${form.time}`).toISOString();
 
+<<<<<<< HEAD
     const res = await fetch("https://api.slotly.io/calendar/create", {
+=======
+    const res = await fetch("http://localhost:8000/calendar/create", {
+>>>>>>> ed9d3d7 (public booking, participants data and  meeting link fetch, profile photo fetch)
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

@@ -7,7 +7,10 @@ import { Button } from "@/components/ui/button";
 import { Menu, X, Search } from "lucide-react";
 import { CommandPalette } from "./commandpallete";
 import { useRouter } from "next/navigation";
+<<<<<<< HEAD
 import Image from "next/image";
+=======
+>>>>>>> ed9d3d7 (public booking, participants data and  meeting link fetch, profile photo fetch)
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -19,6 +22,10 @@ export function Navbar() {
     setIsScrolled(latest > 20);
   });
 
+<<<<<<< HEAD
+=======
+  
+>>>>>>> ed9d3d7 (public booking, participants data and  meeting link fetch, profile photo fetch)
   const router = useRouter();
   return (
     <>
@@ -35,6 +42,7 @@ export function Navbar() {
         <div className="container mx-auto flex items-center justify-between px-6">
           {/* Brand */}
           <Link href="/" className="flex items-center gap-2">
+<<<<<<< HEAD
             <motion.div whileHover={{ scale: 1.05 }}>
               <Image
                 src="/assets/slotly-logo.png"
@@ -45,6 +53,14 @@ export function Navbar() {
                 className="object-contain"
               />
             </motion.div>
+=======
+            <motion.span
+              whileHover={{ scale: 1.05 }}
+              className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent"
+            >
+              Slotly
+            </motion.span>
+>>>>>>> ed9d3d7 (public booking, participants data and  meeting link fetch, profile photo fetch)
           </Link>
 
           {/* Desktop Nav */}
@@ -74,7 +90,11 @@ export function Navbar() {
 
             {/* CTA button */}
             <Button
+<<<<<<< HEAD
               onClick={() => router.push("/login")}
+=======
+            onClick={() => router.push("/login")}
+>>>>>>> ed9d3d7 (public booking, participants data and  meeting link fetch, profile photo fetch)
               className="rounded-full text-sm font-semibold px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:shadow-[0_0_25px_-5px_rgba(37,99,235,0.5)] transition-all"
             >
               Get Started
