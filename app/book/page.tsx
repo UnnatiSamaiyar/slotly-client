@@ -1,34 +1,10 @@
-"use client";
+import { Suspense } from "react";
+import BookingPageClient from "./BookingPageClient";
 
-
-import { useSearchParams } from "next/navigation";
-import BookingForm from "../../components/booking/BookingForm";
-
-export default function BookingPage() {
-  const sp = useSearchParams();
-  const userSub = sp.get("user_sub") || "";
-
-  if (!userSub) return <div className="p-6">Missing user_sub</div>;
+export default function Page() {
   return (
-    <div className="min-h-screen w-full flex bg-gray-100">
-
-      {/* LEFT HEADER BAR (optional, nice top area) */}
-      <div className="absolute top-0 left-0 w-full bg-white shadow-sm border-b p-6">
-        <h1 className="text-2xl font-semibold">Book a Meeting</h1>
-        <p className="text-sm text-gray-500">
-          Create a meeting and invite someone — both calendars will get the event.
-        </p>
-      </div>
-
-      {/* MAIN FULLSCREEN LAYOUT */}
-      <div className="w-full flex pt-32"> 
-        {/* ← this pushes content below header */}
-
-        {/* RIGHT SIDE FORM (FULL WIDTH NOW) */}
-        <div className="flex-1 px-10 pb-10">
-          <BookingForm userSub={userSub} />
-        </div>
-      </div>
-    </div>
+    <Suspense fallback={<div className="p-6">Loading…</div>}>
+      <BookingPageClient />
+    </Suspense>
   );
 }
