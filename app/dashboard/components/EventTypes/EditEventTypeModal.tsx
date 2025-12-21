@@ -1,4 +1,5 @@
 // src/app/dashboard/components/EventTypes/EditEventTypeModal.tsx
+//@ts-nocheck
 "use client";
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";

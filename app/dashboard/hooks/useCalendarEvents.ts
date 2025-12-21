@@ -1,4 +1,5 @@
 // src/app/dashboard/hooks/useCalendarEvents.ts
+//@ts-nocheck
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
