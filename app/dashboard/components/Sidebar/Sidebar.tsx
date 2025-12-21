@@ -218,7 +218,10 @@ export default function Sidebar({ open, onToggle, user }: any) {
       {/* Primary CTA */}
       <div className="px-4 py-4">
         <button
-          onClick={() => router.push("/book")}
+          onClick={() => {
+            const userSub = user?.sub || user?.user_sub || user?.id || "";
+            router.push(`/book?user_sub=${encodeURIComponent(userSub)}`);
+          }}
           className={[
             "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl",
             "bg-indigo-600 hover:bg-indigo-700 text-white font-semibold shadow-sm transition",
