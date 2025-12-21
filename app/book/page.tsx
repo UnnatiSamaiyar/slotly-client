@@ -3,7 +3,7 @@
 import React from "react";
 import BookingForm from "../../components/booking/BookingForm";
 
-export default function BookingPage() {
+export default function BookingPage({ params }: { params: { slug: string } }) {
   return (
     <div className="min-h-screen w-full flex bg-gray-100">
 
@@ -21,7 +21,7 @@ export default function BookingPage() {
 
         {/* RIGHT SIDE FORM (FULL WIDTH NOW) */}
         <div className="flex-1 px-10 pb-10">
-          <BookingForm />
+          <BookingForm profileSlug={params.slug} />
         </div>
       </div>
     </div>

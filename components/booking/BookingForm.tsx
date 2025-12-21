@@ -27,7 +27,7 @@ function toBool(v: any) {
   return v === true || v === "true" || v === 1 || v === "1";
 }
 
-export default function BookingForm() {
+export default function BookingForm({ profileSlug }: { profileSlug: string }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
 
@@ -56,7 +56,7 @@ export default function BookingForm() {
    * For now: fallback to "testing1"
    * If you want: later we can make this come from URL or list event types.
    */
-  const PROFILE_SLUG = "testing1";
+  const PROFILE_SLUG = profileSlug;
 
   // -----------------------------
   // Fetch backend availability
