@@ -1,41 +1,5 @@
 "use client";
 
-<<<<<<< HEAD
-import Image from "next/image";
-import Link from "next/link";
-
-export default function Footer() {
-  return (
-    <footer className="border-t border-gray-200 bg-white">
-      <div className="container mx-auto flex flex-col md:flex-row items-center justify-between px-6 py-6 gap-4">
-        
-        {/* Logo */}
-        <Link href="/" className="flex items-center">
-          <Image
-            src="/assets/slotly-logo.png"
-            alt="Slotly Logo"
-            width={110}
-            height={36}
-            className="object-contain"
-          />
-        </Link>
-
-        {/* Links */}
-        <div className="flex items-center gap-6 text-sm text-gray-600">
-          <Link
-            href="/privacy-policy"
-            className="hover:text-blue-600 transition-colors"
-          >
-            Privacy
-          </Link>
-
-          <Link
-            href="/terms-and-conditions"
-            className="hover:text-blue-600 transition-colors"
-          >
-            Terms
-          </Link>
-=======
 import { motion } from "framer-motion";
 import { Facebook, Twitter, Linkedin, Github } from "lucide-react";
 import Link from "next/link";
@@ -128,7 +92,6 @@ export function Footer() {
             <Link href="/privacy" className="hover:text-blue-600 transition-colors">Privacy Policy</Link>
             <Link href="/terms" className="hover:text-blue-600 transition-colors">Terms of Service</Link>
           </div>
->>>>>>> ed9d3d7 (public booking, participants data and  meeting link fetch, profile photo fetch)
         </div>
       </div>
     </footer>

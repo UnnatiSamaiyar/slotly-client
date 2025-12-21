@@ -1,35 +1,3 @@
-<<<<<<< HEAD
-// "use client";
-
-// import React from "react";
-// import BookingForm from "../../components/booking/BookingForm";
-
-// export default function BookingPage() {
-//   return (
-//     <div className="min-h-screen bg-gray-50 flex items-start justify-center p-8">
-//       <div className="w-full max-w-3xl">
-//         <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm mb-6">
-//           <h1 className="text-2xl font-semibold">Book a meeting</h1>
-//           <p className="text-sm text-gray-500 mt-1">
-//             Create a meeting and invite someone — both calendars will get the event.
-//           </p>
-//         </div>
-
-//         <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
-//           <BookingForm />
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
-
-
-
-
-
-
-=======
->>>>>>> ed9d3d7 (public booking, participants data and  meeting link fetch, profile photo fetch)
 "use client";
 
 import React from "react";

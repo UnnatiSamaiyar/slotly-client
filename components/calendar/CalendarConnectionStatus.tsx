@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-//@ts-nocheck
-=======
->>>>>>> ed9d3d7 (public booking, participants data and  meeting link fetch, profile photo fetch)
 "use client";
 
 import { useEffect, useState } from "react";
@@ -11,18 +7,11 @@ export default function CalendarConnectionStatus({ userSub }: { userSub: string 
   const [connected, setConnected] = useState<boolean | null>(null);
 
   const fetchStatus = async () => {
-<<<<<<< HEAD
-    const res = await fetch(`https://api.slotly.io/auth/calendar-status?user_sub=${userSub}`);
-    const data = await res.json();
-    setConnected(data.calendar_connected);
-  };
-=======
     const res = await fetch(`http://localhost:8000/auth/calendar-status?user_sub=${userSub}`);
     const data = await res.json();
     setConnected(data.calendar_connected);
   };
 
->>>>>>> ed9d3d7 (public booking, participants data and  meeting link fetch, profile photo fetch)
   useEffect(() => {
     fetchStatus();
   }, []);
@@ -46,7 +35,3 @@ export default function CalendarConnectionStatus({ userSub }: { userSub: string 
     </div>
   );
 }
-<<<<<<< HEAD
-
-=======
->>>>>>> ed9d3d7 (public booking, participants data and  meeting link fetch, profile photo fetch)

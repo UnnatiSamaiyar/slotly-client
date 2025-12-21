@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-//@ts-nocheck
-=======
->>>>>>> ed9d3d7 (public booking, participants data and  meeting link fetch, profile photo fetch)
 // src/app/dashboard/components/EventTypes/EditEventTypeModal.tsx
 "use client";
 import React, { useEffect, useState } from "react";

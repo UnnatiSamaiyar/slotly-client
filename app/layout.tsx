@@ -14,16 +14,9 @@ import "./globals.css";
 //   );
 // }
 
-<<<<<<< HEAD
-
-import Providers from "./providers";
-
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-=======
 import Providers from "./providers";
 
 export default function RootLayout({ children }) {
->>>>>>> ed9d3d7 (public booking, participants data and  meeting link fetch, profile photo fetch)
   return (
     <html lang="en">
       <body>

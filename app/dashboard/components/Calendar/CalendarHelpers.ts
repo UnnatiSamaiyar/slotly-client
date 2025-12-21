@@ -1,26 +1,4 @@
 // src/app/dashboard/components/Calendar/CalendarHelpers.ts
-<<<<<<< HEAD
-export function formatEventDate(iso?: string | null) {
-  if (!iso) return "";
-  const d = new Date(iso);
-  return d.toLocaleString();
-}
-
-export function localYMD(isoOrDate?: string | null) {
-  if (!isoOrDate) return null;
-  const d = new Date(isoOrDate);
-  if (Number.isNaN(d.getTime())) return null;
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${y}-${m}-${day}`;
-}
-
-export function isSameISODate(iso?: string | null, ymd?: string | null) {
-  if (!iso || !ymd) return false;
-  const isoDate = localYMD(iso);
-  return isoDate === ymd;
-=======
 
 export function pad2(n: number) {
   return String(n).padStart(2, "0");
@@ -82,5 +60,4 @@ export function buildDayTooltip(events: any[], maxLines = 3) {
 
   if (events.length > maxLines) lines.push(`+${events.length - maxLines} more`);
   return lines.join("\n");
->>>>>>> ed9d3d7 (public booking, participants data and  meeting link fetch, profile photo fetch)
 }

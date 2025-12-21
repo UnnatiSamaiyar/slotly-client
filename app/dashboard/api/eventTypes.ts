@@ -1,11 +1,7 @@
 // // src/app/dashboard/api/eventTypes.ts
 // import { EventType } from "../types";
 
-<<<<<<< HEAD
-// const ET_BASE = process.env.NEXT_PUBLIC_EVENT_TYPES_API || "https://api.slotly.io";
-=======
 // const ET_BASE = process.env.NEXT_PUBLIC_EVENT_TYPES_API || "http://localhost:8000";
->>>>>>> ed9d3d7 (public booking, participants data and  meeting link fetch, profile photo fetch)
 
 // export async function fetchEventTypes(userSub: string): Promise<EventType[]> {
 //   const res = await fetch(`${ET_BASE}/event-types?user_sub=${encodeURIComponent(userSub)}`);
@@ -29,11 +25,7 @@
 // // src/app/dashboard/api/eventTypes.ts
 // import { EventType } from "../types";
 
-<<<<<<< HEAD
-// const BASE = process.env.NEXT_PUBLIC_EVENT_TYPES_API || "https://api.slotly.io";
-=======
 // const BASE = process.env.NEXT_PUBLIC_EVENT_TYPES_API || "http://localhost:8000";
->>>>>>> ed9d3d7 (public booking, participants data and  meeting link fetch, profile photo fetch)
 
 // export async function fetchEventTypes(userSub: string): Promise<EventType[]> {
 //   const res = await fetch(
@@ -58,11 +50,7 @@
 // src/app/dashboard/api/eventTypes.ts
 import { EventType } from "../types";
 
-<<<<<<< HEAD
-const BASE = process.env.NEXT_PUBLIC_EVENT_TYPES_API || "https://api.slotly.io";
-=======
 const BASE = process.env.NEXT_PUBLIC_EVENT_TYPES_API || "http://localhost:8000";
->>>>>>> ed9d3d7 (public booking, participants data and  meeting link fetch, profile photo fetch)
 
 async function handleRes(res: Response) {
   if (!res.ok) {
