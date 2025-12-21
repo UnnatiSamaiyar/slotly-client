@@ -175,7 +175,7 @@ export default function BookingForm({ userSub }: { userSub: string }) {
     }
 
     // local date + time => Date => ISO (UTC). This can shift dates if backend assumes UTC.
-    const startISO = new Date(`${date}T${time}:00`).toISOString();
+    const startISO = `${date}T${time}:00`;
 
     try {
       const res = await fetch(
