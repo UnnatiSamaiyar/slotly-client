@@ -24,7 +24,7 @@
 //   useEffect(() => {
 //     const load = async () => {
 //       const res = await fetch(
-//         `https://api.slotly.io/booking/profile/${profileSlug}`
+//         `http://localhost:8000/booking/profile/${profileSlug}`
 //       );
 //       const data = await res.json();
 //       setProfileData(data);
@@ -118,7 +118,7 @@
 //   useEffect(() => {
 //     const load = async () => {
 //       const res = await fetch(
-//         `https://api.slotly.io/booking/profile/${event_slug}`
+//         `http://localhost:8000/booking/profile/${event_slug}`
 //       );
 //       const data = await res.json();
 //       setEventData(data);
@@ -210,7 +210,7 @@ export default function PublicBookingPage({
     async function load() {
       try {
         const res = await fetch(
-          `https://api.slotly.io/public/profile/${encodeURIComponent(event_slug)}`
+          `http://localhost:8000/public/profile/${encodeURIComponent(event_slug)}`
         );
 
         if (!res.ok) {

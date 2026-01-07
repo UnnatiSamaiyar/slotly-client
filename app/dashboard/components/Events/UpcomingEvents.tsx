@@ -1,19 +1,36 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { CalendarEvent } from "../../types";
 import { CalendarDays, Clock, ExternalLink } from "lucide-react";
-import { safeDate, toISODateLocal } from "../Calendar/CalendarHelpers";
+import { safeDate } from "../Calendar/CalendarHelpers";
+import {
+  getPreferredTimezone,
+  subscribeTimezoneChange,
+} from "@/lib/timezone";
 
-function fmtStart(iso?: string) {
+function fmtStart(iso?: string, tz?: string) {
   const d = safeDate(iso);
   if (!d) return "";
-  return d.toLocaleString([], {
+
+  // If tz not provided, fallback to browser default behavior
+  if (!tz) {
+    return d.toLocaleString([], {
+      day: "2-digit",
+      month: "short",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  }
+
+  return new Intl.DateTimeFormat(undefined, {
+    timeZone: tz,
     day: "2-digit",
     month: "short",
     hour: "2-digit",
     minute: "2-digit",
-  });
+    hour12: false,
+  }).format(d);
 }
 
 export default function UpcomingEvents({
@@ -23,6 +40,13 @@ export default function UpcomingEvents({
   events: CalendarEvent[];
   selectedDate?: string;
 }) {
+  // ✅ Reactively track timezone preference (localStorage + event)
+  const [tz, setTz] = useState<string>(() => getPreferredTimezone());
+
+  useEffect(() => {
+    return subscribeTimezoneChange(() => setTz(getPreferredTimezone()));
+  }, []);
+
   const next = useMemo(() => {
     const selectedDayStart = selectedDate
       ? new Date(`${selectedDate}T00:00:00`)
@@ -51,9 +75,7 @@ export default function UpcomingEvents({
       .slice(0, 6);
   }, [events, selectedDate]);
 
-  const headerLabel = selectedDate
-    ? `Upcoming from ${selectedDate}`
-    : "Upcoming";
+  const headerLabel = selectedDate ? `Upcoming from ${selectedDate}` : "Upcoming";
 
   return (
     <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
@@ -67,7 +89,9 @@ export default function UpcomingEvents({
 
       {next.length === 0 ? (
         <div className="rounded-xl border border-dashed border-gray-200 p-4 bg-white">
-          <div className="text-sm font-semibold text-slate-900">No upcoming events</div>
+          <div className="text-sm font-semibold text-slate-900">
+            No upcoming events
+          </div>
           <div className="text-sm text-gray-500 mt-1">
             Share your booking link to start getting meetings.
           </div>
@@ -76,7 +100,7 @@ export default function UpcomingEvents({
         <ul className="space-y-3">
           {next.map((ev: any) => {
             const summary = ev.summary || "Untitled";
-            const startLabel = fmtStart(ev.start);
+            const startLabel = fmtStart(ev.start, tz); // ✅ timezone-aware
             const organizer = ev.organizer || "";
             const htmlLink = ev.htmlLink || "";
 
@@ -95,7 +119,9 @@ export default function UpcomingEvents({
                           {startLabel}
                         </span>
                       ) : null}
-                      {organizer ? <span className="truncate">• {organizer}</span> : null}
+                      {organizer ? (
+                        <span className="truncate">• {organizer}</span>
+                      ) : null}
                     </div>
                   </div>
 

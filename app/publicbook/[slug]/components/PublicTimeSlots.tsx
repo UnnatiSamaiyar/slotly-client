@@ -22,10 +22,11 @@ export default function PublicTimeSlots({
     setLoading(true);
     setError(null);
 
+    const viewerTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
     fetch(
-      `https://api.slotly.io/bookings/availability/${encodeURIComponent(
+      `http://localhost:8000/bookings/availability/${encodeURIComponent(
         slug
-      )}?date=${date}`
+      )}?date=${date}&tz=${encodeURIComponent(viewerTz)}`
     )
       .then((r) => {
         if (!r.ok) throw new Error("API error");

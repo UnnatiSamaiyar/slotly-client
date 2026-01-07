@@ -12,7 +12,7 @@
 //   user_id?: number | null;
 // };
 
-// const BASE = process.env.NEXT_PUBLIC_API_BASE || "https://api.slotly.io";
+// const BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8000";
 
 // /**
 //  * Dev helper: supply X-User-Id header for owner routes.
@@ -80,7 +80,7 @@ export type EventType = {
   user_id?: number | null;
 };
 
-const BASE = process.env.NEXT_PUBLIC_API_BASE || "https://api.slotly.io";
+const BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8000";
 const DEV_USER_ID = process.env.NEXT_PUBLIC_DEV_USER_ID || "1";
 
 async function request(path: string, opts: RequestInit = {}) {

@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useState, useMemo, useEffect } from "react";
+import { getPreferredTimezone } from "../../lib/timezone";
+import LocationSelector from "../shared/LocationSelector";
 
 // Meeting Type Options
 const MEETING_TYPES = [
@@ -77,10 +79,13 @@ export default function BookingForm({ userSub }: { userSub: string }) {
         setSlotsLoading(true);
         setSlotsError(null);
 
+        // Calendly-style: viewer tz is a UI preference (dashboard selector) persisted to DB.
+        // Fallback to browser timezone if not set.
+        const viewerTz = getPreferredTimezone();
         const res = await fetch(
-          `https://api.slotly.io/bookings/availability?user_sub=${encodeURIComponent(
+          `http://localhost:8000/bookings/availability?user_sub=${encodeURIComponent(
             userSub
-          )}&date=${date}`
+          )}&date=${date}&tz=${encodeURIComponent(viewerTz)}`
         );
 
         if (!res.ok) {
@@ -169,8 +174,8 @@ export default function BookingForm({ userSub }: { userSub: string }) {
       return;
     }
 
-    if (meetingMode.value === "in_person" && location.trim() === "") {
-      setMessage("Please enter the meeting location.");
+    if (meetingMode.value === "in_person" && location.trim().length < 10) {
+      setMessage("Please provide a complete in-person meeting location (full address).");
       return;
     }
 
@@ -179,7 +184,7 @@ export default function BookingForm({ userSub }: { userSub: string }) {
 
     try {
       const res = await fetch(
-        `https://api.slotly.io/bookings/create?user_sub=${encodeURIComponent(
+        `http://localhost:8000/bookings/create?user_sub=${encodeURIComponent(
           userSub
         )}`,
         {
@@ -322,11 +327,7 @@ export default function BookingForm({ userSub }: { userSub: string }) {
 
           {meetingMode.value === "in_person" && (
             <div className="col-span-2">
-              <FormField
-                label="Meeting Location (In-Person)"
-                value={location}
-                setValue={setLocation}
-              />
+              <LocationSelector value={location} onChange={setLocation} />
             </div>
           )}
 
