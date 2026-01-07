@@ -53,7 +53,7 @@ npm run dev
 
 Frontend will run at:
 
-👉 http://localhost:3000/
+👉 https://slotly.io/
 
 ### ✅ Environment Variables
 
@@ -62,7 +62,7 @@ Create `.env.local` inside `/client`
 ```
 NEXT_PUBLIC_API_URL=https://api.slotly.io
 NEXTAUTH_SECRET=your-secret-key
-NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_URL=https://slotly.io
 ```
 
 > ⚠️ `NEXT_PUBLIC_API_URL` must match your FastAPI server.

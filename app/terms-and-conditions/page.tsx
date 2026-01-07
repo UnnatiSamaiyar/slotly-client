@@ -183,7 +183,7 @@ export default function TermsAndConditionsPage() {
 
             <Section id="contact" title="16. Contact">
               <strong>Email:</strong> support@slotly.io <br />
-              <strong>Website:</strong> http://localhost:3000
+              <strong>Website:</strong> https://slotly.io
             </Section>
           </div>
         </div>
