@@ -24,7 +24,7 @@ export default function PublicTimeSlots({
 
     const viewerTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
     fetch(
-      `http://localhost:8000/bookings/availability/${encodeURIComponent(
+      `https://api.slotly.io/bookings/availability/${encodeURIComponent(
         slug
       )}?date=${date}&tz=${encodeURIComponent(viewerTz)}`
     )

@@ -83,7 +83,7 @@ export default function BookingForm({ userSub }: { userSub: string }) {
         // Fallback to browser timezone if not set.
         const viewerTz = getPreferredTimezone();
         const res = await fetch(
-          `http://localhost:8000/bookings/availability?user_sub=${encodeURIComponent(
+          `https://api.slotly.io/bookings/availability?user_sub=${encodeURIComponent(
             userSub
           )}&date=${date}&tz=${encodeURIComponent(viewerTz)}`
         );
@@ -184,7 +184,7 @@ export default function BookingForm({ userSub }: { userSub: string }) {
 
     try {
       const res = await fetch(
-        `http://localhost:8000/bookings/create?user_sub=${encodeURIComponent(
+        `https://api.slotly.io/bookings/create?user_sub=${encodeURIComponent(
           userSub
         )}`,
         {

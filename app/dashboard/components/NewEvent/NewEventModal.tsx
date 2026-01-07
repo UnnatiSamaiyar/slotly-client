@@ -22,7 +22,7 @@
 //   const handleSubmit = async () => {
 //     const startISO = new Date(`${form.date}T${form.time}`).toISOString();
 
-//     const res = await fetch("http://localhost:8000/calendar/create", {
+//     const res = await fetch("https://api.slotly.io/calendar/create", {
 //       method: "POST",
 //       headers: { "Content-Type": "application/json" },
 //       body: JSON.stringify({
@@ -133,7 +133,7 @@
 import { useState } from "react";
 
 const API_BASE =
-  process.env.NEXT_PUBLIC_CALENDAR_API || "http://localhost:8000";
+  process.env.NEXT_PUBLIC_CALENDAR_API || "https://api.slotly.io";
 
 export default function NewEventModal({ open, onClose, user }) {
   if (!open) return null;

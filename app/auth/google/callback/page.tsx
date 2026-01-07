@@ -14,7 +14,7 @@
 //       if (!code) return;
 
 //       // CALL BACKEND
-//       const res = await fetch("http://localhost:8000/auth/google", {
+//       const res = await fetch("https://api.slotly.io/auth/google", {
 //         method: "POST",
 //         headers: { "Content-Type": "application/json" },
 //         body: JSON.stringify({ code }),
@@ -71,7 +71,7 @@ export default function GoogleCallbackPage() {
       if (!code) return;
 
       try {
-        const res = await fetch("http://localhost:8000/auth/google", {
+        const res = await fetch("https://api.slotly.io/auth/google", {
           method: "POST",
           headers: {
             "Content-Type": "application/json"

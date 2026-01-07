@@ -26,7 +26,7 @@
 //     const load = async () => {
 //       setLoading(true);
 //       try {
-//         const res = await fetch(`http://localhost:8000/booking/public/${encodeURIComponent(slug)}`);
+//         const res = await fetch(`https://api.slotly.io/booking/public/${encodeURIComponent(slug)}`);
 //         if (!res.ok) throw new Error(await res.text());
 //         const payload = await res.json();
 //         setProfile(payload.profile);
@@ -150,7 +150,7 @@
 //   useEffect(() => {
 //     async function load() {
 //       try {
-//         const res = await fetch(`http://localhost:8000/public/profile/${encodeURIComponent(slug)}`)
+//         const res = await fetch(`https://api.slotly.io/public/profile/${encodeURIComponent(slug)}`)
 
 //         const data = await res.json();
 
@@ -241,7 +241,7 @@
 //         setLoading(true);
 
 //         const res = await fetch(
-//           `http://localhost:8000/public/profile/${encodeURIComponent(slug)}`
+//           `https://api.slotly.io/public/profile/${encodeURIComponent(slug)}`
 //         );
 
 //         if (!res.ok) throw new Error(await res.text());
@@ -353,7 +353,7 @@ export default function PublicBookingPage() {
       setLoading(true);
       try {
         const res = await fetch(
-          `http://localhost:8000/public/profile/${encodeURIComponent(slug)}`
+          `https://api.slotly.io/public/profile/${encodeURIComponent(slug)}`
         );
 
         if (!res.ok) throw new Error(await res.text());
