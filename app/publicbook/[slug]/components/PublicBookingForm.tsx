@@ -1,16 +1,7 @@
 "use client";
 
-<<<<<<< HEAD
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import LocationSelector from "@/components/shared/LocationSelector";
-=======
-import React, { useEffect, useMemo, useState } from "react";
-import LocationSelector from "@/components/shared/LocationSelector";
-
-function normalizeSpaces(s: string) {
-  return String(s || "").replace(/\s+/g, " ").trim();
-}
->>>>>>> 6f1a8f49dde73878af27096bfbd1418fcc8ff0bb
 
 function normalizeSpaces(s: string) {
   return String(s || "").replace(/\s+/g, " ").trim();
@@ -119,14 +110,10 @@ export default function PublicBookingForm({
 }: any) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-<<<<<<< HEAD
   const [meetingMode, setMeetingMode] = useState<"google_meet" | "in_person">(
     "google_meet"
   );
 
-=======
-  const [meetingMode, setMeetingMode] = useState<"google_meet" | "in_person">("google_meet");
->>>>>>> 6f1a8f49dde73878af27096bfbd1418fcc8ff0bb
   const [location, setLocation] = useState("");
   const [locationModalOpen, setLocationModalOpen] = useState(false);
 
@@ -138,12 +125,9 @@ export default function PublicBookingForm({
     []
   );
 
-<<<<<<< HEAD
   // prevent auto-open modal on first render
   const didMountRef = useRef(false);
 
-=======
->>>>>>> 6f1a8f49dde73878af27096bfbd1418fcc8ff0bb
   useEffect(() => {
     const savedName = localStorage.getItem("slotly_name");
     const savedEmail = localStorage.getItem("slotly_email");
@@ -182,15 +166,9 @@ export default function PublicBookingForm({
 
     const normalizedLocation = normalizeSpaces(location);
     if (meetingMode === "in_person" && normalizedLocation.length < 10) {
-<<<<<<< HEAD
       // if not set, open modal immediately
       setLocationModalOpen(true);
       return setMessage("Please provide a complete meeting location (full address).");
-=======
-      return setMessage(
-        "Please provide a complete, real-world meeting location (full address)."
-      );
->>>>>>> 6f1a8f49dde73878af27096bfbd1418fcc8ff0bb
     }
 
     setLoading(true);
@@ -213,12 +191,7 @@ export default function PublicBookingForm({
       });
 
       const body = await res.json().catch(() => ({}));
-<<<<<<< HEAD
       if (!res.ok) throw new Error(body?.detail ?? "Server error");
-=======
-      if (!res.ok)
-        throw new Error(body?.detail ?? JSON.stringify(body) ?? "Server error");
->>>>>>> 6f1a8f49dde73878af27096bfbd1418fcc8ff0bb
 
       localStorage.setItem("slotly_name", name);
       localStorage.setItem("slotly_email", email);
@@ -243,7 +216,6 @@ export default function PublicBookingForm({
           <div className="text-xs text-gray-500">{viewerTz}</div>
         </div>
 
-<<<<<<< HEAD
         {/* scrollable content */}
         <div className="flex-1 min-h-0 overflow-y-auto p-4 pb-24">
           <SelectedSummary iso={selectedSlotISO} />
@@ -350,59 +322,5 @@ export default function PublicBookingForm({
         </div>
       </Modal>
     </>
-=======
-      <input
-        className="w-full p-3 border rounded-lg mb-3 focus:ring-1 focus:ring-indigo-400 outline-none"
-        placeholder="Your name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-      />
-
-      <input
-        className="w-full p-3 border rounded-lg mb-3 focus:ring-1 focus:ring-indigo-400 outline-none"
-        placeholder="Your email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
-
-      <div className="mb-3">
-        <label className="text-sm font-medium block mb-1">Meeting mode</label>
-        <select
-          value={meetingMode}
-          onChange={(e) => setMeetingMode(e.target.value as any)}
-          className="p-2 border rounded-lg w-full"
-        >
-          <option value="google_meet">Google Meet</option>
-          <option value="in_person">In-person</option>
-        </select>
-      </div>
-
-      {meetingMode === "in_person" && (
-        <div className="mb-3">
-          <LocationSelector value={location} onChange={setLocation} compact />
-        </div>
-      )}
-
-      <button
-        onClick={submit}
-        disabled={loading || !selectedSlotISO}
-        className={`w-full py-3 rounded-lg text-white font-semibold ${
-          !selectedSlotISO || loading
-            ? "bg-gray-300 cursor-not-allowed"
-            : "bg-indigo-600 hover:bg-indigo-700"
-        }`}
-      >
-        {loading
-          ? "Booking…"
-          : selectedSlotISO
-          ? "Confirm Booking"
-          : "Select time first"}
-      </button>
-
-      {message && (
-        <div className="mt-3 text-sm text-center text-gray-700">{message}</div>
-      )}
-    </div>
->>>>>>> 6f1a8f49dde73878af27096bfbd1418fcc8ff0bb
   );
 }

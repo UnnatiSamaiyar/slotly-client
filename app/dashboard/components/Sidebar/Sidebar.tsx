@@ -290,11 +290,6 @@
 
 
 
-<<<<<<< HEAD
-=======
-
-
->>>>>>> 6f1a8f49dde73878af27096bfbd1418fcc8ff0bb
 "use client";
 
 import React from "react";
@@ -320,7 +315,6 @@ export default function Sidebar({ open, onToggle, user }: any) {
       href: "/dashboard/contacts",
       active: pathname?.startsWith("/dashboard/contacts"),
       disabled: false, // ✅ built now
-<<<<<<< HEAD
     },
     {
       label: "Event Types",
@@ -328,8 +322,6 @@ export default function Sidebar({ open, onToggle, user }: any) {
       href: "/dashboard/event-types",
       active: pathname?.startsWith("/dashboard/event-types"),
       disabled: true, // ✅ disabled now
-=======
->>>>>>> 6f1a8f49dde73878af27096bfbd1418fcc8ff0bb
     },
     {
       label: "Notifications",

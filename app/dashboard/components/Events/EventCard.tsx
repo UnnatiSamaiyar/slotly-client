@@ -30,10 +30,7 @@
 //   onClick,
 //   variant = "timeline",
 // }: Props) {
-<<<<<<< HEAD
 
-=======
->>>>>>> 6f1a8f49dde73878af27096bfbd1418fcc8ff0bb
 //   const startISO = event.start || undefined;
 //   const endISO = event.end || undefined;
 
@@ -184,10 +181,7 @@ import React, { useMemo, useState } from "react";
 import { CalendarEvent } from "../../types";
 import { Clock, MapPin, ExternalLink, Users, Pencil, Trash2 } from "lucide-react";
 import { deleteBookingByGoogleEvent, updateBookingByGoogleEvent } from "../../api/calendar";
-<<<<<<< HEAD
 import { useToast } from "@/hooks/use-toast";
-=======
->>>>>>> 6f1a8f49dde73878af27096bfbd1418fcc8ff0bb
 
 function safeDate(iso?: string) {
   if (!iso) return null;
@@ -298,19 +292,11 @@ export default function EventCard({
   async function handleUpdate(e: any) {
     e?.stopPropagation?.();
     if (!userSub) {
-<<<<<<< HEAD
       toast({ title: "Action not available", description: "Missing user context (userSub). Please refresh and try again.", variant: "error" });
       return;
     }
     if (!event?.id) {
       toast({ title: "Action not available", description: "Missing event id. Please refresh and try again.", variant: "error" });
-=======
-      alert("userSub missing (pass userSub prop to EventCard)");
-      return;
-    }
-    if (!event?.id) {
-      alert("event id missing");
->>>>>>> 6f1a8f49dde73878af27096bfbd1418fcc8ff0bb
       return;
     }
 
@@ -325,16 +311,10 @@ export default function EventCard({
         title: editForm.title,
       });
       setEditOpen(false);
-<<<<<<< HEAD
       toast({ title: "Meeting updated", description: "Your changes were saved.", variant: "success" });
       onChanged?.();
     } catch (err: any) {
       toast({ title: "Update failed", description: err?.message || "Please try again.", variant: "error" });
-=======
-      onChanged?.();
-    } catch (err: any) {
-      alert(err?.message || "Update failed");
->>>>>>> 6f1a8f49dde73878af27096bfbd1418fcc8ff0bb
     } finally {
       setBusy(false);
     }
@@ -343,7 +323,6 @@ export default function EventCard({
   async function handleDelete(e: any) {
     e?.stopPropagation?.();
     if (!userSub) {
-<<<<<<< HEAD
       toast({ title: "Action not available", description: "Missing user context (userSub). Please refresh and try again.", variant: "error" });
       return;
     }
@@ -357,18 +336,6 @@ export default function EventCard({
       toast({ title: "Cancelled", description: "Meeting was not deleted.", variant: "default" });
       return;
     }
-=======
-      alert("userSub missing (pass userSub prop to EventCard)");
-      return;
-    }
-    if (!event?.id) {
-      alert("event id missing");
-      return;
-    }
-
-    const ok = confirm("Delete this meeting?");
-    if (!ok) return;
->>>>>>> 6f1a8f49dde73878af27096bfbd1418fcc8ff0bb
 
     try {
       setBusy(true);
@@ -376,16 +343,10 @@ export default function EventCard({
         userSub,
         googleEventId: String(event.id),
       });
-<<<<<<< HEAD
       toast({ title: "Meeting deleted", description: "The meeting has been removed.", variant: "success" });
       onChanged?.();
     } catch (err: any) {
       toast({ title: "Delete failed", description: err?.message || "Please try again.", variant: "error" });
-=======
-      onChanged?.();
-    } catch (err: any) {
-      alert(err?.message || "Delete failed");
->>>>>>> 6f1a8f49dde73878af27096bfbd1418fcc8ff0bb
     } finally {
       setBusy(false);
     }

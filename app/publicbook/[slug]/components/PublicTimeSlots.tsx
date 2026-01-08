@@ -57,7 +57,6 @@ export default function PublicTimeSlots({
     setLoading(true);
     setError(null);
 
-    const viewerTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
     fetch(
       `https://api.slotly.io/bookings/availability/${encodeURIComponent(
         slug
