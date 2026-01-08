@@ -1,8 +1,10 @@
-// src/app/dashboard/components/EventTypes/CreateEventTypeModal.tsx
 "use client";
-import React, { useState } from "react";
+
+import React, { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { Plus } from "lucide-react";
+import { Plus, MapPin, Video } from "lucide-react";
+
+type MeetingMode = "google_meet" | "in_person";
 
 export default function CreateEventTypeModal({
   open,
@@ -11,30 +13,62 @@ export default function CreateEventTypeModal({
 }: {
   open: boolean;
   onClose: () => void;
-  onCreate: (payload: { title: string; duration: number; location?: string; availability_json?: string }) => Promise<void>;
+  onCreate: (payload: {
+    title: string;
+    meeting_mode: MeetingMode;
+    location?: string;
+    availability_json?: string;
+  }) => Promise<void>;
 }) {
   const [title, setTitle] = useState("");
-  const [duration, setDuration] = useState<number>(30);
+  const [meetingMode, setMeetingMode] = useState<MeetingMode>("google_meet");
   const [location, setLocation] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const needsLocation = meetingMode === "in_person";
+
+  useEffect(() => {
+    if (!open) return;
+    setError(null);
+    setTitle("");
+    setMeetingMode("google_meet");
+    setLocation("");
+    setSaving(false);
+  }, [open]);
+
+  const icon = useMemo(
+    () => (meetingMode === "google_meet" ? <Video className="w-5 h-5" /> : <MapPin className="w-5 h-5" />),
+    [meetingMode]
+  );
+
   async function submit(e?: React.FormEvent) {
     if (e) e.preventDefault();
     setError(null);
-    if (!title.trim()) {
+
+    const cleanTitle = title.trim();
+    const cleanLocation = location.trim();
+
+    if (!cleanTitle) {
       setError("Title is required");
       return;
     }
+    if (needsLocation && !cleanLocation) {
+      setError("Location is required for in-person meeting");
+      return;
+    }
+
     setSaving(true);
     try {
-      await onCreate({ title: title.trim(), duration, location: location.trim(), availability_json: "{}" });
-      setTitle("");
-      setDuration(30);
-      setLocation("");
+      await onCreate({
+        title: cleanTitle,
+        meeting_mode: meetingMode,
+        location: needsLocation ? cleanLocation : "",
+        availability_json: "{}",
+      });
       onClose();
     } catch (err: any) {
-      setError(err.message || String(err));
+      setError(err?.message || String(err));
     } finally {
       setSaving(false);
     }
@@ -43,7 +77,7 @@ export default function CreateEventTypeModal({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
       <div className="absolute inset-0 bg-black/40" onClick={onClose} />
 
       <motion.div
@@ -66,25 +100,55 @@ export default function CreateEventTypeModal({
           <div className="space-y-3">
             <div>
               <label className="text-xs text-slate-600">Title</label>
-              <input value={title} onChange={(e) => setTitle(e.target.value)} className="mt-1 w-full px-3 py-2 border rounded-lg" placeholder="e.g. 30-min Meeting" />
+              <input
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                className="mt-1 w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-200"
+                placeholder="e.g. Intro Call"
+              />
             </div>
 
             <div>
-              <label className="text-xs text-slate-600">Duration (minutes)</label>
-              <input type="number" value={duration} onChange={(e) => setDuration(Number(e.target.value))} className="mt-1 w-full px-3 py-2 border rounded-lg" min={5} />
+              <label className="text-xs text-slate-600">Meeting type</label>
+              <div className="mt-1 flex items-center gap-2">
+                <div className="w-10 h-10 rounded-lg border flex items-center justify-center text-slate-700">
+                  {icon}
+                </div>
+                <select
+                  value={meetingMode}
+                  onChange={(e) => setMeetingMode(e.target.value as MeetingMode)}
+                  className="w-full px-3 py-2 border rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-200"
+                >
+                  <option value="google_meet">Google Meet</option>
+                  <option value="in_person">In-person meeting</option>
+                </select>
+              </div>
             </div>
 
-            <div>
-              <label className="text-xs text-slate-600">Location (optional)</label>
-              <input value={location} onChange={(e) => setLocation(e.target.value)} className="mt-1 w-full px-3 py-2 border rounded-lg" placeholder="e.g. Google Meet" />
-            </div>
+            {needsLocation && (
+              <div>
+                <label className="text-xs text-slate-600">Location</label>
+                <input
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                  className="mt-1 w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-200"
+                  placeholder="e.g. Office address + Google Maps link"
+                />
+              </div>
+            )}
 
             {error && <div className="text-sm text-red-600">{error}</div>}
           </div>
 
           <div className="flex items-center justify-end gap-3 mt-4">
-            <button type="button" onClick={onClose} className="px-3 py-2 rounded-md hover:bg-slate-50">Cancel</button>
-            <button type="submit" disabled={saving} className="px-4 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold">
+            <button type="button" onClick={onClose} className="px-3 py-2 rounded-md hover:bg-slate-50">
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={saving}
+              className="px-4 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold disabled:opacity-60"
+            >
               {saving ? "Creating…" : "Create"}
             </button>
           </div>

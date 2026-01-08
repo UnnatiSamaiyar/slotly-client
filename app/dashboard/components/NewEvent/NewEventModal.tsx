@@ -1,3 +1,5 @@
+<<<<<<< HEAD
+=======
 // //@ts-nocheck
 // "use client";
 
@@ -121,6 +123,7 @@
 
 
 
+>>>>>>> 6f1a8f49dde73878af27096bfbd1418fcc8ff0bb
 
 
 
@@ -136,7 +139,7 @@ const API_BASE =
   process.env.NEXT_PUBLIC_CALENDAR_API || "https://api.slotly.io";
 
 export default function NewEventModal({ open, onClose, user }) {
-  if (!open) return null;
+  const { toast } = useToast();
 
   const [form, setForm] = useState({
     invitee_email: "",
@@ -146,6 +149,8 @@ export default function NewEventModal({ open, onClose, user }) {
     duration: 30,
     description: "",
   });
+
+  if (!open) return null;
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -171,11 +176,11 @@ export default function NewEventModal({ open, onClose, user }) {
     console.log("CREATE EVENT RESPONSE:", data);
 
     if (res.ok) {
-      alert("Meeting created!");
+      toast({ title: "Meeting created", description: "Your meeting has been scheduled successfully.", variant: "success" });
       onClose();
-      window.location.reload();
+      setTimeout(() => window.location.reload(), 700);
     } else {
-      alert("Error: " + data.error);
+      toast({ title: "Create failed", description: data?.error || "Unable to create meeting. Please try again.", variant: "error" });
     }
   };
 

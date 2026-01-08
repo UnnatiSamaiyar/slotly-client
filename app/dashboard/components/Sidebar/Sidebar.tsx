@@ -290,8 +290,11 @@
 
 
 
+<<<<<<< HEAD
+=======
 
 
+>>>>>>> 6f1a8f49dde73878af27096bfbd1418fcc8ff0bb
 "use client";
 
 import React from "react";
@@ -312,17 +315,21 @@ export default function Sidebar({ open, onToggle, user }: any) {
       active: pathname === "/dashboard",
     },
     {
-      label: "Event Types",
-      icon: <PlusCircle className="w-5 h-5" />,
-      href: "/dashboard/event-types",
-      active: pathname?.startsWith("/dashboard/event-types"),
-    },
-    {
       label: "Contacts",
       icon: <User className="w-5 h-5" />,
       href: "/dashboard/contacts",
       active: pathname?.startsWith("/dashboard/contacts"),
       disabled: false, // ✅ built now
+<<<<<<< HEAD
+    },
+    {
+      label: "Event Types",
+      icon: <PlusCircle className="w-5 h-5" />,
+      href: "/dashboard/event-types",
+      active: pathname?.startsWith("/dashboard/event-types"),
+      disabled: true, // ✅ disabled now
+=======
+>>>>>>> 6f1a8f49dde73878af27096bfbd1418fcc8ff0bb
     },
     {
       label: "Notifications",
@@ -406,12 +413,7 @@ export default function Sidebar({ open, onToggle, user }: any) {
 
       {/* User Footer */}
       <div className="px-4 py-4 border-t border-gray-100">
-        <div
-          className={[
-            "flex items-center gap-3",
-            !open ? "justify-center" : "",
-          ].join(" ")}
-        >
+        <div className={["flex items-center gap-3", !open ? "justify-center" : ""].join(" ")}>
           {user?.avatarUrl || user?.picture ? (
             <img
               src={
@@ -435,12 +437,8 @@ export default function Sidebar({ open, onToggle, user }: any) {
 
           {open && (
             <div className="min-w-0">
-              <div className="font-semibold truncate">
-                {user?.name || "User"}
-              </div>
-              <div className="text-xs text-gray-500 truncate">
-                {user?.email}
-              </div>
+              <div className="font-semibold truncate">{user?.name || "User"}</div>
+              <div className="text-xs text-gray-500 truncate">{user?.email}</div>
             </div>
           )}
         </div>

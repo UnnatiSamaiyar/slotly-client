@@ -1,29 +1,3 @@
-// // src/app/dashboard/components/EventTypes/EventTypes.tsx
-// "use client";
-// import React from "react";
-// import EventTypeCard from "./EventTypeCard";
-// import { EventType } from "../../types";
-
-// export default function EventTypes({ items }: { items: EventType[] }) {
-//   return (
-//     <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm mb-6">
-//       <h4 className="font-semibold mb-3">Event Types</h4>
-//       <p className="text-sm text-gray-500 mb-4">Quick links to create and edit your event types.</p>
-//       <div className="space-y-3">
-//         {items.map(it => <EventTypeCard key={it.id} item={it} />)}
-//       </div>
-//       <button className="mt-6 w-full px-4 py-3 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold">Create Event Type</button>
-//     </div>
-//   );
-// }
-
-
-
-
-
-
-
-
 
 
 
@@ -69,6 +43,8 @@ export default function EventTypesPanel({ userSub }: { userSub: string | null })
           <PlusCircle className="w-4 h-4" />
           Create Event Type
         </button>
+
+        
       </div>
 
       <div className="space-y-3">

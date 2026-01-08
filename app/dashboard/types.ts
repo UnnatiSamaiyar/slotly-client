@@ -28,15 +28,33 @@ export type CalendarEvent = {
   organizer?: string | null;
 };
 
+// export type EventType = {
+//   id: number;
+//   title: string;
+//   slug: string;
+//   duration: number;
+//   location?: string | null;
+//   availability_json?: string | null;
+
+//   // frontend-only (optional future customization)
+//   color?: string;
+// };
+
+export type MeetingMode = "google_meet" | "in_person";
+
 export type EventType = {
   id: number;
+  user_id?: number;
   title: string;
   slug: string;
-  duration: number;
-  location?: string | null;
-  availability_json?: string | null;
 
-  // frontend-only (optional future customization)
-  color?: string;
+  meeting_mode: MeetingMode; // NEW
+  location?: string | null;
+
+  availability_json?: string | null;
+  timezone?: string | null;
+
+  // optional fields if still present somewhere else
+  created_at?: string;
 };
 

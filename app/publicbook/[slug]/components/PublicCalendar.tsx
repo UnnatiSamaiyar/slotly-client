@@ -3,6 +3,12 @@
 import React, { useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
+function toLocalISODate(d: Date) {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(
+    d.getDate()
+  ).padStart(2, "0")}`;
+}
+
 export default function PublicCalendar({ onSelectDate, selectedDate }: any) {
   const [cursor, setCursor] = useState<Date>(new Date());
   const year = cursor.getFullYear();
@@ -28,27 +34,31 @@ export default function PublicCalendar({ onSelectDate, selectedDate }: any) {
   today.setHours(0, 0, 0, 0);
 
   return (
-    <div className="bg-white rounded-lg p-4 border shadow-sm">
+    <div className="bg-white rounded-xl p-4 border shadow-sm">
       <div className="flex items-center justify-between mb-4">
         <div className="font-semibold">{monthName}</div>
         <div className="flex items-center gap-2">
           <button
+            type="button"
             onClick={() => {
               const n = new Date(cursor);
               n.setMonth(cursor.getMonth() - 1);
               setCursor(n);
             }}
-            className="p-2 rounded-full hover:bg-gray-100"
+            className="p-2 rounded-full hover:bg-gray-100 active:scale-95 transition"
+            aria-label="Previous month"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
           <button
+            type="button"
             onClick={() => {
               const n = new Date(cursor);
               n.setMonth(cursor.getMonth() + 1);
               setCursor(n);
             }}
-            className="p-2 rounded-full hover:bg-gray-100"
+            className="p-2 rounded-full hover:bg-gray-100 active:scale-95 transition"
+            aria-label="Next month"
           >
             <ChevronRight className="w-4 h-4" />
           </button>
@@ -63,7 +73,9 @@ export default function PublicCalendar({ onSelectDate, selectedDate }: any) {
         ))}
 
         {weeks.map((d, idx) => {
-          const iso = d.toISOString().slice(0, 10);
+          // ✅ FIX: local YYYY-MM-DD (no UTC shift)
+          const iso = toLocalISODate(d);
+
           const isCurrentMonth = d.getMonth() === month;
           const isPast = d < today;
           const selected = selectedDate === iso;
@@ -71,14 +83,15 @@ export default function PublicCalendar({ onSelectDate, selectedDate }: any) {
           return (
             <button
               key={idx}
+              type="button"
               disabled={!isCurrentMonth || isPast}
               onClick={() => onSelectDate(iso)}
               className={[
-                "px-2 py-3 rounded-lg text-sm transition",
+                "px-2 py-3 rounded-lg text-sm transition border",
                 !isCurrentMonth || isPast
-                  ? "text-gray-300 cursor-not-allowed"
-                  : "hover:bg-indigo-50",
-                selected ? "bg-indigo-600 text-white" : "bg-white",
+                  ? "text-gray-300 border-transparent cursor-not-allowed"
+                  : "hover:bg-indigo-50 border-transparent",
+                selected ? "bg-indigo-600 text-white border-indigo-600" : "bg-white",
               ].join(" ")}
             >
               {d.getDate()}

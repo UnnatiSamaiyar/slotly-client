@@ -1,5 +1,7 @@
 "use client";
 
+import { Footer } from "@/components/layout/Footer";
+import { Navbar } from "@/components/layout/Navbar";
 import { useEffect, useState } from "react";
 
 export default function TermsAndConditionsPage() {
@@ -43,6 +45,8 @@ export default function TermsAndConditionsPage() {
   }, []);
 
   return (
+    <>
+    <Navbar />
     <main className="bg-gradient-to-b from-slate-50 to-white">
       <section className="max-w-7xl mx-auto px-6 py-20">
         {/* HEADER */}
@@ -189,6 +193,8 @@ export default function TermsAndConditionsPage() {
         </div>
       </section>
     </main>
+    <Footer />
+    </>
   );
 }
 

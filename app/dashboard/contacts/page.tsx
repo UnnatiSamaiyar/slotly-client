@@ -6,8 +6,37 @@ import Topbar from "../components/Topbar/Topbar";
 import { useUserProfile } from "../hooks/useUserProfile";
 import { useContacts } from "../hooks/useContacts";
 import { createContact, updateContact, deleteContact } from "../api/contacts";
+<<<<<<< HEAD
+import { useToast } from "@/hooks/use-toast";
 
 export default function ContactsPage() {
+  const { toast } = useToast();
+
+  const confirmToast = (title: string, description?: string) =>
+    new Promise<boolean>((resolve) => {
+      let resolved = false;
+      toast({
+        title,
+        description,
+        variant: "info",
+        durationMs: 0,
+        action: {
+          label: "Confirm",
+          onClick: () => {
+            resolved = true;
+            resolve(true);
+          },
+        },
+        onDismiss: () => {
+          if (!resolved) resolve(false);
+        },
+      });
+    });
+
+=======
+
+export default function ContactsPage() {
+>>>>>>> 6f1a8f49dde73878af27096bfbd1418fcc8ff0bb
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [userSub, setUserSub] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -86,14 +115,35 @@ export default function ContactsPage() {
       }
 
       setModalOpen(false);
+<<<<<<< HEAD
+      toast({ title: "Saved", description: editing ? "Contact updated." : "Contact added.", variant: "success" });
+      await refresh();
+    } catch (e: any) {
+      toast({ title: "Save failed", description: e?.message || "Unable to save contact. Please try again.", variant: "error" });
+=======
       await refresh();
     } catch (e: any) {
       alert(e?.message || "Save failed");
+>>>>>>> 6f1a8f49dde73878af27096bfbd1418fcc8ff0bb
     }
   }
 
   async function onDelete(c: any) {
     if (!userSub) return;
+<<<<<<< HEAD
+    const ok = await confirmToast("Delete this contact?", `This will remove ${c.email} from your contacts.`);
+    if (!ok) {
+      toast({ title: "Cancelled", description: "Contact was not deleted.", variant: "default" });
+      return;
+    }
+
+    try {
+      await deleteContact(userSub, c.id);
+      toast({ title: "Deleted", description: "Contact removed.", variant: "success" });
+      await refresh();
+    } catch (e: any) {
+      toast({ title: "Delete failed", description: e?.message || "Unable to delete contact. Please try again.", variant: "error" });
+=======
     const ok = confirm(`Delete contact: ${c.email}?`);
     if (!ok) return;
 
@@ -102,6 +152,7 @@ export default function ContactsPage() {
       await refresh();
     } catch (e: any) {
       alert(e?.message || "Delete failed");
+>>>>>>> 6f1a8f49dde73878af27096bfbd1418fcc8ff0bb
     }
   }
 

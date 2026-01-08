@@ -1,16 +1,12 @@
-// "use client";
-
-// import { SessionProvider } from "next-auth/react";
-
-// export function Providers({ children }: { children: React.ReactNode }) {
-//   return <SessionProvider>{children}</SessionProvider>;
-// }
-
-
-
-// src/app/providers.tsx
 "use client";
 
+import { Toaster } from "@/components/ui/toaster";
+
 export default function Providers({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
+  return (
+    <>
+      {children}
+      <Toaster />
+    </>
+  );
 }

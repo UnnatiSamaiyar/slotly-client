@@ -1,29 +1,49 @@
-// slotly-client/app/dashboard/event-types/new/page.tsx
 "use client";
 
 import React, { useState } from "react";
 import { createEventType } from "@/lib/eventApi";
 import { useRouter } from "next/navigation";
+import { useToast } from "@/hooks/use-toast";
+
+type MeetingMode = "google_meet" | "in_person";
 
 export default function NewEventTypePage() {
   const [title, setTitle] = useState("");
-  const [duration, setDuration] = useState(30);
-  const [description, setDescription] = useState("");
+  const [meetingMode, setMeetingMode] = useState<MeetingMode>("google_meet");
+  const [location, setLocation] = useState("");
+
   const [submitting, setSubmitting] = useState(false);
   const router = useRouter();
+  const { toast } = useToast();
+
+  const needsLocation = meetingMode === "in_person";
 
   const handleCreate = async () => {
-    if (!title.trim()) {
-      alert("Title required");
+    const cleanTitle = title.trim();
+    const cleanLocation = location.trim();
+
+    if (!cleanTitle) {
+      toast({ title: "Title required", description: "Please enter a title to continue.", variant: "error" });
       return;
     }
+    if (needsLocation && !cleanLocation) {
+      toast({ title: "Location required", description: "Please enter a location for in-person meeting.", variant: "error" });
+      return;
+    }
+
     setSubmitting(true);
     try {
-      const item = await createEventType({ title: title.trim(), duration_minutes: duration, description });
-      // redirect to edit page for final editing
-      router.push(`/dashboard/event-types/${item.slug}/edit`);
+      const item = await createEventType({
+        title: cleanTitle,
+        meeting_mode: meetingMode,
+        location: needsLocation ? cleanLocation : "",
+        availability_json: "{}",
+      });
+
+      toast({ title: "Created", description: "Event type created successfully.", variant: "success" });
+      router.push(`/dashboard/event-types/${item.id}/edit`);
     } catch (e: any) {
-      alert("Create failed: " + (e.message || e));
+      toast({ title: "Create failed", description: e?.message || String(e) || "Unable to create. Please try again.", variant: "error" });
     } finally {
       setSubmitting(false);
     }
@@ -40,22 +60,22 @@ export default function NewEventTypePage() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">Duration (minutes)</label>
-          <select value={duration} onChange={(e) => setDuration(Number(e.target.value))} className="border p-2 rounded">
-            <option value={15}>15</option>
-            <option value={30}>30</option>
-            <option value={45}>45</option>
-            <option value={60}>60</option>
+          <label className="block text-sm font-medium mb-1">Meeting type</label>
+          <select value={meetingMode} onChange={(e) => setMeetingMode(e.target.value as MeetingMode)} className="border p-2 rounded w-full">
+            <option value="google_meet">Google Meet</option>
+            <option value="in_person">In-person meeting</option>
           </select>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium mb-1">Description (optional)</label>
-          <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={4} className="border p-2 rounded w-full" placeholder="Short instructions for guests" />
-        </div>
+        {needsLocation && (
+          <div>
+            <label className="block text-sm font-medium mb-1">Location</label>
+            <input value={location} onChange={(e) => setLocation(e.target.value)} className="border p-2 rounded w-full" placeholder="Office address + Maps link" />
+          </div>
+        )}
 
         <div className="flex justify-end">
-          <button onClick={handleCreate} disabled={submitting} className="px-4 py-2 bg-blue-600 text-white rounded">
+          <button onClick={handleCreate} disabled={submitting} className="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-60">
             {submitting ? "Creating…" : "Create & Edit"}
           </button>
         </div>
