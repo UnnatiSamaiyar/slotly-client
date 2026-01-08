@@ -205,7 +205,11 @@ export function Features() {
             from back-and-forth into a single, confident step.
           </motion.p>
 
+<<<<<<< HEAD
+          {/* <motion.div
+=======
           <motion.div
+>>>>>>> 6f1a8f49dde73878af27096bfbd1418fcc8ff0bb
             initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, ease: "easeOut", delay: 0.18 }}
@@ -226,7 +230,11 @@ export function Features() {
             >
               Watch demo →
             </Button>
+<<<<<<< HEAD
+          </motion.div> */}
+=======
           </motion.div>
+>>>>>>> 6f1a8f49dde73878af27096bfbd1418fcc8ff0bb
         </div>
 
         {/* Feature Grid */}

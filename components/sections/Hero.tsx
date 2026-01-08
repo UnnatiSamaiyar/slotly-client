@@ -1,3 +1,5 @@
+<<<<<<< HEAD
+=======
 // "use client";
 
 // import { motion } from "framer-motion";
@@ -72,6 +74,7 @@
 
 
 
+>>>>>>> 6f1a8f49dde73878af27096bfbd1418fcc8ff0bb
 
 
 
@@ -80,8 +83,10 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 export function Hero() {
+  const router = useRouter();
   return (
     <section className="relative w-full overflow-hidden bg-white">
       {/* FULL-WIDTH ambient background */}
@@ -114,6 +119,12 @@ export function Hero() {
           </p>
 
           <div className="mt-10 flex flex-col sm:flex-row items-center gap-4 sm:gap-x-6">
+<<<<<<< HEAD
+            <Button
+              size="lg"
+              onClick={() => router.push("/login")}
+              className="px-10 py-6 rounded-full text-base font-semibold bg-gradient-to-r from-blue-600 to-indigo-600 hover:shadow-[0_14px_50px_-12px_rgba(37,99,235,0.7)] transition-all"
+=======
             <Button
               size="lg"
               className="px-10 py-6 rounded-full text-base font-semibold bg-gradient-to-r from-blue-600 to-indigo-600 hover:shadow-[0_14px_50px_-12px_rgba(37,99,235,0.7)] transition-all"
@@ -124,9 +135,12 @@ export function Hero() {
             <Button
               variant="ghost"
               className="text-gray-700 hover:text-blue-600 hover:bg-transparent text-base"
+>>>>>>> 6f1a8f49dde73878af27096bfbd1418fcc8ff0bb
             >
-              Watch demo →
+              Get started free
             </Button>
+
+            
           </div>
         </motion.div>
 
