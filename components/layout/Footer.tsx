@@ -6,7 +6,6 @@ import Link from "next/link";
 
 export function Footer() {
   return (
-    
     <footer className="relative overflow-hidden bg-gradient-to-b from-white to-[#f5f8ff] border-t border-gray-100">
       {/* Ambient soft glow */}
       <div className="absolute top-[-100px] left-[20%] w-[600px] h-[600px] bg-blue-100 rounded-full blur-[200px] opacity-40 -z-10" />
@@ -90,8 +89,8 @@ export function Footer() {
         <div className="mt-16 border-t border-gray-200 pt-8 flex flex-col md:flex-row items-center justify-between text-sm text-gray-500">
           <p>© {new Date().getFullYear()} Slotly. All rights reserved.</p>
           <div className="flex gap-6 mt-4 md:mt-0">
-            <Link href="/privacy-policy" className="hover:text-blue-600 transition-colors">Privacy Policy</Link>
-            <Link href="/terms-and-conditions" className="hover:text-blue-600 transition-colors">Terms of Service</Link>
+            <Link href="/privacy" className="hover:text-blue-600 transition-colors">Privacy Policy</Link>
+            <Link href="/terms" className="hover:text-blue-600 transition-colors">Terms of Service</Link>
           </div>
         </div>
       </div>

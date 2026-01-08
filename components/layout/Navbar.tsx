@@ -57,7 +57,7 @@ export function Navbar() {
             ))}
 
             {/* Command palette trigger */}
-            {/* <button
+            <button
               onClick={() => setOpen(true)}
               className="relative p-2 text-gray-700 hover:text-blue-600 transition-colors"
               aria-label="Open Command Palette"
@@ -66,7 +66,7 @@ export function Navbar() {
               <span className="absolute -bottom-3 right-0 text-[10px] text-gray-400">
                 ⌘K
               </span>
-            </button> */}
+            </button>
 
             {/* CTA button */}
             <Button
