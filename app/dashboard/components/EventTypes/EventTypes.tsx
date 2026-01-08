@@ -66,7 +66,7 @@ export default function EventTypesPanel({ userSub }: { userSub: string | null })
         open={createOpen}
         onClose={() => setCreateOpen(false)}
         onCreate={async (payload) => {
-          await create(payload);
+          await create({ ...payload, duration: 30 });
         }}
       />
 
