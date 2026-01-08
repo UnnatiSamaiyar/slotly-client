@@ -1,161 +1,132 @@
-// // slotly-client/lib/eventApi.ts
-// "use client";
-
-// export type EventType = {
-//   id: number | string;
-//   title: string;
-//   slug: string;
-//   duration_minutes: number;
-//   description?: string | null;
-//   active?: boolean;
-//   created_at?: string | null;
-//   user_id?: number | null;
-// };
-
-// const BASE = process.env.NEXT_PUBLIC_API_BASE || "https://api.slotly.io";
-
-// /**
-//  * Dev helper: supply X-User-Id header for owner routes.
-//  * Replace this behaviour with real auth when available.
-//  */
-// const DEV_USER_ID = process.env.NEXT_PUBLIC_DEV_USER_ID || "1";
-
-// async function request(path: string, opts: RequestInit = {}) {
-//   const headers = new Headers(opts.headers || {});
-//   if (!headers.has("Content-Type")) headers.set("Content-Type", "application/json");
-//   // Dev auth
-//   headers.set("X-User-Id", DEV_USER_ID);
-//   const res = await fetch(`${BASE}${path}`, { ...opts, headers });
-//   if (!res.ok) {
-//     const txt = await res.text().catch(() => "");
-//     throw new Error(txt || `HTTP ${res.status}`);
-//   }
-//   return res.json().catch(() => ({}));
-// }
-
-// export async function listEventTypes(): Promise<EventType[]> {
-//   return request("/booking/profiles/me");
-// }
-
-// export async function getEventType(slug: string): Promise<EventType> {
-//   return request(`/booking/profile/${encodeURIComponent(slug)}`);
-// }
-
-// export async function createEventType(payload: { title: string; duration_minutes: number; description?: string }) {
-//   return request("/booking/profiles", {
-//     method: "POST",
-//     body: JSON.stringify(payload),
-//   });
-// }
-
-// export async function updateEventType(slug: string, patch: Partial<EventType>) {
-//   return request(`/booking/profiles/${encodeURIComponent(slug)}`, {
-//     method: "PUT",
-//     body: JSON.stringify(patch),
-//   });
-// }
-
-// export async function deleteEventType(slug: string) {
-//   return request(`/booking/profiles/${encodeURIComponent(slug)}`, {
-//     method: "DELETE",
-//   });
-// }
-
-
-
-
-
-
-
 "use client";
+
+export type MeetingMode = "google_meet" | "in_person";
 
 export type EventType = {
   id: number;
   title: string;
   slug: string;
-  duration_minutes: number;
-  description?: string | null;
-  active: boolean;
+
+  meeting_mode: MeetingMode;
+  location?: string | null;
+
+  availability_json?: string | null;
+  timezone?: string | null;
+
   created_at?: string | null;
   user_id?: number | null;
 };
 
 const BASE = process.env.NEXT_PUBLIC_API_BASE || "https://api.slotly.io";
-const DEV_USER_ID = process.env.NEXT_PUBLIC_DEV_USER_ID || "1";
+
+/**
+ * IMPORTANT:
+ * Your backend routes for event-types require `user_sub` query param.
+ * We read it from localStorage by default (no refactor to auth system).
+ * Store it wherever you already store user sub (example: "user_sub").
+ */
+function getUserSub(): string {
+  if (typeof window === "undefined") return "";
+  return (
+    localStorage.getItem("user_sub") ||
+    localStorage.getItem("slotly_user_sub") ||
+    ""
+  );
+}
 
 async function request(path: string, opts: RequestInit = {}) {
   const headers = new Headers(opts.headers || {});
   headers.set("Content-Type", "application/json");
-  headers.set("X-User-Id", DEV_USER_ID);
 
   const res = await fetch(`${BASE}${path}`, { ...opts, headers });
 
   if (!res.ok) {
     const txt = await res.text().catch(() => "");
-    throw new Error(txt || `HTTP ${res.status}`);
+    // FastAPI often returns {"detail": "..."} as JSON; try parsing
+    try {
+      const j = JSON.parse(txt);
+      throw new Error(j?.detail || txt || `HTTP ${res.status}`);
+    } catch {
+      throw new Error(txt || `HTTP ${res.status}`);
+    }
   }
-  const json = await res.json().catch(() => ({}));
 
+  const json = await res.json().catch(() => ({}));
   return json;
 }
 
+/**
+ * GET /event-types/list?user_sub=...
+ */
 export async function listEventTypes(): Promise<EventType[]> {
-  const items = await request("/booking/profiles/me");
+  const user_sub = getUserSub();
+  if (!user_sub) throw new Error("Missing user_sub in browser storage");
 
-  // Fix missing active field
-  return items.map((i: any) => ({
-    ...i,
-    active: i.active ?? true,
-  }));
+  const data = await request(`/event-types/list?user_sub=${encodeURIComponent(user_sub)}`);
+  return data.event_types || [];
 }
 
-export async function getEventType(slug: string): Promise<EventType> {
-  const item = await request(`/booking/profile/${encodeURIComponent(slug)}`);
-
-  return {
-    ...item,
-    active: item.active ?? true,
-  };
+/**
+ * GET /event-types/{id}
+ */
+export async function getEventType(id: number): Promise<EventType | null> {
+  const data = await request(`/event-types/${id}`);
+  return data.event_type || null;
 }
 
+/**
+ * POST /event-types/create?user_sub=...
+ */
 export async function createEventType(payload: {
   title: string;
-  duration_minutes: number;
-  description?: string;
-}) {
-  const body = {
-    ...payload,
-    slug: payload.title.toLowerCase().replace(/ /g, "-"),
-  };
+  meeting_mode: MeetingMode;
+  location?: string;
+  availability_json?: string;
+  timezone?: string | null;
+}): Promise<EventType> {
+  const user_sub = getUserSub();
+  if (!user_sub) throw new Error("Missing user_sub in browser storage");
 
-  const item = await request("/booking/profiles", {
+  const data = await request(`/event-types/create?user_sub=${encodeURIComponent(user_sub)}`, {
     method: "POST",
-    body: JSON.stringify(body),
+    body: JSON.stringify(payload),
   });
 
-  return {
-    ...item,
-    active: item.active ?? true,
-  };
+  return data.event_type;
 }
 
+/**
+ * PUT /event-types/{id}?user_sub=...
+ */
 export async function updateEventType(
-  slug: string,
-  patch: Partial<EventType>
-) {
-  const item = await request(`/booking/profiles/${encodeURIComponent(slug)}`, {
+  id: number,
+  patch: Partial<{
+    title: string;
+    meeting_mode: MeetingMode;
+    location: string;
+    availability_json: string;
+    timezone: string | null;
+  }>
+): Promise<EventType> {
+  const user_sub = getUserSub();
+  if (!user_sub) throw new Error("Missing user_sub in browser storage");
+
+  const data = await request(`/event-types/${id}?user_sub=${encodeURIComponent(user_sub)}`, {
     method: "PUT",
     body: JSON.stringify(patch),
   });
 
-  return {
-    ...item,
-    active: item.active ?? true,
-  };
+  return data.event_type;
 }
 
-export async function deleteEventType(slug: string) {
-  return request(`/booking/profiles/${encodeURIComponent(slug)}`, {
+/**
+ * DELETE /event-types/{id}?user_sub=...
+ */
+export async function deleteEventType(id: number) {
+  const user_sub = getUserSub();
+  if (!user_sub) throw new Error("Missing user_sub in browser storage");
+
+  return request(`/event-types/${id}?user_sub=${encodeURIComponent(user_sub)}`, {
     method: "DELETE",
   });
 }
