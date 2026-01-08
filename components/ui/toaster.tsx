@@ -54,7 +54,6 @@ export function Toaster() {
 
             <div className="flex gap-3 p-4">
               <div className="mt-0.5">{
-                // @ts-expect-error narrow union is fine
                 <VariantIcon variant={t.variant} />
               }</div>
 
