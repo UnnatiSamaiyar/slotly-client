@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Menu, X, Search } from "lucide-react";
 import { CommandPalette } from "./commandpallete";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -18,7 +19,6 @@ export function Navbar() {
     setIsScrolled(latest > 20);
   });
 
-  
   const router = useRouter();
   return (
     <>
@@ -34,13 +34,17 @@ export function Navbar() {
       >
         <div className="container mx-auto flex items-center justify-between px-6">
           {/* Brand */}
-          <Link href="/" className="flex items-center gap-2">
-            <motion.span
-              whileHover={{ scale: 1.05 }}
-              className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent"
-            >
-              Slotly
-            </motion.span>
+          <Link href="/" className="flex items-center">
+            <motion.div whileHover={{ scale: 1.05 }} className="relative">
+              <Image
+                src="/assets/Slotlyio-logo.png"
+                alt="Slotly"
+                width={240}
+                height={40}
+                priority
+                className="h-14 w-auto"
+              />
+            </motion.div>
           </Link>
 
           {/* Desktop Nav */}
@@ -57,7 +61,7 @@ export function Navbar() {
             ))}
 
             {/* Command palette trigger */}
-            <button
+            {/* <button
               onClick={() => setOpen(true)}
               className="relative p-2 text-gray-700 hover:text-blue-600 transition-colors"
               aria-label="Open Command Palette"
@@ -66,11 +70,11 @@ export function Navbar() {
               <span className="absolute -bottom-3 right-0 text-[10px] text-gray-400">
                 ⌘K
               </span>
-            </button>
+            </button> */}
 
             {/* CTA button */}
             <Button
-            onClick={() => router.push("/login")}
+              onClick={() => router.push("/login")}
               className="rounded-full text-sm font-semibold px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:shadow-[0_0_25px_-5px_rgba(37,99,235,0.5)] transition-all"
             >
               Get Started
