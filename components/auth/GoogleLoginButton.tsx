@@ -49,7 +49,7 @@ export default function GoogleLoginButton() {
           : "0 6px 25px rgba(99,102,241,0.25)",
       }}
     >
-      {/* 🔥 Animated glowing border */}
+      {/* Animated glowing border */}
       <span
         className="absolute inset-0 rounded-2xl border-[2px] border-transparent"
         style={{
@@ -69,7 +69,7 @@ export default function GoogleLoginButton() {
       />
 
       <FcGoogle className="text-2xl bg-white rounded-full p-1" />
-      Connect Google Calendar
+      Continue with Google
     </button>
   );
 }
