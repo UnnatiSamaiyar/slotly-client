@@ -16,14 +16,16 @@ function monthLabel(d: Date) {
   return d.toLocaleString([], { month: "long", year: "numeric" });
 }
 
-export default function CalendarGrid({ selectedDate, setSelectedDate, eventsByDate }: Props) {
-  // Cursor controls which month we’re viewing
+export default function CalendarGrid({
+  selectedDate,
+  setSelectedDate,
+  eventsByDate,
+}: Props) {
   const [cursor, setCursor] = useState(() => {
     const d = new Date(selectedDate);
     return Number.isNaN(d.getTime()) ? new Date() : d;
   });
 
-  // When selectedDate changes externally, keep cursor aligned to that month
   useEffect(() => {
     const d = new Date(selectedDate);
     if (!Number.isNaN(d.getTime())) setCursor(d);
@@ -47,48 +49,56 @@ export default function CalendarGrid({ selectedDate, setSelectedDate, eventsByDa
   }, [year, month]);
 
   const selected = useMemo(() => new Date(selectedDate), [selectedDate]);
-
   const todayISO = useMemo(() => toISODateLocal(new Date()), []);
 
   return (
-    <div>
-      {/* Month header + controls */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="font-semibold text-slate-900">{monthLabel(cursor)}</div>
+    <div className="w-full">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-3">
+        <div className="min-w-0">
+          <div className="text-base sm:text-lg font-semibold text-slate-900 truncate">
+            {monthLabel(cursor)}
+          </div>
+        </div>
 
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => {
-              const d = new Date(cursor);
-              d.setMonth(d.getMonth() - 1);
-              setCursor(d);
-            }}
-            className="p-2 rounded-xl border border-gray-200 bg-white hover:bg-gray-50"
-            aria-label="Previous month"
-            type="button"
-          >
-            <ChevronLeft className="w-4 h-4" />
-          </button>
+        <div className="flex items-center gap-2 shrink-0">
+          {/* Segmented nav */}
+          <div className="inline-flex items-center rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+            <button
+              onClick={() => {
+                const d = new Date(cursor);
+                d.setMonth(d.getMonth() - 1);
+                setCursor(d);
+              }}
+              className="h-10 w-10 flex items-center justify-center hover:bg-gray-50 transition"
+              aria-label="Previous month"
+              type="button"
+            >
+              <ChevronLeft className="w-4 h-4 text-slate-700" />
+            </button>
 
-          <button
-            onClick={() => {
-              const d = new Date(cursor);
-              d.setMonth(d.getMonth() + 1);
-              setCursor(d);
-            }}
-            className="p-2 rounded-xl border border-gray-200 bg-white hover:bg-gray-50"
-            aria-label="Next month"
-            type="button"
-          >
-            <ChevronRight className="w-4 h-4" />
-          </button>
+            <div className="h-10 w-px bg-gray-200" />
+
+            <button
+              onClick={() => {
+                const d = new Date(cursor);
+                d.setMonth(d.getMonth() + 1);
+                setCursor(d);
+              }}
+              className="h-10 w-10 flex items-center justify-center hover:bg-gray-50 transition"
+              aria-label="Next month"
+              type="button"
+            >
+              <ChevronRight className="w-4 h-4 text-slate-700" />
+            </button>
+          </div>
 
           <button
             onClick={() => {
               setSelectedDate(todayISO as ISODate);
               setCursor(new Date());
             }}
-            className="ml-2 px-3 py-2 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-sm"
+            className="h-10 px-3 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-sm font-medium transition whitespace-nowrap"
             type="button"
           >
             Today
@@ -97,11 +107,11 @@ export default function CalendarGrid({ selectedDate, setSelectedDate, eventsByDa
       </div>
 
       {/* Day headers */}
-      <div className="grid grid-cols-7 gap-2 text-sm">
-        {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => (
+      <div className="grid grid-cols-7 gap-1 sm:gap-2">
+        {["S", "M", "T", "W", "T", "F", "S"].map((d, i) => (
           <div
-            key={d}
-            className="text-xs font-medium text-gray-500 text-center py-2"
+            key={`${d}-${i}`}
+            className="text-[11px] sm:text-xs font-medium text-gray-500 text-center py-1"
           >
             {d}
           </div>
@@ -116,44 +126,63 @@ export default function CalendarGrid({ selectedDate, setSelectedDate, eventsByDa
 
           const dayEvents = eventsByDate?.[iso] || [];
           const hasEvents = dayEvents.length > 0;
-
           const tooltip = hasEvents ? buildDayTooltip(dayEvents, 3) : "";
 
           return (
-            <button
-              key={`${iso}-${idx}`}
-              onClick={() => setSelectedDate(iso as ISODate)}
-              title={tooltip}
-              type="button"
-              className={[
-                "relative p-2 rounded-xl text-center transition border",
-                inMonth ? "bg-white" : "bg-gray-50",
-                inMonth ? "border-gray-100" : "border-gray-100",
-                isSelected ? "ring-2 ring-indigo-500 border-indigo-200" : "hover:bg-indigo-50",
-                !inMonth ? "text-gray-400" : "text-slate-800",
-              ].join(" ")}
-              aria-label={`Select ${iso}`}
-            >
-              {/* Day number */}
-              <div className={["text-sm", isSelected ? "font-semibold" : ""].join(" ")}>
+            <div key={`${iso}-${idx}`} className="flex items-center justify-center">
+              <button
+                onClick={() => setSelectedDate(iso as ISODate)}
+                title={tooltip}
+                type="button"
+                aria-label={`Select ${iso}`}
+                className={[
+                  // size + shape
+                  "relative flex items-center justify-center rounded-full",
+                  "h-10 w-10 sm:h-11 sm:w-11",
+                  "text-sm font-medium transition",
+                  "focus:outline-none focus:ring-2 focus:ring-indigo-500/25",
+
+                  // states
+                  inMonth ? "text-slate-900" : "text-gray-400",
+                  inMonth ? "hover:bg-gray-50" : "hover:bg-gray-50/60",
+
+                  // selected
+                  isSelected ? "bg-indigo-600 text-white shadow-sm" : "",
+
+                  // subtle border only when not selected (keeps it clean)
+                  !isSelected ? "border border-transparent hover:border-gray-200" : "border border-indigo-600",
+                ].join(" ")}
+              >
                 {d.getDate()}
-              </div>
 
-              {/* Today small indicator */}
-              {isToday ? (
-                <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-indigo-600" />
-              ) : null}
+                {/* Today ring (only if not selected) */}
+                {isToday && !isSelected ? (
+                  <span className="absolute inset-0 rounded-full ring-2 ring-indigo-500/40" />
+                ) : null}
 
-              {/* Event indicator */}
-              {hasEvents ? (
-                <div className="absolute left-1/2 -translate-x-1/2 bottom-2 flex items-center gap-1">
-                  <span className="block w-2.5 h-2.5 rounded-full bg-indigo-600" />
-                  {dayEvents.length > 1 ? (
-                    <span className="text-[10px] text-gray-500">{dayEvents.length}</span>
-                  ) : null}
-                </div>
-              ) : null}
-            </button>
+                {/* Event indicator: tiny dot + optional count badge */}
+                {hasEvents ? (
+                  <span className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 flex items-center gap-1">
+                    <span
+                      className={[
+                        "h-1.5 w-1.5 rounded-full",
+                        isSelected ? "bg-white/95" : "bg-indigo-600",
+                      ].join(" ")}
+                    />
+                    {dayEvents.length > 1 ? (
+                      <span
+                        className={[
+                          "text-[10px] leading-none",
+                          isSelected ? "text-white/90" : "text-gray-500",
+                        ].join(" ")}
+                      >
+                        {dayEvents.length}
+                      </span>
+                    ) : null}
+                  </span>
+                ) : null}
+              </button>
+            </div>
           );
         })}
       </div>

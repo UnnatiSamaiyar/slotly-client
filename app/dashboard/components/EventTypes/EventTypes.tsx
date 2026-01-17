@@ -1,6 +1,3 @@
-
-
-
 // src/app/dashboard/components/EventTypes/EventTypes.tsx
 "use client";
 
@@ -22,65 +19,68 @@ export default function EventTypesPanel({ userSub }: { userSub: string | null })
   }, [items]);
 
   return (
-    <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm mb-6">
-      <div className="flex items-start justify-between gap-4 mb-4">
-        <div>
-          <div className="flex items-center gap-2">
-            <h4 className="font-semibold text-lg">Event Types</h4>
-            <span className="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
-              {items.length}
-            </span>
+    <section className="bg-white rounded-2xl border border-gray-100 shadow-sm mb-6">
+      <div className="p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-4">
+          <div className="min-w-0">
+            <div className="flex items-center gap-2 min-w-0">
+              <h4 className="font-semibold text-base sm:text-lg truncate">
+                Event Types
+              </h4>
+              <span className="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 shrink-0">
+                {items.length}
+              </span>
+            </div>
+            <div className="text-sm text-slate-500 mt-0.5">
+              Quick links to create and edit your event types.
+            </div>
           </div>
-          <div className="text-sm text-slate-500">
-            Quick links to create and edit your event types.
-          </div>
+
+          <button
+            type="button"
+            onClick={() => setCreateOpen(true)}
+            className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold shadow-sm transition w-full sm:w-auto"
+          >
+            <PlusCircle className="w-4 h-4 shrink-0" />
+            <span className="truncate">Create Event Type</span>
+          </button>
         </div>
 
-        <button
-          onClick={() => setCreateOpen(true)}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold shadow-sm transition"
-        >
-          <PlusCircle className="w-4 h-4" />
-          Create Event Type
-        </button>
+        <div className="space-y-3">
+          {loading && <div className="text-sm text-slate-500">Loading…</div>}
+          {error && <div className="text-sm text-red-600 break-words">{error}</div>}
 
-        
+          {!loading && sorted.length === 0 && (
+            <div className="text-sm text-slate-600 p-4 rounded-xl border border-dashed border-slate-200 bg-slate-50">
+              No event types yet. Create one to start accepting bookings.
+            </div>
+          )}
+
+          {sorted.map((it) => (
+            <EventTypeCard key={it.id} item={it} onEdit={(i) => setEditing(i)} />
+          ))}
+        </div>
+
+        <CreateEventTypeModal
+          open={createOpen}
+          onClose={() => setCreateOpen(false)}
+          onCreate={async (payload) => {
+            await create({ ...payload, duration: 30 });
+          }}
+        />
+
+        <EditEventTypeModal
+          open={!!editing}
+          item={editing}
+          onClose={() => setEditing(null)}
+          onUpdate={async (id, payload) => {
+            await update(id, payload);
+          }}
+          onDelete={async (id) => {
+            await remove(id);
+          }}
+        />
       </div>
-
-      <div className="space-y-3">
-        {loading && <div className="text-sm text-slate-500">Loading…</div>}
-        {error && <div className="text-sm text-red-600">{error}</div>}
-
-        {!loading && sorted.length === 0 && (
-          <div className="text-sm text-slate-600 p-4 rounded-xl border border-dashed border-slate-200 bg-slate-50">
-            No event types yet. Create one to start accepting bookings.
-          </div>
-        )}
-
-        {sorted.map((it) => (
-          <EventTypeCard key={it.id} item={it} onEdit={(i) => setEditing(i)} />
-        ))}
-      </div>
-
-      <CreateEventTypeModal
-        open={createOpen}
-        onClose={() => setCreateOpen(false)}
-        onCreate={async (payload) => {
-          await create({ ...payload, duration: 30 });
-        }}
-      />
-
-      <EditEventTypeModal
-        open={!!editing}
-        item={editing}
-        onClose={() => setEditing(null)}
-        onUpdate={async (id, payload) => {
-          await update(id, payload);
-        }}
-        onDelete={async (id) => {
-          await remove(id);
-        }}
-      />
-    </div>
+    </section>
   );
 }

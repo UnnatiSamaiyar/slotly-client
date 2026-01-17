@@ -1,8 +1,6 @@
 "use client";
-
-<GoogleLoginButton />
-
 import GoogleLoginButton from "@/components/auth/GoogleLoginButton";
+import EmailAuthPanel from "@/components/auth/EmailAuthPanel";
 import { motion } from "framer-motion";
 
 export default function LoginPage() {
@@ -22,7 +20,18 @@ export default function LoginPage() {
           Login to continue to your dashboard
         </p>
 
-        <GoogleLoginButton />
+        {/* ✅ Center Google button */}
+        <div className="flex justify-center">
+          <GoogleLoginButton />
+        </div>
+
+        <div className="mt-6 flex items-center gap-3">
+          <div className="h-px flex-1 bg-gray-200" />
+          <div className="text-xs text-gray-500">or</div>
+          <div className="h-px flex-1 bg-gray-200" />
+        </div>
+
+        <EmailAuthPanel />
       </motion.div>
     </div>
   );

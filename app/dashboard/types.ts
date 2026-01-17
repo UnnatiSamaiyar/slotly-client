@@ -26,6 +26,13 @@ export type CalendarEvent = {
   location?: string | null;
   htmlLink?: string | null;
   organizer?: string | null;
+
+  // DB-backed booking extras
+  meetLink?: string | null;
+  attendees?: any[];
+
+  // Role for dashboard filtering
+  role?: "host" | "invitee" | "both" | "unknown";
 };
 
 // export type EventType = {

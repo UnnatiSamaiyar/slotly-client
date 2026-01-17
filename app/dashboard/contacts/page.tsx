@@ -54,7 +54,7 @@ export default function ContactsPage() {
   const filtered = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
     if (!q) return contacts;
-    return contacts.filter(c =>
+    return contacts.filter((c) =>
       (c.name || "").toLowerCase().includes(q) ||
       (c.email || "").toLowerCase().includes(q) ||
       (c.company || "").toLowerCase().includes(q)
@@ -110,18 +110,33 @@ export default function ContactsPage() {
       }
 
       setModalOpen(false);
-      toast({ title: "Saved", description: editing ? "Contact updated." : "Contact added.", variant: "success" });
+      toast({
+        title: "Saved",
+        description: editing ? "Contact updated." : "Contact added.",
+        variant: "success",
+      });
       await refresh();
     } catch (e: any) {
-      toast({ title: "Save failed", description: e?.message || "Unable to save contact. Please try again.", variant: "error" });
+      toast({
+        title: "Save failed",
+        description: e?.message || "Unable to save contact. Please try again.",
+        variant: "error",
+      });
     }
   }
 
   async function onDelete(c: any) {
     if (!userSub) return;
-    const ok = await confirmToast("Delete this contact?", `This will remove ${c.email} from your contacts.`);
+    const ok = await confirmToast(
+      "Delete this contact?",
+      `This will remove ${c.email} from your contacts.`
+    );
     if (!ok) {
-      toast({ title: "Cancelled", description: "Contact was not deleted.", variant: "default" });
+      toast({
+        title: "Cancelled",
+        description: "Contact was not deleted.",
+        variant: "default",
+      });
       return;
     }
 
@@ -130,13 +145,17 @@ export default function ContactsPage() {
       toast({ title: "Deleted", description: "Contact removed.", variant: "success" });
       await refresh();
     } catch (e: any) {
-      toast({ title: "Delete failed", description: e?.message || "Unable to delete contact. Please try again.", variant: "error" });
+      toast({
+        title: "Delete failed",
+        description: e?.message || "Unable to delete contact. Please try again.",
+        variant: "error",
+      });
     }
   }
 
   if (!userSub || !user) {
     return (
-      <div className="flex items-center justify-center h-screen text-xl">
+      <div className="flex items-center justify-center h-screen text-base sm:text-xl">
         Loading…
       </div>
     );
@@ -150,83 +169,114 @@ export default function ContactsPage() {
         user={user}
       />
 
-      <main className="flex-1 p-8">
+      <main className="flex-1 p-4 sm:p-6 lg:p-8 min-w-0">
         <Topbar
           user={user}
           searchQuery={searchQuery}
           onSearchQueryChange={setSearchQuery}
         />
 
-        <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h3 className="text-lg font-semibold">Contacts</h3>
-              <div className="text-xs text-gray-500 mt-1">
-                Auto-saved from bookings. Add phone/company manually.
+        <section className="bg-white rounded-2xl border border-gray-100 shadow-sm">
+          <div className="p-4 sm:p-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+              <div className="min-w-0">
+                <h3 className="text-base sm:text-lg font-semibold truncate">Contacts</h3>
+                <div className="text-xs text-gray-500 mt-1">
+                  Auto-saved from bookings. Add phone/company manually.
+                </div>
               </div>
+
+              <button
+                type="button"
+                onClick={openCreate}
+                className="text-sm px-3 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 w-full sm:w-auto"
+              >
+                Add Contact
+              </button>
             </div>
 
-            <button
-              onClick={openCreate}
-              className="text-sm px-3 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700"
-            >
-              Add Contact
-            </button>
+            {loading ? (
+              <div className="text-sm text-gray-500">Loading contacts…</div>
+            ) : null}
+            {error ? (
+              <div className="text-sm text-red-600 break-words">{error}</div>
+            ) : null}
+
+            {!loading && filtered.length === 0 ? (
+              <div className="text-sm text-gray-500">No contacts yet.</div>
+            ) : (
+              <div className="overflow-x-auto -mx-4 sm:mx-0">
+                <div className="min-w-[720px] px-4 sm:px-0">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="text-left text-gray-500">
+                        <th className="py-2">Name</th>
+                        <th className="py-2">Email</th>
+                        <th className="py-2">Phone</th>
+                        <th className="py-2">Company</th>
+                        <th className="py-2 text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filtered.map((c: any) => (
+                        <tr key={c.id} className="border-t">
+                          <td className="py-2 font-medium">
+                            <span className="block max-w-[220px] truncate">{c.name}</span>
+                          </td>
+                          <td className="py-2">
+                            <span className="block max-w-[280px] truncate">{c.email}</span>
+                          </td>
+                          <td className="py-2">
+                            <span className="block max-w-[160px] truncate">
+                              {c.phone || "—"}
+                            </span>
+                          </td>
+                          <td className="py-2">
+                            <span className="block max-w-[200px] truncate">
+                              {c.company || "—"}
+                            </span>
+                          </td>
+                          <td className="py-2 text-right">
+                            <div className="inline-flex gap-2">
+                              <button
+                                type="button"
+                                onClick={() => openEdit(c)}
+                                className="text-xs px-2.5 py-1.5 rounded-lg border border-gray-200 hover:bg-gray-50"
+                              >
+                                Edit
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => onDelete(c)}
+                                className="text-xs px-2.5 py-1.5 rounded-lg border border-red-200 text-red-600 hover:bg-red-50"
+                              >
+                                Delete
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
           </div>
-
-          {loading ? <div className="text-sm text-gray-500">Loading contacts…</div> : null}
-          {error ? <div className="text-sm text-red-600">{error}</div> : null}
-
-          {!loading && filtered.length === 0 ? (
-            <div className="text-sm text-gray-500">No contacts yet.</div>
-          ) : (
-            <div className="overflow-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="text-left text-gray-500">
-                    <th className="py-2">Name</th>
-                    <th className="py-2">Email</th>
-                    <th className="py-2">Phone</th>
-                    <th className="py-2">Company</th>
-                    <th className="py-2 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filtered.map((c: any) => (
-                    <tr key={c.id} className="border-t">
-                      <td className="py-2 font-medium">{c.name}</td>
-                      <td className="py-2">{c.email}</td>
-                      <td className="py-2">{c.phone || "—"}</td>
-                      <td className="py-2">{c.company || "—"}</td>
-                      <td className="py-2 text-right">
-                        <div className="inline-flex gap-2">
-                          <button
-                            onClick={() => openEdit(c)}
-                            className="text-xs px-2.5 py-1.5 rounded-lg border border-gray-200 hover:bg-gray-50"
-                          >
-                            Edit
-                          </button>
-                          <button
-                            onClick={() => onDelete(c)}
-                            className="text-xs px-2.5 py-1.5 rounded-lg border border-red-200 text-red-600 hover:bg-red-50"
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
+        </section>
 
         {/* Modal */}
         {modalOpen ? (
-          <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50" onClick={() => setModalOpen(false)}>
-            <div className="bg-white p-6 rounded-xl shadow-xl w-[560px]" onClick={(e) => e.stopPropagation()}>
-              <h2 className="text-xl font-semibold mb-4">
+          <div
+            className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4"
+            onClick={() => setModalOpen(false)}
+            role="dialog"
+            aria-modal="true"
+          >
+            <div
+              className="bg-white p-5 sm:p-6 rounded-xl shadow-xl w-full max-w-[560px]"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h2 className="text-lg sm:text-xl font-semibold mb-4">
                 {editing ? "Edit Contact" : "Add Contact"}
               </h2>
 
@@ -246,7 +296,7 @@ export default function ContactsPage() {
                     onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))}
                   />
                 ) : (
-                  <div className="text-sm text-gray-600">
+                  <div className="text-sm text-gray-600 break-words">
                     Email: <span className="font-medium">{form.email}</span>
                   </div>
                 )}
@@ -266,11 +316,19 @@ export default function ContactsPage() {
                 />
               </div>
 
-              <div className="flex justify-end gap-3 mt-5">
-                <button onClick={() => setModalOpen(false)} className="px-3 py-2 border rounded">
+              <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 sm:gap-3 mt-5">
+                <button
+                  type="button"
+                  onClick={() => setModalOpen(false)}
+                  className="px-3 py-2 border rounded w-full sm:w-auto"
+                >
                   Cancel
                 </button>
-                <button onClick={onSave} className="px-3 py-2 bg-blue-600 text-white rounded">
+                <button
+                  type="button"
+                  onClick={onSave}
+                  className="px-3 py-2 bg-blue-600 text-white rounded w-full sm:w-auto"
+                >
                   Save
                 </button>
               </div>
