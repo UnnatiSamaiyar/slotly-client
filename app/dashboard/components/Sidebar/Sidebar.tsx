@@ -7,7 +7,7 @@ import NavItem from "./NavItem";
 import GoogleLoginButton from "@/components/auth/GoogleLoginButton";
 import { Calendar, PlusCircle, User, BellRing, Settings, Link2, Unlink, ShieldAlert } from "lucide-react";
 
-const API_BASE = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000").replace(/\/$/, "");
+const API_BASE = (process.env.NEXT_PUBLIC_API_URL || "https://api.slotly.io").replace(/\/$/, "");
 
 export default function Sidebar({ open, onToggle, user }: any) {
   const router = useRouter();
@@ -17,7 +17,7 @@ export default function Sidebar({ open, onToggle, user }: any) {
   const [calLoading, setCalLoading] = useState(false);
   const [calConnected, setCalConnected] = useState<boolean | null>(null);
 
-  // ✅ SAFETY: returnTo will always be a relative path (never http://localhost:3000/...)
+  // ✅ SAFETY: returnTo will always be a relative path (never https://slotly.io/...)
   const safeReturnTo = useMemo(() => {
     const raw = String(pathname || "/dashboard");
     if (!raw.startsWith("/")) return "/dashboard";

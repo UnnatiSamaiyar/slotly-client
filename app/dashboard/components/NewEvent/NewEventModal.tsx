@@ -10,7 +10,7 @@
 import { useState } from "react";
 
 const API_BASE =
-  process.env.NEXT_PUBLIC_CALENDAR_API || "http://localhost:8000";
+  process.env.NEXT_PUBLIC_CALENDAR_API || "https://api.slotly.io";
 
 export default function NewEventModal({ open, onClose, user }) {
   const { toast } = useToast();

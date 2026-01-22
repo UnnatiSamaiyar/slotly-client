@@ -7,7 +7,7 @@ import { useEffect, useMemo, useState } from "react";
 import { toISODateLocal, safeDate } from "../components/Calendar/CalendarHelpers";
 
 const API_BASE =
-  process.env.NEXT_PUBLIC_CALENDAR_API || "http://localhost:8000";
+  process.env.NEXT_PUBLIC_CALENDAR_API || "https://api.slotly.io";
 
 export function useCalendarEvents(userSub: string | null, view: "host" | "invitee" | "all" = "host") {
   const [events, setEvents] = useState<any[]>([]);

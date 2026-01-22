@@ -1,7 +1,7 @@
 import { CalendarEvent } from "../types";
 
 const CAL_BASE =
-  process.env.NEXT_PUBLIC_CALENDAR_API || "http://localhost:8000";
+  process.env.NEXT_PUBLIC_CALENDAR_API || "https://api.slotly.io";
 
 export type CalendarPayload = { calendar_connected: boolean; events: any[] };
 
