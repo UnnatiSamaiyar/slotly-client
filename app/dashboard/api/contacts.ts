@@ -1,4 +1,4 @@
-const API_BASE = process.env.NEXT_PUBLIC_CALENDAR_API || "https://api.slotly.io";
+const API_BASE = process.env.NEXT_PUBLIC_CALENDAR_API || "http://localhost:8000";
 
 export type Contact = {
   id: number;

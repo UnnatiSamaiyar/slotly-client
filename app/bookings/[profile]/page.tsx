@@ -15,7 +15,7 @@ export default function BookingPage({ params }: { params: { profile: string } })
 
   useEffect(() => {
     const load = async () => {
-      const res = await fetch(`https://api.slotly.io/booking/profile/${slug}`);
+      const res = await fetch(`http://localhost:8000/booking/profile/${slug}`);
       const data = await res.json();
       setProfileData(data);
     };

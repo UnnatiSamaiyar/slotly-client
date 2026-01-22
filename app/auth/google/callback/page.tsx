@@ -3,6 +3,18 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
+const API_BASE = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000").replace(/\/$/, "");
+
+function safeBase64UrlDecode(input: string) {
+  try {
+    const b64 = input.replace(/-/g, "+").replace(/_/g, "/");
+    const padded = b64 + "===".slice((b64.length + 3) % 4);
+    return window.atob(padded);
+  } catch {
+    return null;
+  }
+}
+
 export default function GoogleCallbackPage() {
   const router = useRouter();
   const [status, setStatus] = useState<"working" | "error">("working");
@@ -14,6 +26,23 @@ export default function GoogleCallbackPage() {
 
     async function handle() {
       const code = new URLSearchParams(window.location.search).get("code");
+      const state = new URLSearchParams(window.location.search).get("state");
+
+      let returnTo = "/dashboard";
+      if (state) {
+        const decoded = safeBase64UrlDecode(state);
+        if (decoded) {
+          try {
+            const obj = JSON.parse(decoded);
+            if (obj && typeof obj.returnTo === "string" && obj.returnTo.startsWith("/")) {
+              returnTo = obj.returnTo;
+            }
+          } catch {
+            // ignore
+          }
+        }
+      }
+
       if (!code) {
         setStatus("error");
         setMessage("Missing authorization code.");
@@ -26,7 +55,7 @@ export default function GoogleCallbackPage() {
         setMessage("Signing you in…");
         setDetail(null);
 
-        const res = await fetch("https://api.slotly.io/auth/google", {
+        const res = await fetch(`${API_BASE}/auth/google`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ code }),
@@ -52,7 +81,7 @@ export default function GoogleCallbackPage() {
         localStorage.setItem("slotly_user", JSON.stringify(data));
 
         setMessage("Redirecting to your dashboard…");
-        router.push("/dashboard");
+        router.push(returnTo);
       } catch (err) {
         if (cancelled) return;
         console.error("Callback failed:", err);
