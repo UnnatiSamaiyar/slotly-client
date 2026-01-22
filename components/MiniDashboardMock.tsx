@@ -538,17 +538,17 @@
 //                   {
 //                     title: "Intro Meeting",
 //                     meta: "30 minutes • Google Meet",
-//                     url: "https://slotly.io/publicbook/intro-meeting",
+//                     url: "http://localhost:3000/publicbook/intro-meeting",
 //                   },
 //                   {
 //                     title: "Product Demo",
 //                     meta: "45 minutes • Google Meet",
-//                     url: "https://slotly.io/publicbook/product-demo",
+//                     url: "http://localhost:3000/publicbook/product-demo",
 //                   },
 //                   {
 //                     title: "Support Call",
 //                     meta: "30 minutes • Live",
-//                     url: "https://slotly.io/publicbook/support-call",
+//                     url: "http://localhost:3000/publicbook/support-call",
 //                   },
 //                 ].map((e) => (
 //                   <div key={e.title} className="border rounded-2xl p-4">
@@ -1178,17 +1178,17 @@ function DashboardMockup() {
                   {
                     title: "Intro Meeting",
                     meta: "30 minutes • Google Meet",
-                    url: "https://slotly.io/publicbook/intro-meeting",
+                    url: "http://localhost:3000/publicbook/intro-meeting",
                   },
                   {
                     title: "Product Demo",
                     meta: "45 minutes • Google Meet",
-                    url: "https://slotly.io/publicbook/product-demo",
+                    url: "http://localhost:3000/publicbook/product-demo",
                   },
                   {
                     title: "Support Call",
                     meta: "30 minutes • Live",
-                    url: "https://slotly.io/publicbook/support-call",
+                    url: "http://localhost:3000/publicbook/support-call",
                   },
                 ].map((e) => (
                   <div key={e.title} className="border rounded-2xl p-4">
