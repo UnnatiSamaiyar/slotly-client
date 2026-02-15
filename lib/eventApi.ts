@@ -98,7 +98,7 @@ export async function listEventTypes(): Promise<EventType[]> {
 /**
  * GET /event-types/{id}
  */
-export async function getEventType(id: number): Promise<EventType | null> {
+export async function getEventTypes(id: number): Promise<EventType | null> {
   const data = await request(`/event-types/${id}`);
   return data.event_type || null;
 }
