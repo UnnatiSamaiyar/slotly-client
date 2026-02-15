@@ -38,7 +38,7 @@ function pickApiBase() {
 
   if (envBase) return envBase.replace(/\/+$/, "");
   // fallback: your local server
-  return "http://localhost:8000";
+  return "http://api.slotly.io";
 }
 
 export default function GoogleCallbackPage() {

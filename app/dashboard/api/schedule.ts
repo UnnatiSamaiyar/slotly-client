@@ -9,7 +9,7 @@ export type Schedule = {
   max_days_ahead: number;
 };
 
-const API_BASE = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000").replace(/\/+$/, "");
+const API_BASE = (process.env.NEXT_PUBLIC_API_URL || "http://api.slotly.io").replace(/\/+$/, "");
 
 export async function fetchSchedule(userSub: string): Promise<Schedule> {
   const res = await fetch(`${API_BASE}/schedule/me?user_sub=${encodeURIComponent(userSub)}`);

@@ -26,7 +26,7 @@
 //     const load = async () => {
 //       setLoading(true);
 //       try {
-//         const res = await fetch(`http://localhost:8000/booking/public/${encodeURIComponent(slug)}`);
+//         const res = await fetch(`http://api.slotly.io/booking/public/${encodeURIComponent(slug)}`);
 //         if (!res.ok) throw new Error(await res.text());
 //         const payload = await res.json();
 //         setProfile(payload.profile);
@@ -165,7 +165,7 @@ export default function PublicBookingPage({ params }: { params: { slug: string }
     const load = async () => {
       setLoading(true);
       try {
-        const res = await fetch(`http://localhost:8000/booking/public/${encodeURIComponent(slug)}`);
+        const res = await fetch(`http://api.slotly.io/booking/public/${encodeURIComponent(slug)}`);
         if (!res.ok) throw new Error(await res.text());
         const payload = await res.json();
         setProfile(payload.profile);

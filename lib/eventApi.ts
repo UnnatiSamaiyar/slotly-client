@@ -23,7 +23,7 @@ export type EventType = {
   user_id?: number | null;
 };
 
-const BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8000";
+const BASE = process.env.NEXT_PUBLIC_API_BASE || "http://api.slotly.io";
 
 /**
  * IMPORTANT:

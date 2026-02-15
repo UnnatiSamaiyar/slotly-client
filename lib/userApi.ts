@@ -9,7 +9,7 @@ export type MeProfile = {
   brand_logo_url?: string | null;
 };
 
-const BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8000";
+const BASE = process.env.NEXT_PUBLIC_API_BASE || "http://api.slotly.io";
 
 /**
  * Keep consistent with lib/eventApi.ts (do not change auth behavior).

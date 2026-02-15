@@ -3,7 +3,7 @@
 import React, { Suspense, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-const API_BASE = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000").replace(
+const API_BASE = (process.env.NEXT_PUBLIC_API_URL || "http://api.slotly.io").replace(
   /\/$/,
   ""
 );

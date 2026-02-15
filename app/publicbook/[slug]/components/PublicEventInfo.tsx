@@ -5,7 +5,7 @@
 
 
 // export default function PublicEventInfo({ profile }: { profile: any }) {
-//   const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+//   const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://api.slotly.io";
 //   const hostName = profile.host_name || profile.host || "Host";
 //   const title = profile.title || "Meeting";
 //   const duration = profile.duration_minutes ?? profile.duration ?? 30;
@@ -56,7 +56,7 @@
 import React, { useMemo, useState } from "react";
 
 export default function PublicEventInfo({ profile }: { profile: any }) {
-  const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+  const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://api.slotly.io";
   const hostName = profile.host_name || profile.host || "Host";
   const title = profile.title || "Meeting";
   const duration = profile.duration_minutes ?? profile.duration ?? 30;

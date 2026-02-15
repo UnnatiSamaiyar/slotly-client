@@ -7,7 +7,7 @@ export function toAbsoluteLogoUrl(url?: string | null) {
   const api =
     (import.meta as any).env?.VITE_API_URL ||
     (import.meta as any).env?.NEXT_PUBLIC_API_URL ||
-    "http://localhost:8000";
+    "http://api.slotly.io";
 
   // url may start with /uploads...
   if (url.startsWith("/")) return `${api}${url}`;

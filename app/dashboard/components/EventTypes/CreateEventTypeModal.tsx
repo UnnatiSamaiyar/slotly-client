@@ -50,7 +50,7 @@
 //   const needsLocation = meetingMode === "in_person";
 
 //   const fileInputRef = useRef<HTMLInputElement | null>(null);
-//   const apiBase = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8000";
+//   const apiBase = process.env.NEXT_PUBLIC_API_BASE || "http://api.slotly.io";
 
 //   useEffect(() => {
 //     if (!open) return;
@@ -509,7 +509,7 @@ export default function CreateEventTypeModal({
   const needsLocation = meetingMode === "in_person";
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const apiBase = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8000";
+  const apiBase = process.env.NEXT_PUBLIC_API_BASE || "http://api.slotly.io";
 
   useEffect(() => {
     if (!open) return;
