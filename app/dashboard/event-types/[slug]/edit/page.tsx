@@ -1,21 +1,85 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { getEventType, updateEventType } from "@/lib/eventApi";
+import React, { useEffect, useMemo, useState } from "react";
+import { getEventTypes, updateEventType } from "@/lib/eventApi";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
+import AvailabilityEditorModal from "../../../components/Schedule/AvailabilityEditorModal";
 
 type MeetingMode = "google_meet" | "in_person";
 
-export default function EditEventType({ params }: { params: { id: string } }) {
-  const id = Number(params.id);
+type ScheduleProfile = {
+  profile_slug: string;
+  timezone: string;
+  duration_minutes: number;
+  availability_json: string | null;
+  buffer_before_minutes: number;
+  buffer_after_minutes: number;
+  min_notice_minutes: number;
+  max_days_ahead: number;
+};
+
+const API_BASE = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000").replace(/\/+$/, "");
+
+function getUserSub(): string | null {
+  if (typeof window === "undefined") return null;
+  const keysToTry = ["user_sub", "slotly_user", "user", "auth_user", "slotlyUser"]; 
+  for (const key of keysToTry) {
+    try {
+      const saved = localStorage.getItem(key);
+      if (!saved) continue;
+      if (key === "user_sub") return saved;
+      if (saved === "null" || saved === "undefined") continue;
+      const parsed = JSON.parse(saved);
+      const sub = (parsed as any)?.sub || (parsed as any)?.user_sub || (parsed as any)?.google_sub;
+      if (typeof sub === "string" && sub.trim()) return sub.trim();
+      const nested = (parsed as any)?.user?.sub || (parsed as any)?.profile?.sub;
+      if (typeof nested === "string" && nested.trim()) return nested.trim();
+    } catch {
+      // ignore
+    }
+  }
+  return null;
+}
+
+async function fetchScheduleBySlug(profileSlug: string): Promise<ScheduleProfile> {
+  const userSub = getUserSub();
+  if (!userSub) throw new Error("Missing user_sub in browser storage");
+  const res = await fetch(
+    `${API_BASE}/schedule/profile/${encodeURIComponent(profileSlug)}?user_sub=${encodeURIComponent(userSub)}`
+  );
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
+async function updateScheduleBySlug(profileSlug: string, patch: Partial<ScheduleProfile>): Promise<ScheduleProfile> {
+  const userSub = getUserSub();
+  if (!userSub) throw new Error("Missing user_sub in browser storage");
+  const res = await fetch(
+    `${API_BASE}/schedule/profile/${encodeURIComponent(profileSlug)}?user_sub=${encodeURIComponent(userSub)}`,
+    {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(patch),
+    }
+  );
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
+export default function EditEventType({ params }: { params: { slug: string } }) {
+  const slug = String(params?.slug || "").trim();
 
   const [item, setItem] = useState<any | null>(null);
+  const [schedule, setSchedule] = useState<ScheduleProfile | null>(null);
   const [loading, setLoading] = useState(true);
 
   const [title, setTitle] = useState("");
   const [meetingMode, setMeetingMode] = useState<MeetingMode>("google_meet");
   const [location, setLocation] = useState("");
+  const [durationMinutes, setDurationMinutes] = useState<number>(15);
+  const [availabilityJson, setAvailabilityJson] = useState<string>("{}");
+  const [availabilityOpen, setAvailabilityOpen] = useState(false);
 
   const [saving, setSaving] = useState(false);
 
@@ -24,36 +88,55 @@ export default function EditEventType({ params }: { params: { id: string } }) {
 
   const needsLocation = meetingMode === "in_person";
 
+  const publicLink = useMemo(() => {
+    const s = item?.slug || slug;
+    return `/publicbook/${s}`;
+  }, [item?.slug, slug]);
+
   useEffect(() => {
     let mounted = true;
     setLoading(true);
 
-    if (!id || Number.isNaN(id)) {
-      toast({ title: "Invalid event", description: "Event ID is invalid.", variant: "error" });
+    if (!slug) {
+      toast({ title: "Invalid event", description: "Event slug is missing.", variant: "error" });
       router.push("/dashboard/event-types");
       return;
     }
 
-    getEventType(id)
-      .then((x) => {
-        if (!x) throw new Error("Not found");
-        if (!mounted) return;
+    (async () => {
+      try {
+        const all = await getEventTypes();
+        const found = all.find((x: any) => String(x.slug || "") === slug);
+        if (!found) throw new Error("Not found");
 
-        setItem(x);
-        setTitle(x.title || "");
-        setMeetingMode((x.meeting_mode as MeetingMode) || "google_meet");
-        setLocation(x.location || "");
-      })
-      .catch(() => {
-        toast({ title: "Event not found", description: "The requested event type does not exist or was removed.", variant: "error" });
+        const prof = await fetchScheduleBySlug(slug);
+
+        if (!mounted) return;
+        setItem(found);
+        setTitle(found.title || "");
+        setMeetingMode((found.meeting_mode as MeetingMode) || "google_meet");
+        setLocation(found.location || "");
+        setAvailabilityJson(found.availability_json || "{}");
+
+        setSchedule(prof);
+        setDurationMinutes(Number(prof?.duration_minutes || 15));
+      } catch (e: any) {
+        if (!mounted) return;
+        toast({
+          title: "Event not found",
+          description: e?.message || "The requested event type does not exist or was removed.",
+          variant: "error",
+        });
         router.push("/dashboard/event-types");
-      })
-      .finally(() => mounted && setLoading(false));
+      } finally {
+        mounted && setLoading(false);
+      }
+    })();
 
     return () => {
       mounted = false;
     };
-  }, [id]);
+  }, [slug]);
 
   const handleSave = async () => {
     const cleanTitle = title.trim();
@@ -67,19 +150,38 @@ export default function EditEventType({ params }: { params: { id: string } }) {
       toast({ title: "Location required", description: "Please enter a location for in-person meeting.", variant: "error" });
       return;
     }
+    if (!item?.id) {
+      toast({ title: "Save failed", description: "Missing event type id.", variant: "error" });
+      return;
+    }
 
     setSaving(true);
     try {
-      const updated = await updateEventType(id, {
+      // 1) Update EventType fields (including availability rules)
+      const updated = await updateEventType(Number(item.id), {
         title: cleanTitle,
         meeting_mode: meetingMode,
         location: needsLocation ? cleanLocation : "",
+        availability_json: availabilityJson || "{}",
       });
 
+      // 2) Update per-event duration (BookingProfile duration_minutes)
+      const safeDur = Math.max(5, Math.min(24 * 60, Number(durationMinutes || 15)));
+      const updatedSchedule = await updateScheduleBySlug(updated.slug, {
+        duration_minutes: safeDur,
+      } as any);
+
       setItem(updated);
+      setSchedule(updatedSchedule);
+
+      // If slug changed (title change) redirect to the new edit route.
+      if (String(updated.slug) !== slug) {
+        router.replace(`/dashboard/event-types/${updated.slug}/edit`);
+      }
+
       toast({ title: "Saved", description: "Event type updated successfully.", variant: "success" });
     } catch (e: any) {
-      toast({ title: "Save failed", description: e?.message || String(e) || "Unable to save changes. Please try again.", variant: "error" });
+      toast({ title: "Save failed", description: e?.message || String(e) || "Unable to save changes.", variant: "error" });
     } finally {
       setSaving(false);
     }
@@ -92,14 +194,12 @@ export default function EditEventType({ params }: { params: { id: string } }) {
       <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-2xl font-semibold text-gray-900">Edit Event Type</h1>
-          <p className="text-sm text-gray-500 mt-1">Update title and meeting settings.</p>
+          <p className="text-sm text-gray-500 mt-1">Update title, duration, availability, and meeting settings.</p>
         </div>
 
         <div className="mt-4 md:mt-0 text-sm">
           <span className="text-gray-500">Public Link:</span>{" "}
-          <code className="bg-gray-100 px-2 py-1 rounded text-blue-600">
-            /publicbook/{item?.slug}
-          </code>
+          <code className="bg-gray-100 px-2 py-1 rounded text-blue-600">{publicLink}</code>
         </div>
       </div>
 
@@ -112,6 +212,34 @@ export default function EditEventType({ params }: { params: { id: string } }) {
             className="w-full p-3 border rounded-lg bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
             placeholder="Enter a name for this event"
           />
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Duration (minutes)</label>
+            <input
+              type="number"
+              min={5}
+              max={24 * 60}
+              step={5}
+              value={durationMinutes}
+              onChange={(e) => setDurationMinutes(parseInt(e.target.value, 10) || 15)}
+              className="w-full p-3 border rounded-lg bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+            />
+            <p className="text-xs text-gray-500 mt-1">Default is 15 minutes. Use 5-minute steps.</p>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Availability</label>
+            <button
+              type="button"
+              onClick={() => setAvailabilityOpen(true)}
+              className="w-full p-3 border rounded-lg bg-gray-50 hover:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition text-left"
+            >
+              Set availability
+              <span className="text-xs text-gray-500 block mt-0.5">Weekly hours, date overrides, and time blocks</span>
+            </button>
+          </div>
         </div>
 
         <div>
@@ -142,16 +270,33 @@ export default function EditEventType({ params }: { params: { id: string } }) {
           <div className="text-xs text-gray-500">ID: {item?.id ?? "—"}</div>
 
           <div className="flex gap-3">
-            <button onClick={() => router.push("/dashboard/event-types")} className="px-4 py-2 border rounded-lg text-gray-700 hover:bg-gray-100 transition">
+            <button
+              onClick={() => router.push("/dashboard/event-types")}
+              className="px-4 py-2 border rounded-lg text-gray-700 hover:bg-gray-100 transition"
+            >
               Back
             </button>
 
-            <button onClick={handleSave} disabled={saving} className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-sm transition disabled:opacity-50">
+            <button
+              onClick={handleSave}
+              disabled={saving}
+              className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-sm transition disabled:opacity-50"
+            >
               {saving ? "Saving…" : "Save Changes"}
             </button>
           </div>
         </div>
       </div>
+
+      <AvailabilityEditorModal
+        open={availabilityOpen}
+        initialAvailabilityJson={availabilityJson && availabilityJson !== "{}" ? availabilityJson : null}
+        onClose={() => setAvailabilityOpen(false)}
+        onSave={(json) => {
+          setAvailabilityJson(json || "{}");
+          setAvailabilityOpen(false);
+        }}
+      />
     </div>
   );
 }

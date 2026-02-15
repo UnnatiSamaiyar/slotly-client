@@ -61,6 +61,9 @@ export type EventType = {
   availability_json?: string | null;
   timezone?: string | null;
 
+  // per-event duration (minutes)
+  duration_minutes?: number | null;
+
   // optional fields if still present somewhere else
   created_at?: string;
 };

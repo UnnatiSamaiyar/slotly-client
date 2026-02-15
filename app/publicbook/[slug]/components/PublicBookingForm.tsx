@@ -105,6 +105,7 @@ export default function PublicBookingForm({
   slug,
   profile,
   selectedSlotISO,
+  viewerTz,
   onBooked,
   heightClass = "h-[520px]",
 }: any) {
@@ -120,9 +121,9 @@ export default function PublicBookingForm({
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
-  const viewerTz = useMemo(
-    () => Intl.DateTimeFormat().resolvedOptions().timeZone,
-    []
+  const resolvedViewerTz = useMemo(
+    () => viewerTz || Intl.DateTimeFormat().resolvedOptions().timeZone,
+    [viewerTz]
   );
 
   // prevent auto-open modal on first render
@@ -179,12 +180,12 @@ export default function PublicBookingForm({
         attendees: [email],
         start_iso: selectedSlotISO,
         title: profile?.title,
-        timezone: viewerTz,
+        timezone: resolvedViewerTz,
         meeting_mode: meetingMode,
         location: meetingMode === "in_person" ? normalizedLocation : null,
       };
 
-      const res = await fetch("https://api.slotly.io/public/book", {
+      const res = await fetch("http://localhost:8000/public/book", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -213,7 +214,7 @@ export default function PublicBookingForm({
         {/* header fixed */}
         <div className="p-4 border-b flex items-center justify-between">
           <div className="font-semibold">Your Details</div>
-          <div className="text-xs text-gray-500">{viewerTz}</div>
+          <div className="text-xs text-gray-500">{resolvedViewerTz}</div>
         </div>
 
         {/* scrollable content */}

@@ -9,7 +9,7 @@ function toLocalISODate(d: Date) {
   ).padStart(2, "0")}`;
 }
 
-export default function PublicCalendar({ onSelectDate, selectedDate }: any) {
+export default function PublicCalendar({ onSelectDate, selectedDate, bookingWindow }: any) {
   const [cursor, setCursor] = useState<Date>(new Date());
   const year = cursor.getFullYear();
   const month = cursor.getMonth();
@@ -32,6 +32,10 @@ export default function PublicCalendar({ onSelectDate, selectedDate }: any) {
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
+
+  const windowEnabled = Boolean(bookingWindow?.enabled && bookingWindow?.start_date && bookingWindow?.end_date);
+  const windowStart = windowEnabled ? new Date(`${bookingWindow.start_date}T00:00:00`) : null;
+  const windowEnd = windowEnabled ? new Date(`${bookingWindow.end_date}T23:59:59`) : null;
 
   return (
     <div className="bg-white rounded-xl p-4 border shadow-sm">
@@ -65,6 +69,13 @@ export default function PublicCalendar({ onSelectDate, selectedDate }: any) {
         </div>
       </div>
 
+      {windowEnabled && (
+        <div className="mb-3 text-xs text-gray-500">
+          Available dates: <span className="font-medium">{bookingWindow.start_date}</span> to{" "}
+          <span className="font-medium">{bookingWindow.end_date}</span>
+        </div>
+      )}
+
       <div className="grid grid-cols-7 gap-2 text-sm text-center">
         {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => (
           <div key={d} className="text-xs text-gray-500">
@@ -78,17 +89,18 @@ export default function PublicCalendar({ onSelectDate, selectedDate }: any) {
 
           const isCurrentMonth = d.getMonth() === month;
           const isPast = d < today;
+          const outOfWindow = windowEnabled && ((windowStart && d < windowStart) || (windowEnd && d > windowEnd));
           const selected = selectedDate === iso;
 
           return (
             <button
               key={idx}
               type="button"
-              disabled={!isCurrentMonth || isPast}
+              disabled={!isCurrentMonth || isPast || outOfWindow}
               onClick={() => onSelectDate(iso)}
               className={[
                 "px-2 py-3 rounded-lg text-sm transition border",
-                !isCurrentMonth || isPast
+                !isCurrentMonth || isPast || outOfWindow
                   ? "text-gray-300 border-transparent cursor-not-allowed"
                   : "hover:bg-indigo-50 border-transparent",
                 selected ? "bg-indigo-600 text-white border-indigo-600" : "bg-white",

@@ -42,12 +42,75 @@ function inferQuickFromTz(tz: string): QuickKey {
   return "IST";
 }
 
-export default function TimezonePicker({ compact = false }: { compact?: boolean }) {
+function pad2(n: number) {
+  return String(n).padStart(2, "0");
+}
+
+/**
+ * Returns an offset label in UTC format, e.g. "UTC+05:30".
+ * Uses Intl timeZoneName: 'shortOffset' when available.
+ */
+function utcOffsetLabel(timeZone: string): string {
+  const tz = String(timeZone || "").trim();
+  if (!tz) return "UTC+00:00";
+
+  try {
+    const parts = new Intl.DateTimeFormat("en-US", {
+      timeZone: tz,
+      timeZoneName: "shortOffset" as any,
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    }).formatToParts(new Date());
+
+    const raw = parts.find((p) => p.type === "timeZoneName")?.value || "";
+
+    // Examples: "GMT", "GMT+5", "GMT+05:30", "UTC" (rare)
+    if (raw === "GMT" || raw === "UTC") return "UTC+00:00";
+
+    const m = raw.match(/(GMT|UTC)([+-])(\d{1,2})(?::?(\d{2}))?/i);
+    if (m) {
+      const sign = m[2] === "-" ? "-" : "+";
+      const hh = pad2(Number(m[3] || 0));
+      const mm = pad2(Number(m[4] || 0));
+      return `UTC${sign}${hh}:${mm}`;
+    }
+  } catch {
+    // ignore
+  }
+
+  // Fallback: just show UTC
+  return "UTC";
+}
+
+export default function TimezonePicker({
+  compact = false,
+  value,
+  onChange,
+  label = "Timezone",
+  title,
+  allowAuto = true,
+  helperText,
+}: {
+  compact?: boolean;
+  /** Controlled timezone (field mode). If omitted, picker uses localStorage preference (display mode). */
+  value?: string;
+  /** Controlled change handler (field mode). If omitted, picker persists to localStorage (display mode). */
+  onChange?: (tz: string) => void;
+  label?: string;
+  title?: string;
+  allowAuto?: boolean;
+  helperText?: React.ReactNode;
+}) {
   const zones = useMemo(() => getAllTimezones(), []);
 
-  const [tz, setTz] = useState<string>(() => getPreferredTimezone() || getBrowserTimezone());
-  const [open, setOpen] = useState(false);
+  const controlled = typeof value === "string" && typeof onChange === "function";
+  const browserTz = getBrowserTimezone();
 
+  const [internalTz, setInternalTz] = useState<string>(() => getPreferredTimezone() || browserTz);
+  const tz = controlled ? (value || "") : internalTz;
+
+  const [open, setOpen] = useState(false);
   const [activeQuick, setActiveQuick] = useState<QuickKey>(() => inferQuickFromTz(tz));
   const [q, setQ] = useState("");
 
@@ -62,16 +125,22 @@ export default function TimezonePicker({ compact = false }: { compact?: boolean 
     width: 320,
   });
 
-  // Keep in sync if timezone is changed elsewhere
+  // Keep in sync if timezone is changed elsewhere (display mode only)
   useEffect(() => {
+    if (controlled) return;
     return subscribeTimezoneChange(() => {
       const next = getPreferredTimezone() || getBrowserTimezone();
-      setTz(next);
+      setInternalTz(next);
       setActiveQuick(inferQuickFromTz(next));
     });
-  }, []);
+  }, [controlled]);
 
-  // Click outside close (desktop / normal mode)
+  // Keep quick tab in sync when controlled value changes
+  useEffect(() => {
+    setActiveQuick(inferQuickFromTz(tz));
+  }, [tz]);
+
+  // Click outside close
   useEffect(() => {
     const onDown = (e: MouseEvent) => {
       if (!wrapRef.current) return;
@@ -93,28 +162,18 @@ export default function TimezonePicker({ compact = false }: { compact?: boolean 
   // Focus search + compute panel position on open
   useEffect(() => {
     if (!open) return;
-
     setQ("");
 
-    // compute panel position only for compact (mobile) fixed dropdown
     if (compact && triggerRef.current) {
       const rect = triggerRef.current.getBoundingClientRect();
-
-      // target width
       const w = Math.min(window.innerWidth * 0.92, 420);
       const margin = 10;
 
-      // prefer aligning right edge with trigger, but clamp to viewport
       let left = rect.right - w;
       left = Math.max(margin, Math.min(left, window.innerWidth - w - margin));
-
-      // open below trigger
       let top = rect.bottom + 10;
-
-      // clamp if near bottom (rare): push up a bit
-      const maxTop = window.innerHeight - 180; // keep some room
+      const maxTop = window.innerHeight - 180;
       top = Math.min(top, maxTop);
-
       setPanelPos({ top, left, width: w });
     }
 
@@ -154,16 +213,25 @@ export default function TimezonePicker({ compact = false }: { compact?: boolean 
     if (!cleaned) return;
     if (!isValidTimezone(cleaned)) return;
 
-    setPreferredTimezone(cleaned);
-    setTz(cleaned);
+    if (controlled) {
+      onChange(cleaned);
+    } else {
+      setPreferredTimezone(cleaned);
+      setInternalTz(cleaned);
+    }
+
     setActiveQuick(inferQuickFromTz(cleaned));
     setOpen(false);
   };
 
   const resetToBrowser = () => {
     const b = getBrowserTimezone();
-    setPreferredTimezone(b);
-    setTz(b);
+    if (controlled) {
+      onChange(b);
+    } else {
+      setPreferredTimezone(b);
+      setInternalTz(b);
+    }
     setActiveQuick(inferQuickFromTz(b));
     setOpen(false);
   };
@@ -194,17 +262,20 @@ export default function TimezonePicker({ compact = false }: { compact?: boolean 
   const filtered = useMemo(() => {
     const nq = norm(q);
     if (!nq) return scopedZones;
-    return scopedZones.filter((z) => norm(z).includes(nq));
+    return scopedZones.filter((z) => {
+      const label = `${utcOffsetLabel(z)} ${z}`;
+      return norm(label).includes(nq);
+    });
   }, [scopedZones, q]);
 
-  const browserTz = getBrowserTimezone();
   const showingCustom = tz !== browserTz;
+  const tzOffset = tz ? utcOffsetLabel(tz) : "UTC";
 
   return (
     <div ref={wrapRef} className={compact ? "relative inline-block" : "relative inline-block w-full max-w-[360px]"}>
       {!compact && (
         <div className="flex items-center justify-between mb-1">
-          <label className="text-[11px] font-medium text-gray-600">Timezone</label>
+          <label className="text-[11px] font-medium text-gray-600">{label}</label>
           <span className="text-[11px] text-gray-500">{showingCustom ? "Custom" : "Auto"}</span>
         </div>
       )}
@@ -229,14 +300,15 @@ export default function TimezonePicker({ compact = false }: { compact?: boolean 
         }
         aria-haspopup="dialog"
         aria-expanded={open}
-        title="Display timezone (not stored in DB)"
+        title={title || "Timezone"}
       >
         {!compact ? (
           <div className="min-w-0 text-left">
-            <div className="text-sm font-medium text-gray-900 truncate">{tz}</div>
+            <div className="text-sm font-semibold text-gray-900 truncate">{tzOffset}</div>
+            <div className="text-[11px] text-gray-600 truncate">{tz}</div>
           </div>
         ) : (
-          <div className="text-xs font-semibold text-gray-700">{active.label}</div>
+          <div className="text-xs font-semibold text-gray-700">{tzOffset}</div>
         )}
 
         <div className="flex items-center gap-2 shrink-0">
@@ -253,12 +325,7 @@ export default function TimezonePicker({ compact = false }: { compact?: boolean 
 
       {/* ✅ Overlay for compact mode (mobile): closes on tap */}
       {open && compact && (
-        <button
-          type="button"
-          aria-label="Close timezone"
-          onClick={() => setOpen(false)}
-          className="fixed inset-0 z-[48] bg-black/5"
-        />
+        <button type="button" aria-label="Close timezone" onClick={() => setOpen(false)} className="fixed inset-0 z-[48] bg-black/5" />
       )}
 
       {/* Panel */}
@@ -269,11 +336,7 @@ export default function TimezonePicker({ compact = false }: { compact?: boolean 
               ? "fixed z-[50] rounded-2xl border border-gray-200 bg-white shadow-2xl overflow-hidden"
               : "absolute z-50 mt-2 w-full rounded-2xl border border-gray-200 bg-white shadow-xl overflow-hidden",
           ].join(" ")}
-          style={
-            compact
-              ? { top: panelPos.top, left: panelPos.left, width: panelPos.width }
-              : undefined
-          }
+          style={compact ? { top: panelPos.top, left: panelPos.left, width: panelPos.width } : undefined}
         >
           {/* Quick picks */}
           <div className="p-2">
@@ -323,19 +386,21 @@ export default function TimezonePicker({ compact = false }: { compact?: boolean 
                   value={q}
                   onChange={(e) => setQ(e.target.value)}
                   className="w-full h-10 rounded-xl border border-gray-200 bg-white pl-9 pr-3 text-sm outline-none focus:ring-2 focus:ring-blue-500/30"
-                  placeholder="Search timezone (e.g., Kolkata, New York, UTC)"
+                  placeholder="Search timezone (e.g., UTC+04:00, Dubai, Kolkata)"
                   spellCheck={false}
                 />
               </div>
 
-              <button
-                type="button"
-                onClick={resetToBrowser}
-                className="h-10 px-3 rounded-xl border border-gray-200 bg-white text-sm font-medium hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
-                title="Reset to browser timezone"
-              >
-                Auto
-              </button>
+              {allowAuto && (
+                <button
+                  type="button"
+                  onClick={resetToBrowser}
+                  className="h-10 px-3 rounded-xl border border-gray-200 bg-white text-sm font-medium hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+                  title="Reset to browser timezone"
+                >
+                  Auto
+                </button>
+              )}
             </div>
           </div>
 
@@ -347,6 +412,7 @@ export default function TimezonePicker({ compact = false }: { compact?: boolean 
               <ul className="py-1">
                 {filtered.slice(0, 300).map((z) => {
                   const selected = z === tz;
+                  const off = utcOffsetLabel(z);
                   return (
                     <li key={z}>
                       <button
@@ -358,10 +424,11 @@ export default function TimezonePicker({ compact = false }: { compact?: boolean 
                           selected ? "bg-blue-50/60" : "",
                         ].join(" ")}
                       >
-                        <span className="truncate text-gray-900">{z}</span>
-                        {selected && (
-                          <span className="shrink-0 text-[11px] font-semibold text-blue-700">Selected</span>
-                        )}
+                        <div className="min-w-0">
+                          <div className="text-[12px] font-semibold text-gray-900 truncate">{off}</div>
+                          <div className="text-[12px] text-gray-600 truncate">{z}</div>
+                        </div>
+                        {selected && <span className="shrink-0 text-[11px] font-semibold text-blue-700">Selected</span>}
                       </button>
                     </li>
                   );
@@ -372,7 +439,9 @@ export default function TimezonePicker({ compact = false }: { compact?: boolean 
 
           {/* Footer helper */}
           <div className="px-3 py-2 border-t border-gray-100 text-[11px] text-gray-500">
-            {showingCustom ? (
+            {helperText ? (
+              helperText
+            ) : showingCustom ? (
               <>
                 Showing times in <span className="font-medium text-gray-700">{tz}</span>
               </>

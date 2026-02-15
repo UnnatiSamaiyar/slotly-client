@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { Trash2, MapPin, Video } from "lucide-react";
 import { EventType } from "../../types";
 import { useToast } from "@/hooks/use-toast";
+import AvailabilityEditorModal from "../Schedule/AvailabilityEditorModal";
 
 type MeetingMode = "google_meet" | "in_person";
 
@@ -26,6 +27,7 @@ export default function EditEventTypeModal({
       meeting_mode: MeetingMode;
       location: string;
       availability_json: string;
+      duration_minutes: number;
     }>
   ) => Promise<void>;
   onDelete: (id: number) => Promise<void>;
@@ -56,7 +58,11 @@ export default function EditEventTypeModal({
   const [title, setTitle] = useState("");
   const [meetingMode, setMeetingMode] = useState<MeetingMode>("google_meet");
   const [location, setLocation] = useState("");
+  const [durationMinutes, setDurationMinutes] = useState<number>(15);
   const [saving, setSaving] = useState(false);
+  // Event-type scoped availability
+  const [availabilityJson, setAvailabilityJson] = useState<string>("{}");
+  const [availabilityOpen, setAvailabilityOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -67,6 +73,8 @@ export default function EditEventTypeModal({
       setTitle(item.title || "");
       setMeetingMode((item.meeting_mode as MeetingMode) || "google_meet");
       setLocation(item.location || "");
+      setDurationMinutes(Number((item as any).duration_minutes || 15));
+      setAvailabilityJson(String(item.availability_json || "{}"));
     }
   }, [item]);
 
@@ -94,6 +102,8 @@ export default function EditEventTypeModal({
         title: cleanTitle,
         meeting_mode: meetingMode,
         location: needsLocation ? cleanLocation : "",
+        duration_minutes: durationMinutes,
+        availability_json: availabilityJson,
       });
       toast({ title: "Saved", description: "Event type updated successfully.", variant: "success" });
       onClose();
@@ -164,6 +174,36 @@ export default function EditEventTypeModal({
               </select>
             </div>
 
+            <div>
+              <label className="text-xs text-slate-600">Duration</label>
+              <select
+                value={String(durationMinutes)}
+                onChange={(e) => setDurationMinutes(Number(e.target.value))}
+                className="mt-1 w-full px-3 py-2 border rounded-lg bg-white"
+              >
+                {[5, 10, 15, 20, 30, 45, 60, 90, 120].map((m) => (
+                  <option key={m} value={m}>
+                    {m} minutes
+                  </option>
+                ))}
+              </select>
+              <div className="mt-1 text-xs text-slate-500">Controls the slot size shown to guests.</div>
+            </div>
+
+            <div>
+              <label className="text-xs text-slate-600">Availability</label>
+              <div className="mt-1 flex items-center justify-between gap-3">
+                <div className="text-xs text-slate-500">Override weekly hours for this event type.</div>
+                <button
+                  type="button"
+                  onClick={() => setAvailabilityOpen(true)}
+                  className="px-3 py-2 text-sm rounded-lg border hover:bg-slate-50"
+                >
+                  Edit availability
+                </button>
+              </div>
+            </div>
+
             {needsLocation && (
               <div>
                 <label className="text-xs text-slate-600">Location</label>
@@ -196,6 +236,16 @@ export default function EditEventTypeModal({
           </div>
         </form>
       </motion.div>
+
+      <AvailabilityEditorModal
+        open={availabilityOpen}
+        initialAvailabilityJson={availabilityJson}
+        onClose={() => setAvailabilityOpen(false)}
+        onSave={(json) => {
+          setAvailabilityJson(json);
+          setAvailabilityOpen(false);
+        }}
+      />
     </div>
   );
 }

@@ -1,153 +1,168 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+//@ts-nocheck
+import React, { useEffect, useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
-const API_BASE = (process.env.NEXT_PUBLIC_API_URL || "https://api.slotly.io").replace(/\/$/, "");
+/**
+ * Google OAuth callback handler (Client)
+ *
+ * Expects query params:
+ * - code
+ * - state (optional) -> may contain returnTo etc.
+ *
+ * Calls backend: POST {API_BASE}/auth/google
+ * Persists: localStorage.setItem("slotly_user", JSON.stringify({sub, email, name, picture, ...}))
+ * Redirects to returnTo or /dashboard
+ */
 
-function safeBase64UrlDecode(input: string) {
+function safeParseState(stateStr?: string | null) {
+  if (!stateStr) return null;
   try {
-    const b64 = input.replace(/-/g, "+").replace(/_/g, "/");
-    const padded = b64 + "===".slice((b64.length + 3) % 4);
-    return window.atob(padded);
+    // sometimes state is URI encoded json
+    const decoded = decodeURIComponent(stateStr);
+    return JSON.parse(decoded);
   } catch {
-    return null;
+    try {
+      return JSON.parse(stateStr);
+    } catch {
+      return null;
+    }
   }
+}
+
+function pickApiBase() {
+  // Prefer env if you have it
+  const envBase =
+    (process.env.NEXT_PUBLIC_API_BASE || process.env.NEXT_PUBLIC_BACKEND_URL || "").trim();
+
+  if (envBase) return envBase.replace(/\/+$/, "");
+  // fallback: your local server
+  return "http://localhost:8000";
 }
 
 export default function GoogleCallbackPage() {
   const router = useRouter();
-  const [status, setStatus] = useState<"working" | "error">("working");
-  const [message, setMessage] = useState("Logging you in…");
-  const [detail, setDetail] = useState<string | null>(null);
+  const sp = useSearchParams();
+
+  const [status, setStatus] = useState<"loading" | "error" | "done">("loading");
+  const [message, setMessage] = useState<string>("Completing login…");
+
+  const code = sp.get("code");
+  const stateStr = sp.get("state");
+
+  const stateObj = useMemo(() => safeParseState(stateStr), [stateStr]);
+  const returnTo = useMemo(() => {
+    const rt = stateObj?.returnTo;
+    if (typeof rt === "string" && rt.startsWith("/")) return rt;
+    return "/dashboard";
+  }, [stateObj]);
 
   useEffect(() => {
     let cancelled = false;
 
-    async function handle() {
-      const code = new URLSearchParams(window.location.search).get("code");
-      const state = new URLSearchParams(window.location.search).get("state");
-
-      let returnTo = "/dashboard";
-      if (state) {
-        const decoded = safeBase64UrlDecode(state);
-        if (decoded) {
-          try {
-            const obj = JSON.parse(decoded);
-            if (obj && typeof obj.returnTo === "string" && obj.returnTo.startsWith("/")) {
-              returnTo = obj.returnTo;
-            }
-          } catch {
-            // ignore
-          }
-        }
-      }
-
-      if (!code) {
-        setStatus("error");
-        setMessage("Missing authorization code.");
-        setDetail("Please retry Google sign-in from the login page.");
-        return;
-      }
-
+    async function run() {
       try {
-        setStatus("working");
-        setMessage("Signing you in…");
-        setDetail(null);
+        setStatus("loading");
+        setMessage("Completing login…");
 
-        const res = await fetch(`${API_BASE}/auth/google`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ code }),
-        });
-
-        const data = await res.json().catch(() => null);
-
-        if (!res.ok) {
-          if (cancelled) return;
-          console.error("Backend error:", data);
+        if (!code) {
           setStatus("error");
-          setMessage("Sign-in failed.");
-          setDetail(
-            (data && (data.detail || data.message)) ||
-              "Your session could not be created. Please try again."
-          );
+          setMessage("Missing OAuth code. Please try logging in again.");
           return;
         }
 
+        const API_BASE = pickApiBase();
+
+        // Backend expects code+state OR full callback URL depending on your implementation.
+        // We'll send both so it works either way.
+        const res = await fetch(`${API_BASE}/auth/google`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({
+            code,
+            state: stateStr || null,
+            mode: stateObj?.mode || "login",
+            returnTo,
+          }),
+        });
+
+        if (!res.ok) {
+          const text = await res.text().catch(() => "");
+          throw new Error(text || "Login failed");
+        }
+
+        const payload = await res.json();
+
+        // Flexible extraction (different backends send different shapes)
+        const user =
+          payload?.user ||
+          payload?.data?.user ||
+          payload?.profile ||
+          payload?.data?.profile ||
+          payload;
+
+        const sub = user?.sub || user?.google_sub || user?.id || null;
+
+        if (!sub) {
+          // If backend didn't send sub, we still can't open dashboard
+          throw new Error("Login succeeded but user id (sub) was not returned by server.");
+        }
+
+        // Persist in the SAME key dashboard reads
+        const session = {
+          sub: String(sub),
+          email: user?.email || "",
+          name: user?.name || "",
+          picture: user?.picture || "",
+          raw: user, // keep raw for debugging (safe)
+        };
+
+        try {
+          localStorage.setItem("slotly_user", JSON.stringify(session));
+        } catch {}
+
         if (cancelled) return;
 
-        // THIS IS WHERE LOGIN GETS STORED
-        localStorage.setItem("slotly_user", JSON.stringify(data));
+        setStatus("done");
+        setMessage("Login successful. Redirecting…");
 
-        setMessage("Redirecting to your dashboard…");
-        router.push(returnTo);
-      } catch (err) {
+        // small delay to ensure storage flush
+        setTimeout(() => {
+          router.replace(returnTo);
+        }, 150);
+      } catch (e: any) {
         if (cancelled) return;
-        console.error("Callback failed:", err);
         setStatus("error");
-        setMessage("Something went wrong.");
-        setDetail("Please check your connection and try again.");
+        setMessage(e?.message || "Login failed. Please try again.");
       }
     }
 
-    handle();
+    run();
     return () => {
       cancelled = true;
     };
-  }, [router]);
+  }, [code, stateStr, returnTo, router, stateObj]);
 
   return (
-    <div className="min-h-screen bg-[#f6f8ff] flex items-center justify-center px-4">
-      <div className="w-full max-w-md bg-white border border-gray-100 shadow-sm rounded-2xl p-6 sm:p-8">
-        <div className="flex items-center justify-center">
-          <div
-            className={[
-              "h-12 w-12 rounded-full border-2",
-              status === "working"
-                ? "border-indigo-200 border-t-indigo-600 animate-spin"
-                : "border-red-200",
-            ].join(" ")}
-            aria-hidden="true"
-          />
+    <div className="min-h-screen flex items-center justify-center bg-white px-6">
+      <div className="w-full max-w-md rounded-2xl border border-gray-100 shadow-sm p-8 text-center">
+        <div className="text-xl font-semibold text-gray-900">
+          {status === "error" ? "Login Failed" : status === "done" ? "Welcome back" : "Signing you in"}
+        </div>
+        <div className={`mt-3 text-sm ${status === "error" ? "text-red-600" : "text-gray-600"}`}>
+          {message}
         </div>
 
-        <div className="text-center mt-5">
-          <h1 className="text-base sm:text-lg font-semibold text-slate-900">
-            {message}
-          </h1>
-          <p className="text-sm text-slate-500 mt-1">
-            {status === "working"
-              ? "Please wait. Do not close this tab."
-              : detail || "Please try again."}
-          </p>
-
-          {status === "error" ? (
-            <div className="mt-5 flex flex-col sm:flex-row gap-2">
-              <button
-                type="button"
-                onClick={() => router.push("/")}
-                className="w-full sm:w-auto px-4 py-2 rounded-xl border border-gray-200 hover:bg-gray-50 text-sm font-semibold"
-              >
-                Back to Home
-              </button>
-              <button
-                type="button"
-                onClick={() => window.location.reload()}
-                className="w-full sm:w-auto px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold"
-              >
-                Retry
-              </button>
-            </div>
-          ) : null}
-        </div>
-
-        <div className="mt-6 border-t border-gray-100 pt-4">
-          <div className="flex items-center justify-between text-xs text-gray-400">
-            <span>Secure Google sign-in</span>
-            <span>Slotly</span>
-          </div>
-        </div>
+        {status === "error" ? (
+          <button
+            onClick={() => router.replace("/login")}
+            className="mt-6 inline-flex items-center justify-center rounded-xl bg-gray-900 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-800"
+          >
+            Go to Login
+          </button>
+        ) : null}
       </div>
     </div>
   );

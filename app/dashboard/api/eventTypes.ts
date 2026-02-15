@@ -1,7 +1,7 @@
 // // src/app/dashboard/api/eventTypes.ts
 // import { EventType } from "../types";
 
-// const ET_BASE = process.env.NEXT_PUBLIC_EVENT_TYPES_API || "https://api.slotly.io";
+// const ET_BASE = process.env.NEXT_PUBLIC_EVENT_TYPES_API || "http://localhost:8000";
 
 // export async function fetchEventTypes(userSub: string): Promise<EventType[]> {
 //   const res = await fetch(`${ET_BASE}/event-types?user_sub=${encodeURIComponent(userSub)}`);
@@ -25,7 +25,7 @@
 // // src/app/dashboard/api/eventTypes.ts
 // import { EventType } from "../types";
 
-// const BASE = process.env.NEXT_PUBLIC_EVENT_TYPES_API || "https://api.slotly.io";
+// const BASE = process.env.NEXT_PUBLIC_EVENT_TYPES_API || "http://localhost:8000";
 
 // export async function fetchEventTypes(userSub: string): Promise<EventType[]> {
 //   const res = await fetch(
@@ -50,7 +50,7 @@
 // src/app/dashboard/api/eventTypes.ts
 import { EventType } from "../types";
 
-const BASE = process.env.NEXT_PUBLIC_EVENT_TYPES_API || "https://api.slotly.io";
+const BASE = process.env.NEXT_PUBLIC_EVENT_TYPES_API || "http://localhost:8000";
 
 async function handleRes(res: Response) {
   if (!res.ok) {
@@ -69,7 +69,17 @@ export async function fetchEventTypes(userSub: string): Promise<EventType[]> {
   return json.event_types || [];
 }
 
-export async function createEventType(userSub: string, payload: { title: string; duration: number; location?: string; availability_json?: string }) {
+export async function createEventType(
+  userSub: string,
+  payload: {
+    title: string;
+    meeting_mode: "google_meet" | "in_person";
+    location?: string;
+    availability_json?: string;
+    duration_minutes?: number;
+    timezone?: string | null;
+  }
+) {
   const res = await fetch(`${BASE}/event-types/create?user_sub=${encodeURIComponent(userSub)}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -79,7 +89,18 @@ export async function createEventType(userSub: string, payload: { title: string;
   return handleRes(res);
 }
 
-export async function updateEventType(userSub: string, id: number, payload: Partial<{ title: string; duration: number; location: string; availability_json: string }>) {
+export async function updateEventType(
+  userSub: string,
+  id: number,
+  payload: Partial<{
+    title: string;
+    meeting_mode: "google_meet" | "in_person";
+    location: string;
+    availability_json: string;
+    duration_minutes: number;
+    timezone: string | null;
+  }>
+) {
   const res = await fetch(`${BASE}/event-types/${id}?user_sub=${encodeURIComponent(userSub)}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },

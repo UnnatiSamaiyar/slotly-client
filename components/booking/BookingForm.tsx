@@ -73,7 +73,7 @@ export default function BookingForm({ userSub }: { userSub: string }) {
         // Fallback to browser timezone if not set.
         const viewerTz = getPreferredTimezone();
         const res = await fetch(
-          `https://api.slotly.io/bookings/availability?user_sub=${encodeURIComponent(
+          `http://localhost:8000/bookings/availability?user_sub=${encodeURIComponent(
             userSub
           )}&date=${date}&tz=${encodeURIComponent(viewerTz)}`
         );
@@ -129,7 +129,7 @@ export default function BookingForm({ userSub }: { userSub: string }) {
   // Meeting Link Preview
   // -----------------------------
   const meetingLink = useMemo(() => {
-    return `https://slotly.io/dashboard/book?user_sub=${encodeURIComponent(
+    return `http://localhost:3000/dashboard/book?user_sub=${encodeURIComponent(
       userSub
     )}`;
   }, [userSub]);
@@ -174,7 +174,7 @@ export default function BookingForm({ userSub }: { userSub: string }) {
 
     try {
       const res = await fetch(
-        `https://api.slotly.io/bookings/create?user_sub=${encodeURIComponent(
+        `http://localhost:8000/bookings/create?user_sub=${encodeURIComponent(
           userSub
         )}`,
         {

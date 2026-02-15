@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { BellRing, Search, LogOut, ChevronDown } from "lucide-react";
+import { Search, LogOut, ChevronDown } from "lucide-react";
 import { UserProfile } from "../../types";
 import TimezonePicker from "../TimezonePicker";
 
@@ -59,14 +59,14 @@ export default function Topbar({
     "/menwithtab.png";
 
   return (
-    <header className="mb-5">
-      {/* ✅ Desktop header (sm+) */}
-      <div className="hidden sm:flex items-start justify-between gap-3">
+    <header className="mb-6">
+      {/* Desktop header (sm+) */}
+      <div className="hidden sm:flex items-start justify-between gap-4">
         <div className="min-w-0">
-          <h2 className="text-xl font-semibold text-gray-900 leading-tight">
+          <h2 className="text-xl font-semibold text-slate-900 leading-tight">
             Your Schedule
           </h2>
-          <p className="mt-1 text-sm text-gray-500 leading-snug">
+          <p className="mt-1 text-sm text-slate-500 leading-snug">
             Search and manage your meetings quickly.
           </p>
         </div>
@@ -74,20 +74,15 @@ export default function Topbar({
         <div className="flex items-center gap-2 shrink-0">
           <TimezonePicker />
 
-          {/* <button
-            className="h-10 w-10 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 flex items-center justify-center transition"
-            type="button"
-            aria-label="Notifications"
-          >
-            <BellRing className="h-5 w-5 text-slate-700" />
-          </button> */}
-
           {/* Profile */}
           <div className="relative" ref={profileWrapRef}>
             <button
               type="button"
               onClick={() => setProfileOpen((v) => !v)}
-              className="flex items-center gap-2 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 px-2 py-1.5 transition"
+              className={[
+                "flex items-center gap-2 rounded-xl border border-slate-200 bg-white",
+                "hover:bg-slate-50 px-2 py-1.5 transition shadow-[0_1px_0_rgba(15,23,42,0.04)]",
+              ].join(" ")}
               aria-haspopup="menu"
               aria-expanded={profileOpen}
               title="Profile menu"
@@ -103,27 +98,27 @@ export default function Topbar({
               />
 
               <div className="hidden lg:block min-w-0 text-left">
-                <div className="text-sm font-semibold text-gray-900 truncate max-w-[160px]">
+                <div className="text-sm font-semibold text-slate-900 truncate max-w-[160px]">
                   {(user as any)?.name || "User"}
                 </div>
-                <div className="text-xs text-gray-500 truncate max-w-[160px]">
+                <div className="text-xs text-slate-500 truncate max-w-[160px]">
                   {(user as any)?.email || ""}
                 </div>
               </div>
 
-              <ChevronDown className="h-4 w-4 text-gray-400" />
+              <ChevronDown className="h-4 w-4 text-slate-400" />
             </button>
 
             {profileOpen && (
               <div
                 role="menu"
-                className="absolute right-0 mt-2 w-60 rounded-2xl border border-gray-200 bg-white shadow-xl overflow-hidden z-50"
+                className="absolute right-0 mt-2 w-60 rounded-2xl border border-slate-200 bg-white shadow-xl overflow-hidden z-50"
               >
-                <div className="px-4 py-3 border-b border-gray-100">
+                <div className="px-4 py-3 border-b border-slate-100">
                   <div className="text-sm font-semibold truncate">
                     {(user as any)?.name || "User"}
                   </div>
-                  <div className="text-xs text-gray-500 truncate">
+                  <div className="text-xs text-slate-500 truncate">
                     {(user as any)?.email || ""}
                   </div>
                 </div>
@@ -142,28 +137,16 @@ export default function Topbar({
         </div>
       </div>
 
-      {/* ✅ Mobile header (below sm): compact actions row only */}
+      {/* Mobile header (below sm) */}
       <div className="flex sm:hidden items-center justify-between gap-2">
-        {/* <div className="text-sm font-semibold text-gray-900 truncate">
-          Dashboard
-        </div> */}
-
         <div className="flex items-center gap-2 shrink-0">
           <TimezonePicker compact />
-
-          {/* <button
-            className="h-10 w-10 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 flex items-center justify-center transition"
-            type="button"
-            aria-label="Notifications"
-          >
-            <BellRing className="h-5 w-5 text-slate-700" />
-          </button> */}
 
           <div className="relative" ref={profileWrapRef}>
             <button
               type="button"
               onClick={() => setProfileOpen((v) => !v)}
-              className="flex items-center gap-2 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 px-2 py-1.5 transition"
+              className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 px-2 py-1.5 transition shadow-[0_1px_0_rgba(15,23,42,0.04)]"
               aria-haspopup="menu"
               aria-expanded={profileOpen}
               title="Profile menu"
@@ -177,19 +160,19 @@ export default function Topbar({
                   (e.currentTarget as HTMLImageElement).src = "/menwithtab.png";
                 }}
               />
-              <ChevronDown className="h-4 w-4 text-gray-400" />
+              <ChevronDown className="h-4 w-4 text-slate-400" />
             </button>
 
             {profileOpen && (
               <div
                 role="menu"
-                className="absolute right-0 mt-2 w-60 rounded-2xl border border-gray-200 bg-white shadow-xl overflow-hidden z-50"
+                className="absolute right-0 mt-2 w-60 rounded-2xl border border-slate-200 bg-white shadow-xl overflow-hidden z-50"
               >
-                <div className="px-4 py-3 border-b border-gray-100">
+                <div className="px-4 py-3 border-b border-slate-100">
                   <div className="text-sm font-semibold truncate">
                     {(user as any)?.name || "User"}
                   </div>
-                  <div className="text-xs text-gray-500 truncate">
+                  <div className="text-xs text-slate-500 truncate">
                     {(user as any)?.email || ""}
                   </div>
                 </div>
@@ -208,20 +191,65 @@ export default function Topbar({
         </div>
       </div>
 
-      {/* ✅ Search row (same for all, but spacing tuned) */}
-      <div className="mt-3 sm:mt-4">
+      {/* Search row */}
+      <div className="mt-4">
         <div className="relative">
-          <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             placeholder="Search events…"
             value={searchQuery}
             onChange={(e) => onSearchQueryChange(e.target.value)}
-            className="w-full pl-9 pr-3 py-2.5 rounded-2xl border border-gray-200 bg-white
-                       focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-300 transition"
+            className={[
+              "w-full h-11 pl-9 pr-3 rounded-2xl border border-slate-200 bg-white",
+              "shadow-[0_1px_0_rgba(15,23,42,0.04)]",
+              "focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-300 transition",
+            ].join(" ")}
           />
         </div>
       </div>
     </header>
   );
 }
+
+
+
+
+
+
+
+
+// "use client";
+
+// import { Search } from "lucide-react";
+// import { DButton } from "../../../../components/ui/DButton.tsx";
+
+// export default function Topbar() {
+//   return (
+//     <div className="sticky top-0 z-30 bg-white border-b border-slate-200">
+//       <div className="h-16 px-8 flex items-center justify-between gap-6">
+//         {/* Left */}
+//         <div className="flex items-center gap-3 text-slate-800 font-semibold">
+//           Dashboard
+//         </div>
+
+//         {/* Center Search */}
+//         <div className="flex-1 max-w-xl">
+//           <div className="relative">
+//             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+//             <input
+//               placeholder="Search events, people…"
+//               className="w-full h-10 rounded-xl border border-slate-200 bg-slate-50 pl-9 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/30"
+//             />
+//           </div>
+//         </div>
+
+//         {/* Right actions */}
+//         <div className="flex items-center gap-3">
+//           <DButton variant="ghost">Help</DButton>
+//           <DButton variant="primary">Create event</DButton>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }

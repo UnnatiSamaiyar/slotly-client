@@ -2,7 +2,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import PublicEventInfo from "./components/PublicEventInfo";
 import PublicCalendar from "./components/PublicCalendar";
 import PublicTimeSlots from "./components/PublicTimeSlots";
@@ -49,10 +49,61 @@ export default function PublicBookingPage() {
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState<string | null>(null);
 
-  const viewerTz = useMemo(
-    () => Intl.DateTimeFormat().resolvedOptions().timeZone,
-    []
-  );
+  const viewerTz = useMemo(() => {
+    if (typeof window === "undefined") return "UTC";
+    return (
+      localStorage.getItem("slotly_viewer_tz") ||
+      Intl.DateTimeFormat().resolvedOptions().timeZone ||
+      "UTC"
+    );
+  }, []);
+
+  // Default = event's timezone (profile.timezone). If missing, fall back to viewer/browser.
+  const [selectedTz, setSelectedTz] = useState<string>(viewerTz);
+  const didInitTzRef = useRef(false);
+
+  // When profile loads, force default timezone = event timezone ONCE.
+  useEffect(() => {
+    if (didInitTzRef.current) return;
+    if (!profile) return;
+    const etz = String(profile?.timezone || "").trim();
+    if (etz) {
+      setSelectedTz(etz);
+      didInitTzRef.current = true;
+      return;
+    }
+    didInitTzRef.current = true;
+  }, [profile]);
+
+  // expose to children without changing a lot of props plumbing
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    (window as any).__slotly_viewer_tz = selectedTz;
+    localStorage.setItem("slotly_viewer_tz", selectedTz);
+  }, [selectedTz]);
+
+  const tzOptions = useMemo(() => {
+    try {
+      // modern browsers
+      // @ts-ignore
+      const list = (Intl as any).supportedValuesOf?.("timeZone") as string[] | undefined;
+      if (Array.isArray(list) && list.length) return list;
+    } catch {}
+    // fallback: common zones
+    return [
+      "Asia/Kolkata",
+      "Asia/Dubai",
+      "Asia/Singapore",
+      "Europe/London",
+      "Europe/Paris",
+      "America/New_York",
+      "America/Chicago",
+      "America/Denver",
+      "America/Los_Angeles",
+      "Australia/Sydney",
+      "UTC",
+    ];
+  }, []);
 
   useEffect(() => {
     if (!slug) return;
@@ -61,7 +112,7 @@ export default function PublicBookingPage() {
       setLoading(true);
       try {
         const res = await fetch(
-          `https://api.slotly.io/public/profile/${encodeURIComponent(slug)}`
+          `http://localhost:8000/public/profile/${encodeURIComponent(slug)}`
         );
         if (!res.ok) throw new Error(await res.text());
         const payload = await res.json();
@@ -75,6 +126,13 @@ export default function PublicBookingPage() {
 
     load();
   }, [slug]);
+
+  // When profile loads, set default timezone to the event/profile timezone.
+  useEffect(() => {
+    const t = String(profile?.timezone || "").trim();
+    if (!t) return;
+    setSelectedTz(t);
+  }, [profile?.timezone]);
 
   const stepDateDone = !!selectedDate;
   const stepTimeDone = !!selectedSlotISO;
@@ -109,8 +167,19 @@ export default function PublicBookingPage() {
               <StepPill label="Details" active={stepTimeDone} done={false} />
             </div>
 
-            <div className="text-xs text-gray-500">
-              Times shown in <span className="font-medium">{viewerTz}</span>
+            <div className="flex items-center gap-2 text-xs text-gray-500">
+              <span className="whitespace-nowrap">Timezone</span>
+              <select
+                value={selectedTz}
+                onChange={(e) => setSelectedTz(e.target.value)}
+                className="border border-gray-200 rounded-lg px-2 py-1 text-xs bg-white"
+              >
+                {tzOptions.map((tz) => (
+                  <option key={tz} value={tz}>
+                    {tz}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
         </div>
@@ -127,6 +196,7 @@ export default function PublicBookingPage() {
             <div className="grid grid-cols-1 gap-6">
               <PublicCalendar
                 slug={slug}
+                bookingWindow={profile?.booking_window}
                 selectedDate={selectedDate}
                 onSelectDate={(d) => {
                   setSelectedDate(d);
@@ -141,6 +211,7 @@ export default function PublicBookingPage() {
                     slug={slug}
                     date={selectedDate}
                     selectedSlotISO={selectedSlotISO}
+                    viewerTz={selectedTz}
                     onSelectSlot={setSelectedSlotISO}
                     // NEW: internal height control
                     heightClass="h-[520px]"
@@ -152,6 +223,7 @@ export default function PublicBookingPage() {
                     slug={slug}
                     profile={profile}
                     selectedSlotISO={selectedSlotISO}
+                    viewerTz={selectedTz}
                     // NEW: internal height control
                     heightClass="h-[520px]"
                     onBooked={() => {

@@ -2,6 +2,34 @@
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
+function hourInTimeZone(iso: string, timeZone: string): number {
+  try {
+    const d = new Date(iso);
+    const parts = new Intl.DateTimeFormat("en-US", {
+      timeZone,
+      hour: "2-digit",
+      hour12: false,
+    }).formatToParts(d);
+    const hh = parts.find((p) => p.type === "hour")?.value;
+    const n = Number(hh);
+    return Number.isFinite(n) ? n : d.getHours();
+  } catch {
+    return new Date(iso).getHours();
+  }
+}
+
+function timeLabelInTimeZone(iso: string, timeZone: string): string {
+  try {
+    return new Date(iso).toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+      timeZone,
+    });
+  } catch {
+    return new Date(iso).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  }
+}
+
 function sectionForHour(h: number) {
   if (h >= 0 && h < 6) return "Night";
   if (h >= 6 && h < 12) return "Morning";
@@ -14,15 +42,16 @@ export default function PublicTimeSlots({
   date,
   onSelectSlot,
   selectedSlotISO,
+  viewerTz,
   heightClass = "h-[520px]",
 }: any) {
   const [slots, setSlots] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const viewerTz = useMemo(
-    () => Intl.DateTimeFormat().resolvedOptions().timeZone,
-    []
+  const resolvedViewerTz = useMemo(
+    () => viewerTz || Intl.DateTimeFormat().resolvedOptions().timeZone,
+    [viewerTz]
   );
 
   const listRef = useRef<HTMLDivElement | null>(null);
@@ -31,15 +60,14 @@ export default function PublicTimeSlots({
     const g: any = { Night: [], Morning: [], Afternoon: [], Evening: [] };
     for (const s of slots) {
       try {
-        const d = new Date(s.iso);
-        const hr = d.getHours();
+        const hr = hourInTimeZone(String(s.iso || ""), resolvedViewerTz);
         g[sectionForHour(hr)].push(s);
       } catch {
         g.Morning.push(s);
       }
     }
     return g;
-  }, [slots]);
+  }, [slots, resolvedViewerTz]);
 
   function scrollToSection(section: string) {
     const el = document.getElementById(`slot-sec-${section}`);
@@ -58,9 +86,9 @@ export default function PublicTimeSlots({
     setError(null);
 
     fetch(
-      `https://api.slotly.io/bookings/availability/${encodeURIComponent(
+      `http://localhost:8000/bookings/availability/${encodeURIComponent(
         slug
-      )}?date=${date}&tz=${encodeURIComponent(viewerTz)}`
+      )}?date=${date}&tz=${encodeURIComponent(resolvedViewerTz)}`
     )
       .then((r) => {
         if (!r.ok) throw new Error("API error");
@@ -86,7 +114,7 @@ export default function PublicTimeSlots({
       })
       .catch(() => setError("Failed to load slots"))
       .finally(() => setLoading(false));
-  }, [slug, date]);
+  }, [slug, date, resolvedViewerTz, selectedSlotISO, onSelectSlot]);
 
   if (!date) {
     return (
@@ -101,7 +129,7 @@ export default function PublicTimeSlots({
       {/* Header stays fixed */}
       <div className="p-4 border-b flex items-center justify-between">
         <div className="font-semibold">Available Times</div>
-        <div className="text-xs text-gray-500">{viewerTz}</div>
+        <div className="text-xs text-gray-500">{resolvedViewerTz}</div>
       </div>
 
       {/* Chips stays fixed */}
@@ -131,9 +159,7 @@ export default function PublicTimeSlots({
           <div className="space-y-4">
             {["Night", "Morning", "Afternoon", "Evening"].map((section) => (
               <div key={section} id={`slot-sec-${section}`}>
-                <div className="text-xs font-semibold text-gray-500 mb-2">
-                  {section}
-                </div>
+                <div className="text-xs font-semibold text-gray-500 mb-2">{section}</div>
 
                 <div className="grid grid-cols-3 gap-2">
                   {(grouped?.[section] || []).map((s: any) => {
@@ -156,10 +182,7 @@ export default function PublicTimeSlots({
                         ].join(" ")}
                         title={disabled ? "Already booked" : "Select this time"}
                       >
-                        {new Date(s.iso).toLocaleTimeString([], {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
+                        {timeLabelInTimeZone(String(s.iso), resolvedViewerTz)}
                       </button>
                     );
                   })}

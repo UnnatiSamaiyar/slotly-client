@@ -85,21 +85,23 @@ export default function MyMeetingsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex text-slate-900">
+    <div className="h-screen bg-gray-50 flex text-slate-900 overflow-hidden">
       <Sidebar
         open={sidebarOpen}
         onToggle={() => setSidebarOpen((s: boolean) => !s)}
         user={user}
       />
+      <main className="flex-1 min-w-0 flex flex-col overflow-hidden">
+        <div className="shrink-0 p-4 sm:p-6 lg:p-8">
+          <Topbar
+            user={user}
+            searchQuery={searchQuery}
+            onSearchQueryChange={setSearchQuery}
+          />
+        </div>
 
-      <main className="flex-1 p-8">
-        <Topbar
-          user={user}
-          searchQuery={searchQuery}
-          onSearchQueryChange={setSearchQuery}
-        />
-
-        <div className="grid grid-cols-12 gap-6">
+        <div className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 pb-8">
+          <div className="grid grid-cols-12 gap-6">
           <section className="col-span-12 lg:col-span-8 space-y-6">
             <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
               <div className="flex items-start justify-between gap-4 mb-4">

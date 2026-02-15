@@ -12,7 +12,7 @@ export default function EventTypeCard({
   onEdit: (item: EventType) => void;
 }) {
   const bookingUrl = useMemo(() => {
-    return `https://slotly.io/publicbook/${item.slug}`;
+    return `http://localhost:3000/publicbook/${item.slug}`;
   }, [item.slug]);
 
   const [copied, setCopied] = useState(false);
