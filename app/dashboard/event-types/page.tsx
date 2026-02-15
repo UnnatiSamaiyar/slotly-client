@@ -1327,14 +1327,9 @@ export default function DashboardEventTypes() {
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <div className="shrink-0">
           <Topbar
-            userSub={userSub}
-            onMenuClick={() => setSidebarOpen(true)}
+            user={null}
             searchQuery={""}
-            onSearchChange={() => {}}
-            roleFilter={"all"}
-            onRoleChange={() => {}}
-            showRoleFilter={false}
-            showSearch={false}
+            onSearchQueryChange={() => {}}
           />
         </div>
 

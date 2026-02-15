@@ -1,7 +1,7 @@
 "use client";
 
 //@ts-nocheck
-import React, { useEffect, useMemo, useState } from "react";
+import React, { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 /**
@@ -41,7 +41,8 @@ function pickApiBase() {
   return "http://api.slotly.io";
 }
 
-export default function GoogleCallbackPage() {
+/** ✅ Inner component uses useSearchParams (must be wrapped in Suspense) */
+function GoogleCallbackInner() {
   const router = useRouter();
   const sp = useSearchParams();
 
@@ -74,8 +75,6 @@ export default function GoogleCallbackPage() {
 
         const API_BASE = pickApiBase();
 
-        // Backend expects code+state OR full callback URL depending on your implementation.
-        // We'll send both so it works either way.
         const res = await fetch(`${API_BASE}/auth/google`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -95,7 +94,6 @@ export default function GoogleCallbackPage() {
 
         const payload = await res.json();
 
-        // Flexible extraction (different backends send different shapes)
         const user =
           payload?.user ||
           payload?.data?.user ||
@@ -106,17 +104,15 @@ export default function GoogleCallbackPage() {
         const sub = user?.sub || user?.google_sub || user?.id || null;
 
         if (!sub) {
-          // If backend didn't send sub, we still can't open dashboard
           throw new Error("Login succeeded but user id (sub) was not returned by server.");
         }
 
-        // Persist in the SAME key dashboard reads
         const session = {
           sub: String(sub),
           email: user?.email || "",
           name: user?.name || "",
           picture: user?.picture || "",
-          raw: user, // keep raw for debugging (safe)
+          raw: user,
         };
 
         try {
@@ -128,7 +124,6 @@ export default function GoogleCallbackPage() {
         setStatus("done");
         setMessage("Login successful. Redirecting…");
 
-        // small delay to ensure storage flush
         setTimeout(() => {
           router.replace(returnTo);
         }, 150);
@@ -149,7 +144,11 @@ export default function GoogleCallbackPage() {
     <div className="min-h-screen flex items-center justify-center bg-white px-6">
       <div className="w-full max-w-md rounded-2xl border border-gray-100 shadow-sm p-8 text-center">
         <div className="text-xl font-semibold text-gray-900">
-          {status === "error" ? "Login Failed" : status === "done" ? "Welcome back" : "Signing you in"}
+          {status === "error"
+            ? "Login Failed"
+            : status === "done"
+            ? "Welcome back"
+            : "Signing you in"}
         </div>
         <div className={`mt-3 text-sm ${status === "error" ? "text-red-600" : "text-gray-600"}`}>
           {message}
@@ -165,5 +164,20 @@ export default function GoogleCallbackPage() {
         ) : null}
       </div>
     </div>
+  );
+}
+
+/** ✅ Page wrapped in Suspense (fixes Next build error) */
+export default function GoogleCallbackPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-white px-6 text-gray-600">
+          Completing login…
+        </div>
+      }
+    >
+      <GoogleCallbackInner />
+    </Suspense>
   );
 }

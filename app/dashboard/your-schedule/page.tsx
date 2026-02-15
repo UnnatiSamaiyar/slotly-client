@@ -342,7 +342,7 @@
 //         toast({
 //           title: "Failed to load schedule",
 //           description: e?.message || "Please try again.",
-//           variant: "destructive",
+//          variant: "error",
 //         });
 //       } finally {
 //         if (mounted) setLoading(false);
@@ -387,7 +387,7 @@
 //       toast({
 //         title: "Failed to save",
 //         description: e?.message || "Please try again.",
-//         variant: "destructive",
+//        variant: "error",
 //       });
 //     } finally {
 //       setSaving(false);
@@ -402,7 +402,7 @@
 //         toast({
 //           title: "Invalid override time",
 //           description: "End time must be after start time.",
-//           variant: "destructive",
+//          variant: "error",
 //         });
 //         return;
 //       }
@@ -430,7 +430,7 @@
 //       toast({
 //         title: "Invalid block time",
 //         description: "Block end time must be after start time.",
-//         variant: "destructive",
+//        variant: "error",
 //       });
 //       return;
 //     }
@@ -460,7 +460,7 @@
 //       toast({
 //         title: "Invalid date range",
 //         description: "End date must be on or after start date.",
-//         variant: "destructive",
+//        variant: "error",
 //       });
 //       return;
 //     }
@@ -468,7 +468,7 @@
 //       toast({
 //         title: "Invalid range time",
 //         description: "End time must be after start time.",
-//         variant: "destructive",
+//        variant: "error",
 //       });
 //       return;
 //     }
@@ -1435,7 +1435,7 @@
 //         toast({
 //           title: "Failed to load schedule",
 //           description: e?.message || "Please try again.",
-//           variant: "destructive",
+//          variant: "error",
 //         });
 //       } finally {
 //         if (mounted) setLoading(false);
@@ -1478,7 +1478,7 @@
 //       toast({
 //         title: "Failed to save",
 //         description: e?.message || "Please try again.",
-//         variant: "destructive",
+//        variant: "error",
 //       });
 //     } finally {
 //       setSaving(false);
@@ -1493,7 +1493,7 @@
 //         toast({
 //           title: "Invalid override time",
 //           description: "End time must be after start time.",
-//           variant: "destructive",
+//          variant: "error",
 //         });
 //         return;
 //       }
@@ -1521,7 +1521,7 @@
 //       toast({
 //         title: "Invalid block time",
 //         description: "Block end time must be after start time.",
-//         variant: "destructive",
+//        variant: "error",
 //       });
 //       return;
 //     }
@@ -1549,7 +1549,7 @@
 //       toast({
 //         title: "Invalid date range",
 //         description: "End date must be on or after start date.",
-//         variant: "destructive",
+//        variant: "error",
 //       });
 //       return;
 //     }
@@ -1557,7 +1557,7 @@
 //       toast({
 //         title: "Invalid range time",
 //         description: "End time must be after start time.",
-//         variant: "destructive",
+//        variant: "error",
 //       });
 //       return;
 //     }
@@ -2679,7 +2679,7 @@ export default function YourSchedulePage() {
         toast({
           title: "Failed to load schedule",
           description: e?.message || "Please try again.",
-          variant: "destructive",
+          variant: "error",
         });
       } finally {
         if (mounted) setLoading(false);
@@ -2722,7 +2722,7 @@ export default function YourSchedulePage() {
       toast({
         title: "Failed to save",
         description: e?.message || "Please try again.",
-        variant: "destructive",
+        variant: "error",
       });
     } finally {
       setSaving(false);
@@ -2737,7 +2737,7 @@ export default function YourSchedulePage() {
         toast({
           title: "Invalid override time",
           description: "End time must be after start time.",
-          variant: "destructive",
+          variant: "error",
         });
         return;
       }
@@ -2765,7 +2765,7 @@ export default function YourSchedulePage() {
       toast({
         title: "Invalid block time",
         description: "Block end time must be after start time.",
-        variant: "destructive",
+       variant: "error",
       });
       return;
     }
@@ -2793,7 +2793,7 @@ export default function YourSchedulePage() {
       toast({
         title: "Invalid date range",
         description: "End date must be on or after start date.",
-        variant: "destructive",
+       variant: "error",
       });
       return;
     }
@@ -2801,7 +2801,7 @@ export default function YourSchedulePage() {
       toast({
         title: "Invalid range time",
         description: "End time must be after start time.",
-        variant: "destructive",
+       variant: "error",
       });
       return;
     }

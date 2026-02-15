@@ -89,7 +89,7 @@ export default function PublicCalendar({ onSelectDate, selectedDate, bookingWind
 
           const isCurrentMonth = d.getMonth() === month;
           const isPast = d < today;
-          const outOfWindow = windowEnabled && ((windowStart && d < windowStart) || (windowEnd && d > windowEnd));
+          const outOfWindow = windowEnabled && ((windowStart && d < windowStart) || (windowEnd && d > windowEnd)) ? true : false;
           const selected = selectedDate === iso;
 
           return (
