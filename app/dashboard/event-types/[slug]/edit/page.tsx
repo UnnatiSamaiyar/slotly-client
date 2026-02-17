@@ -19,7 +19,7 @@ type ScheduleProfile = {
   max_days_ahead: number;
 };
 
-const API_BASE = (process.env.NEXT_PUBLIC_API_URL || "http://api.slotly.io").replace(/\/+$/, "");
+const API_BASE = (process.env.NEXT_PUBLIC_API_URL || "https://api.slotly.io").replace(/\/+$/, "");
 
 function getUserSub(): string | null {
   if (typeof window === "undefined") return null;

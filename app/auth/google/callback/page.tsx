@@ -38,7 +38,7 @@ function pickApiBase() {
 
   if (envBase) return envBase.replace(/\/+$/, "");
   // fallback: your local server
-  return "http://api.slotly.io";
+  return "https://api.slotly.io";
 }
 
 /** ✅ Inner component uses useSearchParams (must be wrapped in Suspense) */

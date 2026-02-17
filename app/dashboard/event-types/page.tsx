@@ -247,7 +247,7 @@
 
 
 
-//   const API_BASE = (process.env.NEXT_PUBLIC_API_URL || "http://api.slotly.io").replace(/\/+$/, "");
+//   const API_BASE = (process.env.NEXT_PUBLIC_API_URL || "https://api.slotly.io").replace(/\/+$/, "");
 
 //   async function fetchScheduleBySlug(profileSlug: string) {
 //     const sub = safeGetUserSubFromStorage();
@@ -800,7 +800,7 @@
 //       // Also keep BookingProfile duration in sync (used by slot generator)
 //       if (updated?.slug) {
 //         try {
-//           const API_BASE = (process.env.NEXT_PUBLIC_API_URL || "http://api.slotly.io").replace(/\/+$/, "");
+//           const API_BASE = (process.env.NEXT_PUBLIC_API_URL || "https://api.slotly.io").replace(/\/+$/, "");
 //           const sub = (function safeGetUserSubFromStorage2(): string | null {
 //             const keysToTry = ["user_sub", "slotly_user", "user", "auth_user", "slotlyUser"]; 
 //             for (const key of keysToTry) {
@@ -2122,7 +2122,7 @@ function EventTypeEditModal({
       // keep BookingProfile duration in sync (non-blocking)
       if (updated?.slug) {
         try {
-          const API_BASE = (process.env.NEXT_PUBLIC_API_URL || "http://api.slotly.io").replace(/\/+$/, "");
+          const API_BASE = (process.env.NEXT_PUBLIC_API_URL || "https://api.slotly.io").replace(/\/+$/, "");
           const sub = (function safeGetUserSubFromStorage2(): string | null {
             const keysToTry = ["user_sub", "slotly_user", "user", "auth_user", "slotlyUser"];
             for (const key of keysToTry) {

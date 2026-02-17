@@ -1,5 +1,5 @@
 export default function PublicBookingHeader({ profile }: any) {
-  const apiBase = process.env.NEXT_PUBLIC_API_BASE || "http://api.slotly.io";
+  const apiBase = process.env.NEXT_PUBLIC_API_BASE || "https://api.slotly.io";
   return (
     <div className="w-full bg-gradient-to-b from-blue-600 to-indigo-600 text-white p-8 sm:p-10 flex flex-col">
       <div>

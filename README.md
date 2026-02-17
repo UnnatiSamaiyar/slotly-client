@@ -60,7 +60,7 @@ Frontend will run at:
 Create `.env.local` inside `/client`
 
 ```
-NEXT_PUBLIC_API_URL=http://api.slotly.io
+NEXT_PUBLIC_API_URL=https://api.slotly.io
 NEXTAUTH_SECRET=your-secret-key
 NEXTAUTH_URL=http://slotly.io
 ```
@@ -110,7 +110,7 @@ uvicorn server.main:app --reload --port 8000
 
 Backend API docs:
 
-👉 http://api.slotly.io/docs
+👉 https://api.slotly.io/docs
 
 ---
 
