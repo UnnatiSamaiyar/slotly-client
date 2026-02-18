@@ -272,7 +272,7 @@ export default function AvailabilityEditorModal({
     } catch {
       return "";
     }
-  }, [week, overrides, blocks, ranges]);
+  }, [week, overrides, blocks, ranges, bookingWindow]);
 
   function addOrUpdateOverride() {
     if (!overrideDate) return;
