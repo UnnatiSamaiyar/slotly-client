@@ -1,4 +1,5 @@
 // src/app/dashboard/hooks/useUserProfile.ts
+"use client";
 import { useEffect, useState } from "react";
 import { UserProfile } from "../types";
 import * as api from "../api/user";

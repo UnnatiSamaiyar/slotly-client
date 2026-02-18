@@ -26,6 +26,13 @@ export type CalendarEvent = {
   location?: string | null;
   htmlLink?: string | null;
   organizer?: string | null;
+
+  // DB-backed booking extras
+  meetLink?: string | null;
+  attendees?: any[];
+
+  // Role for dashboard filtering
+  role?: "host" | "invitee" | "both" | "unknown";
 };
 
 // export type EventType = {
@@ -53,6 +60,9 @@ export type EventType = {
 
   availability_json?: string | null;
   timezone?: string | null;
+
+  // per-event duration (minutes)
+  duration_minutes?: number | null;
 
   // optional fields if still present somewhere else
   created_at?: string;

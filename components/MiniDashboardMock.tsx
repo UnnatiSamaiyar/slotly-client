@@ -751,7 +751,7 @@ export default function DashboardMockupSection() {
   const startBottomY = frameBottom - 115;
 
   return (
-    <section className="relative w-full py-20 bg-[#0b0c0f] overflow-hidden hidden lg:block">
+    <section id="how-it-works" className="relative w-full py-20 bg-[#0b0c0f] overflow-hidden hidden lg:block">
       {/* Ambient background */}
       <div aria-hidden className="pointer-events-none absolute inset-0">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_60%_at_50%_40%,rgba(255,255,255,0.06),transparent_60%)]" />

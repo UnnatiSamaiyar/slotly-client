@@ -425,7 +425,7 @@ export function SecurityTrustSection() {
   ];
 
   return (
-    <section className="relative w-full overflow-hidden bg-white">
+    <section id="security" className="relative w-full overflow-hidden bg-white">
       {/* Premium background */}
       <div aria-hidden className="absolute inset-0 -z-10">
         <div className="absolute -top-44 left-1/2 h-[680px] w-[1100px] -translate-x-1/2 rounded-full bg-gradient-to-r from-blue-100/70 via-indigo-50/50 to-white blur-[140px]" />
@@ -595,7 +595,7 @@ export function FAQSection() {
   const [open, setOpen] = useState<number | null>(0);
 
   return (
-    <section className="relative w-full overflow-hidden bg-white">
+    <section id="faq" className="relative w-full overflow-hidden bg-white">
       {/* soft background */}
       <div aria-hidden className="absolute inset-0 -z-10">
         <div className="absolute -top-24 right-[-160px] h-[520px] w-[520px] rounded-full bg-indigo-100/60 blur-[130px]" />

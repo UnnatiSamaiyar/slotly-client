@@ -69,27 +69,50 @@ export function useEventTypes(userSub: string | null) {
   }, [fetchAll]);
 
   // create
-  const create = useCallback(async (payload: { title: string; duration: number; location?: string; availability_json?: string }) => {
-    if (!userSub) throw new Error("no user");
-    setLoading(true);
-    try {
-      await api.createEventType(userSub, payload);
-      await fetchAll();
-    } finally {
-      setLoading(false);
-    }
-  }, [userSub, fetchAll]);
+  const create = useCallback(
+    async (payload: {
+      title: string;
+      meeting_mode: "google_meet" | "in_person";
+      location?: string;
+      availability_json?: string;
+      duration_minutes?: number;
+      timezone?: string | null;
+    }) => {
+      if (!userSub) throw new Error("no user");
+      setLoading(true);
+      try {
+        await api.createEventType(userSub, payload);
+        await fetchAll();
+      } finally {
+        setLoading(false);
+      }
+    },
+    [userSub, fetchAll]
+  );
 
-  const update = useCallback(async (id: number, payload: Partial<{ title: string; duration: number; location: string; availability_json: string }>) => {
-    if (!userSub) throw new Error("no user");
-    setLoading(true);
-    try {
-      await api.updateEventType(userSub, id, payload);
-      await fetchAll();
-    } finally {
-      setLoading(false);
-    }
-  }, [userSub, fetchAll]);
+  const update = useCallback(
+    async (
+      id: number,
+      payload: Partial<{
+        title: string;
+        meeting_mode: "google_meet" | "in_person";
+        location: string;
+        availability_json: string;
+        duration_minutes: number;
+        timezone: string | null;
+      }>
+    ) => {
+      if (!userSub) throw new Error("no user");
+      setLoading(true);
+      try {
+        await api.updateEventType(userSub, id, payload);
+        await fetchAll();
+      } finally {
+        setLoading(false);
+      }
+    },
+    [userSub, fetchAll]
+  );
 
   const remove = useCallback(async (id: number) => {
     if (!userSub) throw new Error("no user");

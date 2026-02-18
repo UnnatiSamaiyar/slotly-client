@@ -2,23 +2,29 @@
 
 import React from "react";
 import { Menu } from "lucide-react";
+import { Calendar } from "lucide-react";
 
-export default function SidebarToggle({ onToggle }: { onToggle: () => void }) {
+export default function SidebarToggle({
+  onToggle,
+}: {
+  onToggle: () => void;
+}) {
   return (
     <button
       onClick={onToggle}
       aria-label="Toggle sidebar"
+      title="Toggle sidebar"
       className="
-        p-2 rounded-xl
-        border border-gray-200
-        bg-white
-        hover:bg-gray-50
-        active:scale-95
+        flex items-center justify-center
+        h-10 w-10
+        rounded-lg
+        text-slate-700
+        hover:bg-slate-100
         transition
+        active:scale-95
       "
     >
-      <Menu className="w-5 h-5 text-slate-700" />
+      <Menu className="w-5 h-5" />
     </button>
   );
 }
-

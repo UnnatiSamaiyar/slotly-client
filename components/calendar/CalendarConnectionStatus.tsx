@@ -1,15 +1,15 @@
-//@ts-nocheck
-
 "use client";
 
 import { useEffect, useState } from "react";
 import GoogleLoginButton from "../auth/GoogleLoginButton";
 
+const API_BASE = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8  000").replace(/\/$/, "");
+
 export default function CalendarConnectionStatus({ userSub }: { userSub: string }) {
   const [connected, setConnected] = useState<boolean | null>(null);
 
   const fetchStatus = async () => {
-    const res = await fetch(`https://api.slotly.io/auth/calendar-status?user_sub=${userSub}`);
+    const res = await fetch(`${API_BASE}/auth/calendar-status?user_sub=${encodeURIComponent(userSub)}`);
     const data = await res.json();
     setConnected(data.calendar_connected);
   };
@@ -31,7 +31,10 @@ export default function CalendarConnectionStatus({ userSub }: { userSub: string 
       ) : (
         <div className="flex flex-col gap-3">
           <p className="text-red-600 font-medium">✗ Not Connected</p>
-          <GoogleLoginButton onSuccess={fetchStatus} />
+          <GoogleLoginButton variant="calendar" label="Connect Google Calendar" returnTo="/dashboard" />
+          <p className="text-xs text-slate-500">
+            Google may show a warning because verification is in progress. Connect only if you need calendar sync.
+          </p>
         </div>
       )}
     </div>

@@ -3,8 +3,10 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 export function CTA() {
+  const router = useRouter();
   return (
     <section className="relative w-full overflow-hidden bg-[radial-gradient(ellipse_80%_100%_at_center_bottom,_#eaf1ff_0%,_#ffffff_60%)]">
       {/* Ambient light glows */}
@@ -40,18 +42,19 @@ export function CTA() {
             <div className="mt-8 flex flex-col sm:flex-row gap-3 sm:gap-4 items-center justify-center lg:justify-start">
               <Button
                 size="lg"
+                onClick={() => router.push("/login")}
                 className="px-9 py-6 rounded-full text-base font-semibold bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:shadow-[0_18px_55px_-25px_rgba(37,99,235,0.65)] transition-all"
               >
                 Get Started Free
               </Button>
 
-              <Button
+              {/* <Button
                 variant="ghost"
                 size="lg"
                 className="text-gray-700 hover:text-blue-600 hover:bg-transparent transition-all text-base"
               >
                 Watch Demo →
-              </Button>
+              </Button> */}
             </div>
 
             {/* subtle micro trust line (Calendly-ish, but minimal) */}

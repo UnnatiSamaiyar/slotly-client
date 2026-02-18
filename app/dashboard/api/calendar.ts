@@ -1,62 +1,3 @@
-// // src/app/dashboard/api/calendar.ts
-// import { CalendarEvent } from "../types";
-
-// const CAL_BASE =
-//   process.env.NEXT_PUBLIC_CALENDAR_API || "https://api.slotly.io";
-
-// export type CalendarPayload = { calendar_connected: boolean; events: any[] };
-
-// export async function fetchCalendarEvents(
-//   userSub: string
-// ): Promise<CalendarEvent[]> {
-//   const res = await fetch(
-//     `${CAL_BASE}/auth/calendar/events?user_sub=${encodeURIComponent(userSub)}`
-//   );
-//   if (!res.ok) throw new Error(await res.text());
-//   const payload: CalendarPayload = await res.json();
-//   if (!payload.calendar_connected) return [];
-//   return (payload.events || []).map((ev: any) => ({
-//     id: ev.id,
-//     summary: ev.summary || "Untitled",
-//     start: ev.start || null,
-//     end: ev.end || null,
-//     location: ev.location || null,
-//     htmlLink: ev.htmlLink || null,
-//     organizer: ev.organizer || null,
-
-//     // 🔥 ADD THESE
-//     meetLink: ev.meetLink || null,
-//     attendees: Array.isArray(ev.attendees) ? ev.attendees : [],
-//   }));
-// }
-
-
-
-// export async function updateBooking(id: number, payload: any) {
-//   return fetch(`${CAL_BASE}/bookings/${id}?user_sub=${payload.userSub}`, {
-//     method: "PUT",
-//     headers: { "Content-Type": "application/json" },
-//     body: JSON.stringify(payload),
-//   });
-// }
-
-// export async function deleteBooking(id: number, userSub: string) {
-//   return fetch(
-//     `${CAL_BASE}/bookings/${id}?user_sub=${encodeURIComponent(userSub)}`,
-//     { method: "DELETE" }
-//   );
-// }
-
-
-
-
-
-
-
-
-
-
-
 import { CalendarEvent } from "../types";
 
 const CAL_BASE =
@@ -67,24 +8,29 @@ export type CalendarPayload = { calendar_connected: boolean; events: any[] };
 export async function fetchCalendarEvents(
   userSub: string
 ): Promise<CalendarEvent[]> {
+  // Source of truth for the dashboard is Postgres bookings.
   const res = await fetch(
-    `${CAL_BASE}/auth/calendar/events?user_sub=${encodeURIComponent(userSub)}`
+    `${CAL_BASE}/bookings/list?user_sub=${encodeURIComponent(userSub)}&view=me`
   );
-  if (!res.ok) throw new Error(await res.text());
-  const payload: CalendarPayload = await res.json();
-  if (!payload.calendar_connected) return [];
-  return (payload.events || []).map((ev: any) => ({
-    id: ev.id,
-    summary: ev.summary || "Untitled",
-    start: ev.start || null,
-    end: ev.end || null,
-    location: ev.location || null,
-    htmlLink: ev.htmlLink || null,
-    organizer: ev.organizer || null,
 
-    // 🔥 ADD THESE
-    meetLink: ev.meetLink || null,
-    attendees: Array.isArray(ev.attendees) ? ev.attendees : [],
+  if (!res.ok) throw new Error(await res.text());
+  const payload: any = await res.json().catch(() => ({}));
+  const bookings = payload?.bookings || [];
+
+  return (Array.isArray(bookings) ? bookings : []).map((b: any) => ({
+    id: b.id,
+    summary: b.title || "Untitled",
+    start: b.start_time || null,
+    end: b.end_time || null,
+    location: b.location || null,
+    htmlLink: null,
+    organizer: null,
+
+    meetLink: b.meet_link || null,
+    attendees: Array.isArray(b.attendees) ? b.attendees : [],
+
+    // for single-dashboard filters
+    role: b.role || "unknown",
   }));
 }
 

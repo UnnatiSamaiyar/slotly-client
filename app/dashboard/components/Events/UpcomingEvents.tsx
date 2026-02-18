@@ -4,10 +4,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { CalendarEvent } from "../../types";
 import { CalendarDays, Clock, ExternalLink } from "lucide-react";
 import { safeDate } from "../Calendar/CalendarHelpers";
-import {
-  getPreferredTimezone,
-  subscribeTimezoneChange,
-} from "@/lib/timezone";
+import { getPreferredTimezone, subscribeTimezoneChange } from "@/lib/timezone";
 
 function fmtStart(iso?: string, tz?: string) {
   const d = safeDate(iso);
@@ -54,7 +51,7 @@ export default function UpcomingEvents({
 
     return events
       .filter((ev: any) => {
-        if (!ev.start) return false;
+        if (!ev?.start) return false;
 
         const start = safeDate(ev.start);
         if (!start) return false;
@@ -68,8 +65,8 @@ export default function UpcomingEvents({
         return new Date(ev.end || ev.start).getTime() >= Date.now();
       })
       .sort((a: any, b: any) => {
-        const ta = a.start ? new Date(a.start).getTime() : 0;
-        const tb = b.start ? new Date(b.start).getTime() : 0;
+        const ta = a?.start ? new Date(a.start).getTime() : 0;
+        const tb = b?.start ? new Date(b.start).getTime() : 0;
         return ta - tb;
       })
       .slice(0, 6);
@@ -78,69 +75,79 @@ export default function UpcomingEvents({
   const headerLabel = selectedDate ? `Upcoming from ${selectedDate}` : "Upcoming";
 
   return (
-    <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <CalendarDays className="w-4 h-4 text-slate-700" />
-          <h4 className="font-semibold">{headerLabel}</h4>
-        </div>
-        <div className="text-xs text-gray-500">{next.length} shown</div>
-      </div>
-
-      {next.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-gray-200 p-4 bg-white">
-          <div className="text-sm font-semibold text-slate-900">
-            No upcoming events
+    <section
+      aria-label="Upcoming events"
+      className="bg-white rounded-2xl border border-gray-100 shadow-sm"
+    >
+      <div className="p-4 sm:p-6">
+        <div className="flex items-start sm:items-center justify-between gap-3 mb-3">
+          <div className="flex items-center gap-2 min-w-0">
+            <CalendarDays className="w-4 h-4 text-slate-700 shrink-0" />
+            <h4 className="font-semibold truncate">{headerLabel}</h4>
           </div>
-          <div className="text-sm text-gray-500 mt-1">
-            Share your booking link to start getting meetings.
-          </div>
+          <div className="text-xs text-gray-500 shrink-0">{next.length} shown</div>
         </div>
-      ) : (
-        <ul className="space-y-3">
-          {next.map((ev: any) => {
-            const summary = ev.summary || "Untitled";
-            const startLabel = fmtStart(ev.start, tz); // ✅ timezone-aware
-            const organizer = ev.organizer || "";
-            const htmlLink = ev.htmlLink || "";
 
-            return (
-              <li
-                key={ev.id}
-                className="p-4 rounded-2xl border border-gray-100 bg-white hover:bg-gray-50 transition"
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <div className="text-sm font-semibold truncate">{summary}</div>
-                    <div className="text-xs text-gray-500 mt-1 flex flex-wrap items-center gap-2">
-                      {startLabel ? (
-                        <span className="inline-flex items-center gap-1">
-                          <Clock className="w-3.5 h-3.5" />
-                          {startLabel}
-                        </span>
-                      ) : null}
-                      {organizer ? (
-                        <span className="truncate">• {organizer}</span>
-                      ) : null}
+        {next.length === 0 ? (
+          <div className="rounded-xl border border-dashed border-gray-200 p-4 bg-white">
+            <div className="text-sm font-semibold text-slate-900">
+              No upcoming events
+            </div>
+            <div className="text-sm text-gray-500 mt-1">
+              Share your booking link to start getting meetings.
+            </div>
+          </div>
+        ) : (
+          <ul className="space-y-3">
+            {next.map((ev: any, idx: number) => {
+              const summary = ev?.summary || "Untitled";
+              const startLabel = fmtStart(ev?.start, tz); // ✅ timezone-aware
+              const organizer = ev?.organizer || "";
+              const htmlLink = ev?.htmlLink || "";
+
+              return (
+                <li
+                  key={ev?.id ?? `${ev?.start ?? "no-start"}-${idx}`}
+                  className="p-3 sm:p-4 rounded-2xl border border-gray-100 bg-white hover:bg-gray-50 transition"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="text-sm font-semibold truncate">{summary}</div>
+
+                      <div className="text-xs text-gray-500 mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 min-w-0">
+                        {startLabel ? (
+                          <span className="inline-flex items-center gap-1">
+                            <Clock className="w-3.5 h-3.5 shrink-0" />
+                            <span className="whitespace-nowrap">{startLabel}</span>
+                          </span>
+                        ) : null}
+
+                        {organizer ? (
+                          <span className="truncate">• {organizer}</span>
+                        ) : null}
+                      </div>
                     </div>
-                  </div>
 
-                  {htmlLink ? (
-                    <a
-                      className="text-xs text-indigo-600 hover:underline inline-flex items-center gap-1 whitespace-nowrap"
-                      href={htmlLink}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      Open <ExternalLink className="w-3.5 h-3.5" />
-                    </a>
-                  ) : null}
-                </div>
-              </li>
-            );
-          })}
-        </ul>
-      )}
-    </div>
+                    {htmlLink ? (
+                      <a
+                        className="text-xs text-indigo-600 hover:underline inline-flex items-center gap-1 shrink-0"
+                        href={htmlLink}
+                        target="_blank"
+                        rel="noreferrer"
+                        aria-label={`Open event: ${summary}`}
+                        title="Open in calendar"
+                      >
+                        <span className="hidden sm:inline">Open</span>
+                        <ExternalLink className="w-3.5 h-3.5" />
+                      </a>
+                    ) : null}
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </div>
+    </section>
   );
 }

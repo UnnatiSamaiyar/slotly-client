@@ -13,6 +13,12 @@ export type EventType = {
   availability_json?: string | null;
   timezone?: string | null;
 
+  // Optional logo shown on public page.
+  brand_logo_url?: string | null;
+
+  // Per-event duration (minutes). Stored server-side on BookingProfile keyed by slug.
+  duration_minutes?: number | null;
+
   created_at?: string | null;
   user_id?: number | null;
 };
@@ -21,17 +27,40 @@ const BASE = process.env.NEXT_PUBLIC_API_BASE || "https://api.slotly.io";
 
 /**
  * IMPORTANT:
- * Your backend routes for event-types require `user_sub` query param.
- * We read it from localStorage by default (no refactor to auth system).
- * Store it wherever you already store user sub (example: "user_sub").
+ * Backend routes for event-types require `user_sub` query param.
+ * The app stores session in localStorage under different keys depending on auth flow.
+ * This helper reads sub from the most common keys WITHOUT changing auth behavior.
  */
 function getUserSub(): string {
   if (typeof window === "undefined") return "";
-  return (
+
+  // direct keys
+  const direct =
     localStorage.getItem("user_sub") ||
     localStorage.getItem("slotly_user_sub") ||
-    ""
-  );
+    localStorage.getItem("google_sub");
+  if (direct && direct.trim()) return direct.trim();
+
+  // session objects
+  const keysToTry = ["slotly_user", "user", "auth_user", "slotlyUser"];
+  for (const k of keysToTry) {
+    try {
+      const raw = localStorage.getItem(k);
+      if (!raw || raw === "null" || raw === "undefined") continue;
+      const parsed = JSON.parse(raw);
+      if (!parsed || typeof parsed !== "object") continue;
+
+      const sub = (parsed as any).sub || (parsed as any).user_sub || (parsed as any).google_sub || (parsed as any).id;
+      if (typeof sub === "string" && sub.trim()) return sub.trim();
+
+      const nested = (parsed as any).user?.sub || (parsed as any).profile?.sub;
+      if (typeof nested === "string" && nested.trim()) return nested.trim();
+    } catch {
+      // ignore
+    }
+  }
+
+  return "";
 }
 
 async function request(path: string, opts: RequestInit = {}) {
@@ -69,7 +98,7 @@ export async function listEventTypes(): Promise<EventType[]> {
 /**
  * GET /event-types/{id}
  */
-export async function getEventType(id: number): Promise<EventType | null> {
+export async function getEventTypes(id: number): Promise<EventType | null> {
   const data = await request(`/event-types/${id}`);
   return data.event_type || null;
 }
@@ -82,7 +111,9 @@ export async function createEventType(payload: {
   meeting_mode: MeetingMode;
   location?: string;
   availability_json?: string;
+  duration_minutes?: number;
   timezone?: string | null;
+  brand_logo_url?: string | null;
 }): Promise<EventType> {
   const user_sub = getUserSub();
   if (!user_sub) throw new Error("Missing user_sub in browser storage");
@@ -105,7 +136,9 @@ export async function updateEventType(
     meeting_mode: MeetingMode;
     location: string;
     availability_json: string;
+    duration_minutes: number;
     timezone: string | null;
+    brand_logo_url: string | null;
   }>
 ): Promise<EventType> {
   const user_sub = getUserSub();

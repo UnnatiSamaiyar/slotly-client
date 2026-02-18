@@ -14,12 +14,33 @@ export function toISODateLocal(d: Date) {
 /**
  * Parse an ISO-like string into Date safely.
  */
+// src/app/dashboard/components/Calendar/CalendarHelpers.ts
+
+// src/app/dashboard/components/Calendar/CalendarHelpers.ts
+
 export function safeDate(iso?: string) {
   if (!iso) return null;
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return null;
-  return d;
+
+  // If date-only "YYYY-MM-DD", create local date (avoid UTC midnight parsing)
+  const m = iso.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (m) {
+    const y = Number(m[1]);
+    const mo = Number(m[2]) - 1;
+    const d = Number(m[3]);
+    const dt = new Date(y, mo, d);
+    return Number.isNaN(dt.getTime()) ? null : dt;
+  }
+
+  // If datetime has no timezone info, treat it as UTC by appending Z
+  const hasTZ =
+    /Z$/i.test(iso) || /[+-]\d{2}:\d{2}$/.test(iso) || /[+-]\d{4}$/.test(iso);
+
+  const normalized = hasTZ ? iso : `${iso}Z`;
+
+  const dt = new Date(normalized);
+  return Number.isNaN(dt.getTime()) ? null : dt;
 }
+
 
 /**
  * Compare an event datetime ISO with a YYYY-MM-DD date string (local day match).
