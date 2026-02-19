@@ -250,6 +250,7 @@
 
 "use client";
 
+import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import React, { useEffect, useMemo, useState } from "react";
 import PublicEventInfo from "./components/PublicEventInfo";
@@ -258,6 +259,7 @@ import PublicTimeSlots from "./components/PublicTimeSlots";
 import PublicBookingForm from "./components/PublicBookingForm";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft } from "lucide-react";
+import SlotlyLogo from "../../../public/assets/Slotlyio-logo.png"
 
 export default function PublicBookingPage() {
   const params = useParams();
@@ -502,9 +504,11 @@ export default function PublicBookingPage() {
             className="flex items-center gap-2 text-xs text-gray-500 hover:text-indigo-600 transition"
           >
             <span>Powered by</span>
-            <img
-              src="/Slotlyio-logo.png"
+            <Image
+              src={SlotlyLogo}
               alt="Slotly"
+              width={24}
+              height={24}
               className="h-5 sm:h-6 w-auto object-contain"
             />
           </a>
