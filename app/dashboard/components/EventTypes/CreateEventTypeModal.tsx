@@ -15,6 +15,7 @@ import AvailabilityEditorModal from "../Schedule/AvailabilityEditorModal";
 import TimezonePicker from "../TimezonePicker";
 import { getBrowserTimezone, getPreferredTimezone } from "@/lib/timezone";
 import { getMe, uploadBrandLogo } from "@/lib/userApi";
+import SetMeetingLocationModal from "@/components/shared/SetMeetingLocationModal";
 
 type MeetingMode = "google_meet" | "in_person";
 
@@ -56,6 +57,8 @@ export default function CreateEventTypeModal({
   const [availabilityJson, setAvailabilityJson] = useState<string>("{}");
   const [availabilityOpen, setAvailabilityOpen] = useState(false);
 
+  const [locationModalOpen, setLocationModalOpen] = useState(false);
+
   const needsLocation = meetingMode === "in_person";
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -72,11 +75,25 @@ export default function CreateEventTypeModal({
     setTimezone(getPreferredTimezone() || getBrowserTimezone());
     setAvailabilityJson("{}");
     setAvailabilityOpen(false);
+    setLocationModalOpen(false);
     setSaving(false);
     setExistingLogoUrl(null);
     setLogoUrl(null);
     setLogoUploading(false);
   }, [open]);
+
+  // ✅ Auto-open location modal when switching to in-person
+  useEffect(() => {
+    if (!open) return;
+    if (meetingMode === "in_person") {
+      const t = setTimeout(() => setLocationModalOpen(true), 120);
+      return () => clearTimeout(t);
+    }
+
+    // Switching back to Google Meet clears location
+    setLocationModalOpen(false);
+    setLocation("");
+  }, [meetingMode, open]);
 
   useEffect(() => {
     if (!open || !userSub) return;
@@ -280,16 +297,21 @@ export default function CreateEventTypeModal({
 
                     {needsLocation && (
                       <div>
-                        <label className="text-xs font-medium text-slate-600">
-                          Location
-                        </label>
-                        <input
-                          value={location}
-                          onChange={(e) =>
-                            setLocation(e.target.value)
-                          }
-                          className="mt-1 w-full px-3.5 py-2.5 border rounded-xl"
-                        />
+                        <div className="flex items-center justify-between">
+                          <label className="text-xs font-medium text-slate-600">
+                            Location
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => setLocationModalOpen(true)}
+                            className="text-xs font-semibold text-indigo-600"
+                          >
+                            {location?.trim() ? "Edit" : "Set"}
+                          </button>
+                        </div>
+                        <div className="mt-1 rounded-xl border bg-slate-50 px-3.5 py-2.5 text-sm text-slate-900 break-words">
+                          {location?.trim() ? location : "No location set"}
+                        </div>
                       </div>
                     )}
                   </div>
@@ -439,6 +461,13 @@ export default function CreateEventTypeModal({
             setAvailabilityJson(json || "{}");
             setAvailabilityOpen(false);
           }}
+        />
+
+        <SetMeetingLocationModal
+          open={locationModalOpen}
+          onClose={() => setLocationModalOpen(false)}
+          initialValue={location}
+          onSave={(loc) => setLocation(loc)}
         />
       </div>
     </AnimatePresence>

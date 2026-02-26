@@ -1,102 +1,17 @@
-// "use client";
-
-// import React, { useMemo, useState } from "react";
-
-// export default function PublicEventInfo({ profile }: { profile: any }) {
-//   const apiBase = process.env.NEXT_PUBLIC_API_URL || "https://api.slotly.io";
-//   const hostName = profile.host_name || profile.host || "Host";
-//   const title = profile.title || "Meeting";
-//   const duration = profile.duration_minutes ?? profile.duration ?? 30;
-
-//   const subtitle = useMemo(() => {
-//     return `${duration}-minute meeting`;
-//   }, [duration]);
-
-//   // ✅ Safe absolute URL builder (UNCHANGED)
-//   const logoSrc = useMemo(() => {
-//     const u = profile?.brand_logo_url;
-//     if (!u || typeof u !== "string") return null;
-//     if (u.startsWith("http://") || u.startsWith("https://")) return u;
-//     if (u.startsWith("/")) return `${apiBase}${u}`;
-//     return `${apiBase}/${u}`;
-//   }, [profile?.brand_logo_url, apiBase]);
-
-//   // ✅ AUTO mode (UNCHANGED)
-//   const [logoMode, setLogoMode] = useState<"unknown" | "wide" | "badge">("unknown");
-
-//   return (
-//     <div className="h-full p-8 sm:p-10 bg-white flex flex-col border-r">
-
-//       {/* LOGO */}
-//       {logoSrc && (
-//         <div className="mb-6">
-//           {logoMode !== "badge" && (
-//             <div className="inline-flex items-center rounded-xl border px-4 py-3 max-w-[280px]">
-//               {/* eslint-disable-next-line @next/next/no-img-element */}
-//               <img
-//                 src={logoSrc}
-//                 alt=""
-//                 className="block max-h-[56px] w-auto max-w-[220px] object-contain"
-//                 loading="eager"
-//                 decoding="async"
-//                 onLoad={(e) => {
-//                   const img = e.currentTarget;
-//                   const w = img.naturalWidth || 0;
-//                   const h = img.naturalHeight || 0;
-//                   if (!w || !h) return;
-//                   setLogoMode(w / h < 1.15 ? "badge" : "wide");
-//                 }}
-//               />
-//             </div>
-//           )}
-
-//           {logoMode === "badge" && (
-//             <div className="inline-flex items-center justify-center rounded-xl border p-4">
-//               {/* eslint-disable-next-line @next/next/no-img-element */}
-//               <img
-//                 src={logoSrc}
-//                 alt=""
-//                 className="block h-[72px] w-[72px] object-contain"
-//                 loading="eager"
-//                 decoding="async"
-//               />
-//             </div>
-//           )}
-//         </div>
-//       )}
-
-//       {/* HOST */}
-//       <div className="text-sm text-gray-500">Booking with</div>
-//       <h1 className="text-2xl font-semibold text-gray-900 mt-1">
-//         {hostName}
-//       </h1>
-
-//       {/* EVENT */}
-//       <div className="mt-6">
-//         <h2 className="text-xl font-semibold text-gray-900">
-//           {title}
-//         </h2>
-//         <div className="text-sm text-gray-500 mt-2 flex items-center gap-2">
-//           ⏱ {subtitle}
-//         </div>
-//       </div>
-
-//       {/* INFO BOX */}
-//       <div className="mt-auto">
-//         <div className="rounded-xl border p-4 text-sm text-gray-600 bg-gray-50">
-//           Select a date & time, then confirm your details to book instantly.
-//         </div>
-//       </div>
-//     </div>
-//   );
-// // }
-
-
-
 "use client";
 
 import React, { useMemo, useState } from "react";
-import { Clock } from "lucide-react";
+import { Clock, MapPin, Video } from "lucide-react";
+
+function parseLocation(location: string) {
+  const s = String(location || "").trim();
+  if (!s) return { text: "", url: "" };
+  // Common pattern we store: "Office: Blue Tokai (https://...)"
+  const m = s.match(/\((https?:\/\/[^)]+)\)\s*$/i);
+  const url = m?.[1] || "";
+  const text = url ? s.replace(m![0], "").trim() : s;
+  return { text, url };
+}
 
 
 export default function PublicEventInfo({ profile }: { profile: any }) {
@@ -109,13 +24,16 @@ export default function PublicEventInfo({ profile }: { profile: any }) {
     return `${duration}-minute meeting`;
   }, [duration]);
 
+  const meetingMode = String(profile?.meeting_mode || "google_meet");
+  const loc = useMemo(() => parseLocation(profile?.location || ""), [profile?.location]);
+
   const logoSrc = useMemo(() => {
     const u = profile?.brand_logo_url;
     if (!u || typeof u !== "string") return null;
     if (u.startsWith("http://") || u.startsWith("https://")) return u;
     if (u.startsWith("/")) return `${apiBase}${u}`;
     return `${apiBase}/${u}`;
-  }, [profile?.brand_logo_url, apiBase]);
+  }, [profile, apiBase]);
 
   const [logoMode, setLogoMode] = useState<
     "unknown" | "wide" | "badge"
@@ -181,6 +99,43 @@ export default function PublicEventInfo({ profile }: { profile: any }) {
         <div className="text-sm text-gray-500 mt-1 flex items-center gap-2">
           <Clock className="w-4 h-4 text-gray-800" />
           <span>{subtitle}</span>
+        </div>
+
+        {/* Meeting info (read-only) */}
+        <div className="mt-3 space-y-2">
+          <div className="flex items-start gap-2 text-sm text-slate-700">
+            {meetingMode === "in_person" ? (
+              <MapPin className="w-4 h-4 mt-0.5 text-slate-700" />
+            ) : (
+              <Video className="w-4 h-4 mt-0.5 text-slate-700" />
+            )}
+            <div className="leading-snug">
+              <div className="font-medium">
+                {meetingMode === "in_person" ? "In-person" : "Google Meet"}
+              </div>
+              {meetingMode === "in_person" && (loc.text || loc.url) ? (
+                <div className="text-slate-600 break-words">
+                  {loc.text}
+                  {loc.url ? (
+                    <>
+                      {loc.text ? " · " : ""}
+                      <a
+                        href={loc.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-indigo-600 hover:underline"
+                      >
+                        Open in Maps
+                      </a>
+                    </>
+                  ) : null}
+                </div>
+              ) : null}
+              {meetingMode === "google_meet" ? (
+                <div className="text-slate-600">Link will be shared after booking.</div>
+              ) : null}
+            </div>
+          </div>
         </div>
 
       </div>
