@@ -21,7 +21,7 @@ export default function EmailAuthPanel() {
   const btnLabel = useMemo(() => {
     if (mode === "register") return "Create account";
     if (mode === "forgot") return "Send reset link";
-    return "Sign in";
+    return "Continue";
   }, [mode]);
 
   function resetBanners() {
@@ -80,154 +80,118 @@ export default function EmailAuthPanel() {
   const isRegister = mode === "register";
 
   return (
-    <div className="w-full mt-6">
-      {/* segmented control */}
-      <div className="flex items-center justify-center">
-        <div className="w-full rounded-2xl bg-gray-100 p-1 flex gap-1">
-          <button
-            type="button"
-            onClick={() => {
-              setMode("login");
-              resetBanners();
-            }}
-            className={[
-              "flex-1 rounded-2xl px-3 py-2.5 text-sm font-medium transition",
-              mode === "login"
-                ? "bg-gray-900 text-white shadow-sm"
-                : "text-gray-700 hover:bg-white/70",
-            ].join(" ")}
-            aria-pressed={mode === "login"}
-          >
-            Email sign in
-          </button>
+  <div className="w-full mt-4">
 
-          <button
-            type="button"
-            onClick={() => {
-              setMode("register");
-              resetBanners();
-            }}
-            className={[
-              "flex-1 rounded-2xl px-3 py-2.5 text-sm font-medium transition",
-              mode === "register"
-                ? "bg-gray-900 text-white shadow-sm"
-                : "text-gray-700 hover:bg-white/70",
-            ].join(" ")}
-            aria-pressed={mode === "register"}
-          >
-            Create account
-          </button>
-        </div>
-      </div>
+    {/* Segmented Control (Cleaner Style) */}
+    <div className="flex w-full rounded-lg bg-gray-100 p-1 text-xs font-medium">
+      {["login", "register"].map((type) => (
+        <button
+          key={type}
+          type="button"
+          onClick={() => {
+            setMode(type as Mode);
+            resetBanners();
+          }}
+          className={`flex-1 rounded-md px-3 py-2 transition-all duration-200 ${
+            mode === type
+              ? "bg-blue-600 text-white shadow-sm"
+              : "text-gray-600 hover:text-gray-900"
+          }`}
+        >
+          {type === "login" ? "Use email" : "Create account"}
+        </button>
+      ))}
+    </div>
 
-      {/* form */}
-      <form onSubmit={onSubmit} className="mt-4 space-y-3">
-        {isRegister && (
-          <div className="space-y-1.5">
-            <label className="sr-only" htmlFor="slotly_name">
-              Full name
-            </label>
-            <input
-              id="slotly_name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Full name"
-              autoComplete="name"
-              className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-500/15"
-            />
-          </div>
-        )}
+    {/* Form */}
+    <form onSubmit={onSubmit} className="mt-4 space-y-3">
 
-        <div className="space-y-1.5">
-          <label className="sr-only" htmlFor="slotly_email">
-            Work email
-          </label>
+      {isRegister && (
+        <input
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Full name"
+          autoComplete="name"
+          className="w-full h-9 rounded-lg border border-gray-200 bg-gray-50 px-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+        />
+      )}
+
+      <input
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        placeholder="Work email"
+        type="email"
+        required
+        autoComplete="email"
+        className="w-full h-9 rounded-lg border border-gray-200 bg-gray-50 px-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+      />
+
+      {!isForgot && (
+        <div className="relative">
           <input
-            id="slotly_email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Work email"
-            type="email"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Password"
+            type="password"
             required
-            autoComplete="email"
-            inputMode="email"
-            className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-500/15"
+            minLength={8}
+            autoComplete={isRegister ? "new-password" : "current-password"}
+            className="w-full h-9 rounded-lg border border-gray-200 bg-gray-50 px-3 pr-10 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
           />
         </div>
+      )}
 
-        {!isForgot && (
-          <div className="space-y-1.5">
-            <label className="sr-only" htmlFor="slotly_password">
-              Password
-            </label>
-            <input
-              id="slotly_password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Password (min 8 chars)"
-              type="password"
-              required
-              minLength={8}
-              autoComplete={isRegister ? "new-password" : "current-password"}
-              className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-500/15"
-            />
-          </div>
-        )}
-
-        {/* banners */}
-        {(err || msg) && (
-          <div
-            className={[
-              "rounded-2xl px-3 py-2 text-xs leading-relaxed border",
-              err
-                ? "border-red-200 bg-red-50 text-red-700"
-                : "border-emerald-200 bg-emerald-50 text-emerald-800",
-            ].join(" ")}
-            role="status"
-            aria-live="polite"
-          >
-            {err || msg}
-          </div>
-        )}
-
-        <button
-          type="submit"
-          disabled={loading}
-          className={[
-            "w-full rounded-2xl py-3.5 text-sm font-semibold text-white",
-            "bg-gradient-to-r from-blue-600 to-indigo-600 shadow-md",
-            "transition hover:opacity-95 active:scale-[0.99]",
-            "disabled:opacity-60 disabled:cursor-not-allowed",
-            "focus:outline-none focus:ring-4 focus:ring-blue-500/20",
-          ].join(" ")}
+      {/* Error / Success */}
+      {(err || msg) && (
+        <div
+          className={`text-xs rounded-lg px-3 py-2 ${
+            err
+              ? "bg-red-50 text-red-600 border border-red-200"
+              : "bg-emerald-50 text-emerald-600 border border-emerald-200"
+          }`}
         >
-          {loading ? "Please wait…" : btnLabel}
-        </button>
+          {err || msg}
+        </div>
+      )}
 
-        {!isForgot ? (
-          <button
-            type="button"
-            onClick={() => {
-              setMode("forgot");
-              resetBanners();
-            }}
-            className="w-full text-xs text-gray-600 hover:text-gray-900 transition py-1"
-          >
-            Forgot password?
-          </button>
-        ) : (
-          <button
-            type="button"
-            onClick={() => {
-              setMode("login");
-              resetBanners();
-            }}
-            className="w-full text-xs text-gray-600 hover:text-gray-900 transition py-1"
-          >
-            Back to login
-          </button>
-        )}
-      </form>
-    </div>
-  );
+      {/* Submit */}
+      <button
+        type="submit"
+        disabled={loading}
+        className="w-full h-9 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-sm font-medium shadow-sm transition hover:opacity-95 active:scale-[0.99] disabled:opacity-60"
+      >
+        {loading ? "Please wait…" : btnLabel}
+      </button>
+
+      {/* Forgot / Back */}
+        <div className="text-center pt-1">
+          {mode === "login" && (
+            <button
+              type="button"
+              onClick={() => {
+                setMode("forgot");
+                resetBanners();
+              }}
+              className="text-[11px] text-gray-700 hover:text-gray-800 transition"
+            >
+              Forgot password?
+            </button>
+          )}
+
+          {mode === "forgot" && (
+            <button
+              type="button"
+              onClick={() => {
+                setMode("login");
+                resetBanners();
+              }}
+              className="text-[11px] text-gray-500 hover:text-gray-800 transition"
+            >
+              Back to login
+            </button>
+          )}
+        </div>
+    </form>
+  </div>
+);
 }

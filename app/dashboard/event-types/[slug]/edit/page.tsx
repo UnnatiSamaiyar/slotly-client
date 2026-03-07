@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
-import { listEventTypes, updateEventType } from "@/lib/eventApi";
+import { listEventTypes, updateEventType } from "@/lib/eventApi"; 
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import AvailabilityEditorModal from "../../../components/Schedule/AvailabilityEditorModal";
@@ -23,7 +23,7 @@ const API_BASE = (process.env.NEXT_PUBLIC_API_URL || "https://api.slotly.io").re
 
 function getUserSub(): string | null {
   if (typeof window === "undefined") return null;
-  const keysToTry = ["user_sub", "slotly_user", "user", "auth_user", "slotlyUser"];
+  const keysToTry = ["user_sub", "slotly_user", "user", "auth_user", "slotlyUser"]; 
   for (const key of keysToTry) {
     try {
       const saved = localStorage.getItem(key);
@@ -31,8 +31,7 @@ function getUserSub(): string | null {
       if (key === "user_sub") return saved;
       if (saved === "null" || saved === "undefined") continue;
       const parsed = JSON.parse(saved);
-      const sub =
-        (parsed as any)?.sub || (parsed as any)?.user_sub || (parsed as any)?.google_sub;
+      const sub = (parsed as any)?.sub || (parsed as any)?.user_sub || (parsed as any)?.google_sub;
       if (typeof sub === "string" && sub.trim()) return sub.trim();
       const nested = (parsed as any)?.user?.sub || (parsed as any)?.profile?.sub;
       if (typeof nested === "string" && nested.trim()) return nested.trim();
@@ -53,10 +52,7 @@ async function fetchScheduleBySlug(profileSlug: string): Promise<ScheduleProfile
   return res.json();
 }
 
-async function updateScheduleBySlug(
-  profileSlug: string,
-  patch: Partial<ScheduleProfile>
-): Promise<ScheduleProfile> {
+async function updateScheduleBySlug(profileSlug: string, patch: Partial<ScheduleProfile>): Promise<ScheduleProfile> {
   const userSub = getUserSub();
   if (!userSub) throw new Error("Missing user_sub in browser storage");
   const res = await fetch(
@@ -99,6 +95,7 @@ export default function EditEventType({ params }: { params: { slug: string } }) 
 
   useEffect(() => {
     let mounted = true;
+    setLoading(true);
 
     if (!slug) {
       toast({ title: "Invalid event", description: "Event slug is missing.", variant: "error" });
@@ -106,14 +103,9 @@ export default function EditEventType({ params }: { params: { slug: string } }) 
       return;
     }
 
-    setLoading(true);
-
     (async () => {
       try {
-        const userSub = getUserSub();
-        if (!userSub) throw new Error("Missing user session. Please login again.");
-
-        // ✅ Correct API: list + find by slug (no numeric id mismatch)
+      
         const all = await listEventTypes();
         const found = all.find((x: any) => String(x.slug || "") === slug);
         if (!found) throw new Error("Not found");
@@ -145,7 +137,6 @@ export default function EditEventType({ params }: { params: { slug: string } }) 
     return () => {
       mounted = false;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [slug]);
 
   const handleSave = async () => {
@@ -157,11 +148,7 @@ export default function EditEventType({ params }: { params: { slug: string } }) 
       return;
     }
     if (needsLocation && !cleanLocation) {
-      toast({
-        title: "Location required",
-        description: "Please enter a location for in-person meeting.",
-        variant: "error",
-      });
+      toast({ title: "Location required", description: "Please enter a location for in-person meeting.", variant: "error" });
       return;
     }
     if (!item?.id) {
@@ -171,6 +158,7 @@ export default function EditEventType({ params }: { params: { slug: string } }) 
 
     setSaving(true);
     try {
+      // 1) Update EventType fields (including availability rules)
       const updated = await updateEventType(Number(item.id), {
         title: cleanTitle,
         meeting_mode: meetingMode,
@@ -178,6 +166,7 @@ export default function EditEventType({ params }: { params: { slug: string } }) 
         availability_json: availabilityJson || "{}",
       });
 
+      // 2) Update per-event duration (BookingProfile duration_minutes)
       const safeDur = Math.max(5, Math.min(24 * 60, Number(durationMinutes || 15)));
       const updatedSchedule = await updateScheduleBySlug(updated.slug, {
         duration_minutes: safeDur,
@@ -186,17 +175,14 @@ export default function EditEventType({ params }: { params: { slug: string } }) 
       setItem(updated);
       setSchedule(updatedSchedule);
 
+      // If slug changed (title change) redirect to the new edit route.
       if (String(updated.slug) !== slug) {
         router.replace(`/dashboard/event-types/${updated.slug}/edit`);
       }
 
       toast({ title: "Saved", description: "Event type updated successfully.", variant: "success" });
     } catch (e: any) {
-      toast({
-        title: "Save failed",
-        description: e?.message || String(e) || "Unable to save changes.",
-        variant: "error",
-      });
+      toast({ title: "Save failed", description: e?.message || String(e) || "Unable to save changes.", variant: "error" });
     } finally {
       setSaving(false);
     }
@@ -205,7 +191,9 @@ export default function EditEventType({ params }: { params: { slug: string } }) 
   if (loading) return <div className="p-10 text-center text-gray-500">Loading event type…</div>;
 
   return (
-    <div className="px-6 py-10 max-w-3xl mx-auto">
+ 
+      <div className="px-6 py-10 w-full max-w-none">
+
       <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-2xl font-semibold text-gray-900">Edit Event Type</h1>

@@ -102,19 +102,18 @@ export function Hero() {
           className="max-w-2xl text-center lg:text-left"
         >
           <h1 className="text-5xl sm:text-6xl xl:text-7xl font-semibold tracking-tight text-gray-900 leading-[1.05]">
-            Scheduling that
+Meet smarter,
             <br />
             <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-              works for you.
+              grow faster.
             </span>
           </h1>
 
           <p className="mt-6 text-lg leading-8 text-gray-600">
-            Slotly removes friction from scheduling. One link, real-time
-            availability, automatic time zone handling — built for individuals
-            and teams who value speed.
+            Stop losing hours to back-and-forth emails. Slotly handles
+            availability, time zones, and confirmations automatically —
+            so you can focus on work that actually moves the needle.
           </p>
-
           <div className="mt-10 flex flex-col sm:flex-row items-center gap-4 sm:gap-x-6">
             <Button
               size="lg"

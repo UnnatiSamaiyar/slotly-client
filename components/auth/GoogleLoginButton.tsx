@@ -81,65 +81,35 @@ export default function GoogleLoginButton({
     <button
       type="button"
       onClick={handleLogin}
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
-      aria-label={variant === "calendar" ? "Connect Google Calendar" : "Continue with Google"}
-      className={[
-        "relative",
-        compact ? "w-full" : "w-full",
-        compact ? "px-3 py-2 rounded-xl" : "px-5 py-4 rounded-2xl",
-        "flex flex-nowrap items-center justify-center gap-3",
-        "text-white font-semibold",
-        compact ? "text-sm" : "text-base sm:text-lg",
-        "whitespace-nowrap",
-        "transition-all duration-300",
-        "active:scale-[0.99]",
-        "focus:outline-none focus:ring-4 focus:ring-indigo-500/20",
-        hover ? "sm:scale-[1.01]" : "scale-100",
-      ].join(" ")}
-      style={{
-        background: "linear-gradient(135deg, #3b82f6, #6366f1)",
-        boxShadow: hover
-          ? "0 10px 40px rgba(99,102,241,0.45)"
-          : "0 6px 25px rgba(99,102,241,0.25)",
-      }}
+      aria-label={
+        variant === "calendar"
+          ? "Connect Google Calendar"
+          : "Continue with Google"
+      }
+      className="
+      w-full
+      flex items-center justify-center gap-3
+      h-10
+      rounded-lg
+      border border-gray-200
+      bg-white
+      text-gray-700
+      text-sm font-medium
+      transition
+      hover:bg-gray-50
+      hover:shadow-sm
+      active:scale-[0.99]
+      focus:outline-none
+      focus:ring-2
+      focus:ring-blue-500/20
+    "
     >
-      {/* Gradient border */}
-      <span
-        className={[
-          "pointer-events-none absolute inset-0 border-[2px] border-transparent",
-          compact ? "rounded-xl" : "rounded-2xl",
-        ].join(" ")}
-        style={{
-          background:
-            "linear-gradient(120deg, rgba(255,255,255,0.65), rgba(99,102,241,0.35), rgba(59,130,246,0.65)) border-box",
-          WebkitMask:
-            "linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)",
-          WebkitMaskComposite: "xor",
-        }}
-      />
-
-      {/* Shine */}
-      <span
-        className={[
-          "pointer-events-none absolute inset-0 rounded-2xl bg-white/20 blur-xl transition-opacity duration-300",
-          hover ? "opacity-20" : "opacity-0",
-        ].join(" ")}
-      />
-
-      {/* Google Icon */}
-      <span
-        className={[
-          "flex items-center justify-center rounded-full bg-white shadow-sm shrink-0",
-          compact ? "w-8 h-8" : "w-10 h-10",
-        ].join(" ")}
-      >
-        <FcGoogle className={compact ? "text-xl" : "text-2xl"} />
-      </span>
-
-      {/* Text – FORCED SINGLE LINE */}
-      <span className="leading-none whitespace-nowrap">
-        {label || (variant === "calendar" ? "Connect Google Calendar" : "Continue with Google")}
+      <FcGoogle className="text-lg" />
+      <span>
+        {label ||
+          (variant === "calendar"
+            ? "Connect Google Calendar"
+            : "Continue with Google")}
       </span>
     </button>
   );

@@ -246,11 +246,9 @@
 //   );
 // }
 //@ts-nocheck
-//@ts-nocheck
 
 "use client";
 
-// import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import React, { useEffect, useMemo, useState } from "react";
 import PublicEventInfo from "./components/PublicEventInfo";
@@ -259,7 +257,6 @@ import PublicTimeSlots from "./components/PublicTimeSlots";
 import PublicBookingForm from "./components/PublicBookingForm";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft } from "lucide-react";
-// import SlotlyLogo from "../../../public/assets/Slotlyio-logo.png"
 
 export default function PublicBookingPage() {
   const params = useParams();
@@ -317,8 +314,8 @@ export default function PublicBookingPage() {
   };
 
   return (
-    <div className="min-h-[100dvh] bg-gray-50 flex justify-center px-3 sm:px-6 py-4 sm:py-8">
-      <div
+    <div className="min-h-screen bg-gray-50 flex justify-center px-3 sm:px-6 py-4 sm:py-6">
+                  <div
         className="
           w-full
           max-w-4xl
@@ -503,14 +500,12 @@ export default function PublicBookingPage() {
             target="_blank"
             className="flex items-center gap-2 text-xs text-gray-500 hover:text-indigo-600 transition"
           >
-            <span>Powered by Slotly</span>
-            {/* <Image
-              src={SlotlyLogo}
+            <span>Powered by</span>
+            <img
+              src="/Slotlyio-logo.webp"
               alt="Slotly"
-              width={24}
-              height={24}
               className="h-5 sm:h-6 w-auto object-contain"
-            /> */}
+            />
           </a>
         </div>
       </div>

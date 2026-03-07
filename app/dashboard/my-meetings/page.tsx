@@ -91,6 +91,7 @@ export default function MyMeetingsPage() {
         onToggle={() => setSidebarOpen((s: boolean) => !s)}
         user={user}
       />
+
       <main className="flex-1 min-w-0 flex flex-col overflow-hidden">
         <div className="shrink-0 p-4 sm:p-6 lg:p-8">
           <Topbar
@@ -102,63 +103,79 @@ export default function MyMeetingsPage() {
 
         <div className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 pb-8">
           <div className="grid grid-cols-12 gap-6">
-          <section className="col-span-12 lg:col-span-8 space-y-6">
-            <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
-              <div className="flex items-start justify-between gap-4 mb-4">
-                <div>
-                  <h3 className="text-lg font-semibold">
-                    {isToday ? "My Meetings (Today)" : "My Meetings"}
-                  </h3>
-                  <div className="text-xs text-gray-500 mt-1">
-                    Showing <span className="font-medium text-slate-700">{selectedDate}</span>
-                    {searchQuery.trim() ? (
-                      <>
-                        {" "}• filtered by <span className="font-medium text-slate-700">“{searchQuery.trim()}”</span>
-                      </>
-                    ) : null}
+            <section className="col-span-12 lg:col-span-8 space-y-6">
+              <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+                <div className="flex items-start justify-between gap-4 mb-4">
+                  <div>
+                    <h3 className="text-lg font-semibold">
+                      {isToday ? "My Meetings (Today)" : "My Meetings"}
+                    </h3>
+                    <div className="text-xs text-gray-500 mt-1">
+                      Showing{" "}
+                      <span className="font-medium text-slate-700">
+                        {selectedDate}
+                      </span>
+                      {searchQuery.trim() ? (
+                        <>
+                          {" "}
+                          • filtered by{" "}
+                          <span className="font-medium text-slate-700">
+                            “{searchQuery.trim()}”
+                          </span>
+                        </>
+                      ) : null}
+                    </div>
+                  </div>
+
+                  <div className="text-sm text-gray-500 whitespace-nowrap">
+                    {dayCount} events
                   </div>
                 </div>
 
-                <div className="text-sm text-gray-500 whitespace-nowrap">{dayCount} events</div>
+                <EventList
+                  events={filteredEvents}
+                  selectedDate={selectedDate}
+                  loading={loadingEvents}
+                  error={eventsError}
+                  userSub={userSub}
+                  onChanged={refresh}
+                />
               </div>
 
-              <EventList
-                events={filteredEvents}
-                selectedDate={selectedDate}
-                loading={loadingEvents}
-                error={eventsError}
-                userSub={userSub}
-                onChanged={refresh}
-              />
-            </div>
+              <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h4 className="font-semibold">Calendar Overview</h4>
+                    <div className="text-xs text-gray-500 mt-1">
+                      Pick a date to filter the timeline.
+                    </div>
+                  </div>
 
-            <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <h4 className="font-semibold">Calendar Overview</h4>
-                  <div className="text-xs text-gray-500 mt-1">Pick a date to filter the timeline.</div>
+                  <button
+                    onClick={() =>
+                      setSelectedDate(new Date().toISOString().slice(0, 10))
+                    }
+                    className="text-sm px-3 py-1.5 rounded-lg border border-gray-200 hover:bg-gray-50"
+                  >
+                    Today
+                  </button>
                 </div>
 
-                <button
-                  onClick={() => setSelectedDate(new Date().toISOString().slice(0, 10))}
-                  className="text-sm px-3 py-1.5 rounded-lg border border-gray-200 hover:bg-gray-50"
-                >
-                  Today
-                </button>
+                <CalendarGrid
+                  selectedDate={selectedDate}
+                  setSelectedDate={setSelectedDate}
+                  eventsByDate={filteredEventsByDate}
+                />
               </div>
+            </section>
 
-              <CalendarGrid
+            <aside className="col-span-12 lg:col-span-4 space-y-6">
+              <UpcomingEvents
+                events={filteredEvents}
                 selectedDate={selectedDate}
-                setSelectedDate={setSelectedDate}
-                eventsByDate={filteredEventsByDate}
               />
-            </div>
-          </section>
-
-          <aside className="col-span-12 lg:col-span-4 space-y-6">
-            <UpcomingEvents events={filteredEvents} selectedDate={selectedDate} />
-          </aside>
-        </div>
+            </aside>
+          </div>
         </div>
       </main>
     </div>

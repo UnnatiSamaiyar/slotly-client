@@ -47,11 +47,16 @@ export default function NavItem({
 
   if (href && !disabled) {
     return (
-      <Link href={href} className={className}>
+      <Link
+        href={href}
+        className={className}
+        onClick={onClick}
+      >
         {content}
       </Link>
     );
   }
+
 
   return (
     <div
