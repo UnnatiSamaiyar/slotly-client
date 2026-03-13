@@ -315,7 +315,7 @@ function parseLocation(location: string) {
 
   const m = s.match(/\((https?:\/\/[^)]+)\)\s*$/i);
   const url = m?.[1] || "";
-  const text = url ? s.replace(m[0], "").trim() : s;
+  const text = m && url ? s.replace(m[0], "").trim() : s;
 
   return { text, url };
 }
