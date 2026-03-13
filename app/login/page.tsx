@@ -5,7 +5,8 @@ import { useMemo } from "react";
 import GoogleLoginButton from "@/components/auth/GoogleLoginButton";
 import EmailAuthPanel from "@/components/auth/EmailAuthPanel";
 import { motion } from "framer-motion";
-
+import Link from "next/dist/client/link";
+// import Link from "next/link";
 export default function LoginPage() {
 
   /* ===== REAL BROWSER CALENDAR ===== */
@@ -46,7 +47,7 @@ export default function LoginPage() {
             className="w-full max-w-sm"
           >
             {/* Logo */}
-            <div className="mb-6">
+            {/* <div className="mb-6">
               <Image
                 src="/Slotlyio-logo.webp"
                 alt="Slotly Logo"
@@ -54,6 +55,19 @@ export default function LoginPage() {
                 height={20}
                 priority
               />
+            </div> */}
+            {/* Logo */}
+            <div className="mb-6">
+              <Link href="/">
+                <Image
+                  src="/Slotlyio-logo.webp"
+                  alt="Slotly Logo"
+                  width={100}
+                  height={20}
+                  priority
+                  className="cursor-pointer"
+                />
+              </Link>
             </div>
 
             {/* Heading */}

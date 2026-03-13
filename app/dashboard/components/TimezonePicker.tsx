@@ -915,11 +915,288 @@
 //     </div>
 //   );
 // }
+
+
+// "use client";
+
+// import React, { useEffect, useMemo, useRef, useState } from "react";
+// import { createPortal } from "react-dom";
+// import { Globe } from "lucide-react";
+// import {
+//   getAllTimezones,
+//   getBrowserTimezone,
+//   getPreferredTimezone,
+//   isValidTimezone,
+//   setPreferredTimezone,
+//   subscribeTimezoneChange,
+// } from "../../../lib/timezone";
+
+// type QuickKey = "IST" | "UTC" | "ET" | "PT" | "AUS";
+// type OpenDirection = "auto" | "up" | "down";
+// type CompactTrigger = "offset" | "icon";
+
+// const QUICK = [
+//   { key: "IST", label: "IST", value: "Asia/Kolkata", prefixes: ["Asia/"] },
+//   { key: "UTC", label: "UTC", value: "Etc/UTC", prefixes: ["Etc/"] },
+//   { key: "ET", label: "US ET", value: "America/New_York", prefixes: ["America/"] },
+//   { key: "PT", label: "US PT", value: "America/Los_Angeles", prefixes: ["America/"] },
+//   { key: "AUS", label: "AUS", value: "Australia/Sydney", prefixes: ["Australia/", "Pacific/"] },
+// ];
+
+// function inferQuickFromTz(tz: string): QuickKey {
+//   if (tz.startsWith("Etc/")) return "UTC";
+//   if (tz.startsWith("Australia/") || tz.startsWith("Pacific/")) return "AUS";
+//   if (tz.startsWith("Asia/")) return "IST";
+//   if (tz.startsWith("America/")) return "ET";
+//   return "IST";
+// }
+
+// function utcOffsetLabel(timeZone: string): string {
+//   try {
+//     const parts = new Intl.DateTimeFormat("en-US", {
+//       timeZone,
+//       timeZoneName: "shortOffset" as any,
+//     }).formatToParts(new Date());
+
+//     const raw = parts.find((p) => p.type === "timeZoneName")?.value || "";
+//     if (!raw || raw === "GMT" || raw === "UTC") return "UTC+00:00";
+//     return raw.replace("GMT", "UTC");
+//   } catch {
+//     return "UTC";
+//   }
+// }
+
+// export default function TimezonePicker({
+//   compact = false,
+//   value,
+//   onChange,
+//   label = "Timezone",
+//   allowAuto = true,
+//   openDirection = "auto",
+//   compactTrigger = "offset", // ✅ NEW
+// }: {
+//   compact?: boolean;
+//   value?: string;
+//   onChange?: (tz: string) => void;
+//   label?: string;
+//   allowAuto?: boolean;
+//   openDirection?: OpenDirection;
+//   compactTrigger?: CompactTrigger; // ✅ NEW
+// }) {
+//   const zones = useMemo(() => getAllTimezones(), []);
+
+//   // ✅ HYDRATION SAFE
+//   const [mounted, setMounted] = useState(false);
+//   useEffect(() => setMounted(true), []);
+
+//   const controlled = typeof value === "string" && typeof onChange === "function";
+//   const browserTz = getBrowserTimezone();
+//   const [internalTz, setInternalTz] = useState(() => getPreferredTimezone() || browserTz);
+
+//   const tz = controlled ? value || "" : internalTz;
+
+//   const [open, setOpen] = useState(false);
+//   const [activeQuick, setActiveQuick] = useState<QuickKey>(() => inferQuickFromTz(tz));
+//   const wrapRef = useRef<HTMLDivElement | null>(null);
+
+//   // Portal dropdown geometry
+//   const [dd, setDd] = useState<{
+//     top?: number;
+//     left?: number;
+//     width?: number;
+//     bottom?: number;
+//     direction: "up" | "down";
+//   } | null>(null);
+
+//   useEffect(() => {
+//     if (controlled) return;
+//     return subscribeTimezoneChange(() => {
+//       const next = getPreferredTimezone() || getBrowserTimezone();
+//       setInternalTz(next);
+//       setActiveQuick(inferQuickFromTz(next));
+//     });
+//   }, [controlled]);
+
+//   const apply = (next: string) => {
+//     if (!isValidTimezone(next)) return;
+
+//     if (controlled) onChange?.(next);
+//     else {
+//       setPreferredTimezone(next);
+//       setInternalTz(next);
+//     }
+
+//     setActiveQuick(inferQuickFromTz(next));
+//     setOpen(false);
+//   };
+
+//   const showingCustom = tz !== browserTz;
+//   const tzOffset = tz ? utcOffsetLabel(tz) : "UTC";
+
+//   // Close on outside click + ESC
+//   useEffect(() => {
+//     if (!open) return;
+
+//     const onDocDown = (e: MouseEvent) => {
+//       const t = e.target as Node;
+//       if (!wrapRef.current) return;
+//       if (!wrapRef.current.contains(t)) setOpen(false);
+//     };
+
+//     const onKey = (e: KeyboardEvent) => {
+//       if (e.key === "Escape") setOpen(false);
+//     };
+
+//     document.addEventListener("mousedown", onDocDown);
+//     document.addEventListener("keydown", onKey);
+//     return () => {
+//       document.removeEventListener("mousedown", onDocDown);
+//       document.removeEventListener("keydown", onKey);
+//     };
+//   }, [open]);
+
+//   // Position dropdown (up/down)
+//   const recalc = () => {
+//     const el = wrapRef.current;
+//     if (!el) return;
+
+//     const r = el.getBoundingClientRect();
+//     const gap = 8;
+//     const ddMaxH = 280 + (allowAuto ? 44 : 0);
+
+//     const spaceBelow = window.innerHeight - r.bottom;
+//     const spaceAbove = r.top;
+
+//     let dir: "up" | "down" = "down";
+//     if (openDirection === "up") dir = "up";
+//     else if (openDirection === "down") dir = "down";
+//     else {
+//       if (spaceBelow < ddMaxH && spaceAbove > spaceBelow) dir = "up";
+//       else dir = "down";
+//     }
+
+//     if (dir === "down") {
+//       setDd({
+//         direction: "down",
+//         top: Math.round(r.bottom + gap),
+//         left: Math.round(r.left),
+//         width: Math.round(r.width),
+//       });
+//     } else {
+//       setDd({
+//         direction: "up",
+//         bottom: Math.round(window.innerHeight - r.top + gap),
+//         left: Math.round(r.left),
+//         width: Math.round(r.width),
+//       });
+//     }
+//   };
+
+//   useEffect(() => {
+//     if (!open) return;
+//     recalc();
+//     window.addEventListener("resize", recalc);
+//     window.addEventListener("scroll", recalc, true);
+//     return () => {
+//       window.removeEventListener("resize", recalc);
+//       window.removeEventListener("scroll", recalc, true);
+//     };
+//     // eslint-disable-next-line react-hooks/exhaustive-deps
+//   }, [open, openDirection, allowAuto, compact, tz]);
+
+//   return (
+//     <div
+//       ref={wrapRef}
+//       className={compact ? "relative inline-block w-auto" : "relative inline-block w-full max-w-[360px]"}
+//     >
+//       {!compact && (
+//         <div className="flex items-center justify-between mb-1">
+//           <label className="text-[11px] font-medium text-gray-600">{label}</label>
+//           <span className="text-[11px] text-gray-500">
+//             {mounted ? (showingCustom ? "Custom" : "Auto") : ""}
+//           </span>
+//         </div>
+//       )}
+
+//       <button
+//         type="button"
+//         onClick={() => setOpen((v) => !v)}
+//         className={
+//           compact
+//             ? "h-9 rounded-xl border bg-white shadow-sm flex items-center gap-2 whitespace-nowrap hover:bg-gray-50 transition px-3"
+//             : "w-full h-11 rounded-2xl border bg-white shadow-sm px-3 flex items-center justify-between gap-3"
+//         }
+//         aria-haspopup="dialog"
+//         aria-expanded={open}
+//       >
+//         {compact ? (
+//           compactTrigger === "icon" ? (
+//             <span className="inline-flex h-9 w-9 items-center justify-center -ml-2">
+//               <Globe className="h-4 w-4 text-gray-700" />
+//             </span>
+//           ) : (
+//             <span className="text-xs font-semibold text-gray-700">{mounted ? tzOffset : ""}</span>
+//           )
+//         ) : (
+//           <div className="text-left min-w-0">
+//             <div className="text-sm font-semibold text-gray-900 truncate">{mounted ? tzOffset : ""}</div>
+//             <div className="text-[11px] text-gray-600 truncate">{mounted ? tz : ""}</div>
+//           </div>
+//         )}
+
+//         <span className="text-xs border px-2 py-0.5 rounded-full">{activeQuick}</span>
+//       </button>
+
+//       {mounted && open && dd
+//         ? createPortal(
+//           <div
+//             className="fixed z-[9999] rounded-2xl border bg-white shadow-xl overflow-hidden"
+//             style={{
+//               left: dd.left,
+//               width: dd.width,
+//               top: dd.direction === "down" ? dd.top : undefined,
+//               bottom: dd.direction === "up" ? dd.bottom : undefined,
+//             }}
+//             onMouseDown={(e) => e.stopPropagation()}
+//             onClick={(e) => e.stopPropagation()}
+//           >
+//             <ul className="max-h-[280px] overflow-auto">
+//               {zones.map((z) => (
+//                 <li key={z}>
+//                   <button
+//                     type="button"
+//                     onClick={() => apply(z)}
+//                     className="w-full px-3 py-2 text-left hover:bg-gray-50"
+//                   >
+//                     <div className="text-xs font-semibold">{utcOffsetLabel(z)}</div>
+//                     <div className="text-xs text-gray-500">{z}</div>
+//                   </button>
+//                 </li>
+//               ))}
+//             </ul>
+
+//             {allowAuto && (
+//               <button
+//                 type="button"
+//                 onClick={() => apply(browserTz)}
+//                 className="w-full border-t py-2 text-sm text-blue-600 hover:bg-blue-50"
+//               >
+//                 Auto (Browser)
+//               </button>
+//             )}
+//           </div>,
+//           document.body
+//         )
+//         : null}
+//     </div>
+//   );
+// }
+
 "use client";
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { Globe } from "lucide-react";
+import { Globe, Search, X } from "lucide-react";
 import {
   getAllTimezones,
   getBrowserTimezone,
@@ -971,7 +1248,7 @@ export default function TimezonePicker({
   label = "Timezone",
   allowAuto = true,
   openDirection = "auto",
-  compactTrigger = "offset", // ✅ NEW
+  compactTrigger = "offset",
 }: {
   compact?: boolean;
   value?: string;
@@ -979,11 +1256,10 @@ export default function TimezonePicker({
   label?: string;
   allowAuto?: boolean;
   openDirection?: OpenDirection;
-  compactTrigger?: CompactTrigger; // ✅ NEW
+  compactTrigger?: CompactTrigger;
 }) {
   const zones = useMemo(() => getAllTimezones(), []);
 
-  // ✅ HYDRATION SAFE
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
@@ -994,10 +1270,11 @@ export default function TimezonePicker({
   const tz = controlled ? value || "" : internalTz;
 
   const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState("");
   const [activeQuick, setActiveQuick] = useState<QuickKey>(() => inferQuickFromTz(tz));
   const wrapRef = useRef<HTMLDivElement | null>(null);
+  const searchRef = useRef<HTMLInputElement | null>(null);
 
-  // Portal dropdown geometry
   const [dd, setDd] = useState<{
     top?: number;
     left?: number;
@@ -1015,6 +1292,18 @@ export default function TimezonePicker({
     });
   }, [controlled]);
 
+  const filteredZones = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return zones;
+
+    return zones.filter((z) => {
+      const zone = z.toLowerCase();
+      const normalized = zone.replaceAll("_", " ");
+      const offset = utcOffsetLabel(z).toLowerCase();
+      return zone.includes(q) || normalized.includes(q) || offset.includes(q);
+    });
+  }, [zones, search]);
+
   const apply = (next: string) => {
     if (!isValidTimezone(next)) return;
 
@@ -1026,12 +1315,12 @@ export default function TimezonePicker({
 
     setActiveQuick(inferQuickFromTz(next));
     setOpen(false);
+    setSearch("");
   };
 
   const showingCustom = tz !== browserTz;
   const tzOffset = tz ? utcOffsetLabel(tz) : "UTC";
 
-  // Close on outside click + ESC
   useEffect(() => {
     if (!open) return;
 
@@ -1042,7 +1331,10 @@ export default function TimezonePicker({
     };
 
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setOpen(false);
+      if (e.key === "Escape") {
+        setOpen(false);
+        setSearch("");
+      }
     };
 
     document.addEventListener("mousedown", onDocDown);
@@ -1053,15 +1345,15 @@ export default function TimezonePicker({
     };
   }, [open]);
 
-  // Position dropdown (up/down)
   const recalc = () => {
     const el = wrapRef.current;
     if (!el) return;
 
     const r = el.getBoundingClientRect();
     const gap = 8;
-    const ddMaxH = 280 + (allowAuto ? 44 : 0);
+    const ddMaxH = 360 + (allowAuto ? 44 : 0);
 
+    const vw = window.innerWidth;
     const spaceBelow = window.innerHeight - r.bottom;
     const spaceAbove = r.top;
 
@@ -1073,19 +1365,27 @@ export default function TimezonePicker({
       else dir = "down";
     }
 
+    const desiredWidth = Math.max(Math.round(r.width), 320);
+    const maxAllowedWidth = Math.max(260, vw - 24);
+    const finalWidth = Math.min(desiredWidth, maxAllowedWidth);
+
+    const minLeft = 12;
+    const maxLeft = Math.max(12, vw - finalWidth - 12);
+    const finalLeft = Math.min(Math.max(Math.round(r.left), minLeft), maxLeft);
+
     if (dir === "down") {
       setDd({
         direction: "down",
         top: Math.round(r.bottom + gap),
-        left: Math.round(r.left),
-        width: Math.round(r.width),
+        left: finalLeft,
+        width: finalWidth,
       });
     } else {
       setDd({
         direction: "up",
         bottom: Math.round(window.innerHeight - r.top + gap),
-        left: Math.round(r.left),
-        width: Math.round(r.width),
+        left: finalLeft,
+        width: finalWidth,
       });
     }
   };
@@ -1093,9 +1393,15 @@ export default function TimezonePicker({
   useEffect(() => {
     if (!open) return;
     recalc();
+
+    const t = setTimeout(() => {
+      searchRef.current?.focus();
+    }, 40);
+
     window.addEventListener("resize", recalc);
     window.addEventListener("scroll", recalc, true);
     return () => {
+      clearTimeout(t);
       window.removeEventListener("resize", recalc);
       window.removeEventListener("scroll", recalc, true);
     };
@@ -1108,7 +1414,7 @@ export default function TimezonePicker({
       className={compact ? "relative inline-block w-auto" : "relative inline-block w-full max-w-[360px]"}
     >
       {!compact && (
-        <div className="flex items-center justify-between mb-1">
+        <div className="mb-1 flex items-center justify-between">
           <label className="text-[11px] font-medium text-gray-600">{label}</label>
           <span className="text-[11px] text-gray-500">
             {mounted ? (showingCustom ? "Custom" : "Auto") : ""}
@@ -1121,8 +1427,8 @@ export default function TimezonePicker({
         onClick={() => setOpen((v) => !v)}
         className={
           compact
-            ? "h-9 rounded-xl border bg-white shadow-sm flex items-center gap-2 whitespace-nowrap hover:bg-gray-50 transition px-3"
-            : "w-full h-11 rounded-2xl border bg-white shadow-sm px-3 flex items-center justify-between gap-3"
+            ? "flex h-9 items-center gap-2 whitespace-nowrap rounded-xl border bg-white px-3 shadow-sm transition hover:bg-gray-50"
+            : "flex h-11 w-full items-center justify-between gap-3 rounded-2xl border bg-white px-3 shadow-sm"
         }
         aria-haspopup="dialog"
         aria-expanded={open}
@@ -1136,19 +1442,19 @@ export default function TimezonePicker({
             <span className="text-xs font-semibold text-gray-700">{mounted ? tzOffset : ""}</span>
           )
         ) : (
-          <div className="text-left min-w-0">
-            <div className="text-sm font-semibold text-gray-900 truncate">{mounted ? tzOffset : ""}</div>
-            <div className="text-[11px] text-gray-600 truncate">{mounted ? tz : ""}</div>
+          <div className="min-w-0 text-left">
+            <div className="truncate text-sm font-semibold text-gray-900">{mounted ? tzOffset : ""}</div>
+            <div className="truncate text-[11px] text-gray-600">{mounted ? tz : ""}</div>
           </div>
         )}
 
-        <span className="text-xs border px-2 py-0.5 rounded-full">{activeQuick}</span>
+        <span className="rounded-full border px-2 py-0.5 text-xs">{activeQuick}</span>
       </button>
 
       {mounted && open && dd
         ? createPortal(
           <div
-            className="fixed z-[9999] rounded-2xl border bg-white shadow-xl overflow-hidden"
+            className="fixed z-[9999] overflow-hidden rounded-2xl border bg-white shadow-xl"
             style={{
               left: dd.left,
               width: dd.width,
@@ -1158,26 +1464,62 @@ export default function TimezonePicker({
             onMouseDown={(e) => e.stopPropagation()}
             onClick={(e) => e.stopPropagation()}
           >
-            <ul className="max-h-[280px] overflow-auto">
-              {zones.map((z) => (
-                <li key={z}>
+            <div className="border-b bg-white px-4 py-3">
+              <div className="relative">
+                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                <input
+                  ref={searchRef}
+                  type="text"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Search timezone..."
+                  className="h-10 w-full rounded-xl border bg-white pl-9 pr-9 text-sm outline-none transition focus:border-blue-400"
+                />
+                {search ? (
                   <button
                     type="button"
-                    onClick={() => apply(z)}
-                    className="w-full px-3 py-2 text-left hover:bg-gray-50"
+                    onClick={() => {
+                      setSearch("");
+                      searchRef.current?.focus();
+                    }}
+                    className="absolute right-2 top-1/2 inline-flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full hover:bg-gray-100"
                   >
-                    <div className="text-xs font-semibold">{utcOffsetLabel(z)}</div>
-                    <div className="text-xs text-gray-500">{z}</div>
+                    <X className="h-4 w-4 text-gray-500" />
                   </button>
+                ) : null}
+              </div>
+            </div>
+
+            <ul className="max-h-[300px] overflow-auto py-1">
+              {filteredZones.length > 0 ? (
+                filteredZones.map((z) => {
+                  const selected = z === tz;
+                  return (
+                    <li key={z}>
+                      <button
+                        type="button"
+                        onClick={() => apply(z)}
+                        className={`w-full px-4 py-2 text-left transition hover:bg-gray-50 ${selected ? "bg-blue-50" : ""
+                          }`}
+                      >
+                        <div className="text-xs font-semibold">{utcOffsetLabel(z)}</div>
+                        <div className="text-xs text-gray-500">{z}</div>
+                      </button>
+                    </li>
+                  );
+                })
+              ) : (
+                <li className="px-4 py-6 text-center text-sm text-gray-500">
+                  No timezone found
                 </li>
-              ))}
+              )}
             </ul>
 
             {allowAuto && (
               <button
                 type="button"
                 onClick={() => apply(browserTz)}
-                className="w-full border-t py-2 text-sm text-blue-600 hover:bg-blue-50"
+                className="w-full border-t px-4 py-2 text-left text-sm text-blue-600 hover:bg-blue-50"
               >
                 Auto (Browser)
               </button>

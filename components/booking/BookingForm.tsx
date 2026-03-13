@@ -73,7 +73,7 @@
 // //         // Fallback to browser timezone if not set.
 // //         const viewerTz = getPreferredTimezone();
 // //         const res = await fetch(
-// //           `https://api.slotly.io/bookings/availability?user_sub=${encodeURIComponent(
+// //           ` https://api.slotly.io/bookings/availability?user_sub=${encodeURIComponent(
 // //             userSub
 // //           )}&date=${date}&tz=${encodeURIComponent(viewerTz)}`
 // //         );
@@ -174,7 +174,7 @@
 
 // //     try {
 // //       const res = await fetch(
-// //         `https://api.slotly.io/bookings/create?user_sub=${encodeURIComponent(
+// //         ` https://api.slotly.io/bookings/create?user_sub=${encodeURIComponent(
 // //           userSub
 // //         )}`,
 // //         {
@@ -565,7 +565,7 @@
 
 // //         const tz = getPreferredTimezone();
 // //         const res = await fetch(
-// //           `https://api.slotly.io/bookings/availability?user_sub=${encodeURIComponent(
+// //           ` https://api.slotly.io/bookings/availability?user_sub=${encodeURIComponent(
 // //             userSub
 // //           )}&date=${date}&tz=${encodeURIComponent(tz)}`
 // //         );
@@ -610,7 +610,7 @@
 
 // //     try {
 // //       const res = await fetch(
-// //         `https://api.slotly.io/bookings/create?user_sub=${encodeURIComponent(
+// //         ` https://api.slotly.io/bookings/create?user_sub=${encodeURIComponent(
 // //           userSub
 // //         )}`,
 // //         {
@@ -1050,7 +1050,7 @@
 
 // //         const tz = getPreferredTimezone();
 // //         const res = await fetch(
-// //           `https://api.slotly.io/bookings/availability?user_sub=${encodeURIComponent(
+// //           ` https://api.slotly.io/bookings/availability?user_sub=${encodeURIComponent(
 // //             userSub
 // //           )}&date=${date}&tz=${encodeURIComponent(tz)}`
 // //         );
@@ -1095,7 +1095,7 @@
 
 // //     try {
 // //       const res = await fetch(
-// //         `https://api.slotly.io/bookings/create?user_sub=${encodeURIComponent(
+// //         ` https://api.slotly.io/bookings/create?user_sub=${encodeURIComponent(
 // //           userSub
 // //         )}`,
 // //         {
@@ -1533,7 +1533,7 @@
 
 //         const tz = getPreferredTimezone();
 //         const res = await fetch(
-//           `https://api.slotly.io/bookings/availability?user_sub=${encodeURIComponent(
+//           ` https://api.slotly.io/bookings/availability?user_sub=${encodeURIComponent(
 //             userSub
 //           )}&date=${date}&duration=${duration}&tz=${encodeURIComponent(tz)}`
 //         );
@@ -1588,7 +1588,7 @@
 
 //   //   try {
 //   //     const res = await fetch(
-//   //       `https://api.slotly.io/bookings/create?user_sub=${encodeURIComponent(
+//   //       ` https://api.slotly.io/bookings/create?user_sub=${encodeURIComponent(
 //   //         userSub
 //   //       )}`,
 //   //       {
@@ -1638,7 +1638,7 @@
 
 //   //   try {
 //   //     const res = await fetch(
-//   //       `https://api.slotly.io/bookings/create?user_sub=${encodeURIComponent(
+//   //       ` https://api.slotly.io/bookings/create?user_sub=${encodeURIComponent(
 //   //         userSub
 //   //       )}`,
 //   //       {
@@ -1712,7 +1712,7 @@
 //     setShowStatus(true);
 //     try {
 //       const res = await fetch(
-//         `https://api.slotly.io/bookings/create?user_sub=${encodeURIComponent(userSub)}`,
+//         ` https://api.slotly.io/bookings/create?user_sub=${encodeURIComponent(userSub)}`,
 //         {
 //           method: "POST",
 //           headers: { "Content-Type": "application/json" },
@@ -2078,8 +2078,8 @@ const toBool = (v: any) => v === true || v === "true" || v === 1 || v === "1";
 /* ------------------ COMPONENT ------------------ */
 
 export default function BookingForm({ userSub }: { userSub: string }) {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  // const [name, setName] = useState("");
+  // const [email, setEmail] = useState("");
 
   const [attendees, setAttendees] = useState<string[]>([]);
   const [attendeeInput, setAttendeeInput] = useState("");
@@ -2132,7 +2132,7 @@ export default function BookingForm({ userSub }: { userSub: string }) {
 
         const tz = getPreferredTimezone();
         const res = await fetch(
-          `https://api.slotly.io/bookings/availability?user_sub=${encodeURIComponent(
+          ` https://api.slotly.io/bookings/availability?user_sub=${encodeURIComponent(
             userSub
           )}&date=${date}&duration=${duration}&tz=${encodeURIComponent(tz)}`
         );
@@ -2167,15 +2167,15 @@ export default function BookingForm({ userSub }: { userSub: string }) {
 
     // ---------------- VALIDATION ----------------
 
-    if (!name.trim()) {
-      setMessage("Please enter your name.");
-      return;
-    }
+    // if (!name.trim()) {
+    //   setMessage("Please enter your name.");
+    //   return;
+    // }
 
-    if (!email.trim()) {
-      setMessage("Please enter your email.");
-      return;
-    }
+    // if (!email.trim()) {
+    //   setMessage("Please enter your email.");
+    //   return;
+    // }
 
     if (!date) {
       setMessage("Please select a date.");
@@ -2205,7 +2205,7 @@ export default function BookingForm({ userSub }: { userSub: string }) {
 
     try {
       const res = await fetch(
-        `https://api.slotly.io/bookings/create?user_sub=${encodeURIComponent(
+        ` https://api.slotly.io/bookings/create?user_sub=${encodeURIComponent(
           userSub
         )}`,
         {
@@ -2238,7 +2238,10 @@ export default function BookingForm({ userSub }: { userSub: string }) {
       <StatusModal
         open={showStatus}
         type={statusType}
-        onClose={() => router.replace("/dashboard")}
+        onClose={() => {
+          setShowStatus(false);
+          router.refresh();
+        }}
       />
 
       {/* ✅ Mobile preview backdrop */}
@@ -2312,8 +2315,8 @@ export default function BookingForm({ userSub }: { userSub: string }) {
             </span>
           </Preview> */}
 
-          <Preview label="Title" value={title} />
-          <Preview label="Host" value={name || "—"} />
+          {/* <Preview label="Title" value={title} />
+          <Preview label="Host" value={name || "—"} /> */}
           <Preview
             label="Attendees"
             value={attendees.filter(Boolean).join(", ") || "—"}

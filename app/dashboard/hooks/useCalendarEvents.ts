@@ -7,7 +7,7 @@ import { useEffect, useMemo, useState } from "react";
 import { toISODateLocal, safeDate } from "../components/Calendar/CalendarHelpers";
 
 const API_BASE =
-  process.env.NEXT_PUBLIC_CALENDAR_API || "https://api.slotly.io";
+  process.env.NEXT_PUBLIC_CALENDAR_API || " https://api.slotly.io";
 
 export function useCalendarEvents(userSub: string | null, view: "host" | "invitee" | "all" = "host") {
   const [events, setEvents] = useState<any[]>([]);
@@ -39,6 +39,7 @@ export function useCalendarEvents(userSub: string | null, view: "host" | "invite
         const items = (Array.isArray(bookings) ? bookings : []).map((b: any) => ({
           id: b.id,
           summary: b.title || "Untitled",
+          title: b.title || "Untitled",
           start: b.start_time || null,
           end: b.end_time || null,
           location: b.location || null,
@@ -47,6 +48,8 @@ export function useCalendarEvents(userSub: string | null, view: "host" | "invite
           meetLink: b.meet_link || null,
           attendees: Array.isArray(b.attendees) ? b.attendees : [],
           role: b.role || "unknown",
+          profile_slug: b.profile_slug || null,
+          meeting_mode: b.meeting_mode || null,
         }));
 
         if (!cancelled) setEvents(items);

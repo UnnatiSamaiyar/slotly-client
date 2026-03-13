@@ -60,7 +60,7 @@
 
 //   const fileInputRef = useRef<HTMLInputElement | null>(null);
 //   const apiBase =
-//     process.env.NEXT_PUBLIC_API_BASE || "https://api.slotly.io";
+//     process.env.NEXT_PUBLIC_API_BASE || " https://api.slotly.io";
 
 //   useEffect(() => {
 //     if (!open) return;
@@ -529,6 +529,7 @@ import TimezonePicker from "../TimezonePicker";
 import { getBrowserTimezone, getPreferredTimezone } from "@/lib/timezone";
 import { getMe, uploadBrandLogo } from "@/lib/userApi";
 import BookingForm from "@/components/booking/BookingForm";
+import SetMeetingLocationModal from "@/components/shared/SetMeetingLocationModal";
 
 type MeetingMode = "google_meet" | "in_person";
 
@@ -566,11 +567,11 @@ export default function CreateEventTypeModal({
 
   const [availabilityJson, setAvailabilityJson] = useState<string>("{}");
   const [availabilityOpen, setAvailabilityOpen] = useState(false);
-
+  const [locationModalOpen, setLocationModalOpen] = useState(false);
   const needsLocation = meetingMode === "in_person";
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const apiBase = process.env.NEXT_PUBLIC_API_BASE || "https://api.slotly.io";
+  const apiBase = process.env.NEXT_PUBLIC_API_BASE || " https://api.slotly.io";
 
   useEffect(() => {
     if (!open) return;
@@ -582,12 +583,25 @@ export default function CreateEventTypeModal({
     setTimezone(getPreferredTimezone() || getBrowserTimezone());
     setAvailabilityJson("{}");
     setAvailabilityOpen(false);
+    setLocationModalOpen(false);
     setSaving(false);
     setExistingLogoUrl(null);
     setLogoUrl(null);
     setLogoUploading(false);
     setIsPublic(true);
   }, [open]);
+
+  useEffect(() => {
+    if (!open) return;
+
+    if (meetingMode === "in_person") {
+      const t = setTimeout(() => setLocationModalOpen(true), 120);
+      return () => clearTimeout(t);
+    }
+
+    setLocationModalOpen(false);
+    setLocation("");
+  }, [meetingMode, open]);
 
   useEffect(() => {
     if (!open || !userSub) return;
@@ -801,12 +815,21 @@ export default function CreateEventTypeModal({
 
                           {needsLocation && (
                             <div>
-                              <label className="text-xs font-medium text-slate-600">Location</label>
-                              <input
-                                value={location}
-                                onChange={(e) => setLocation(e.target.value)}
-                                className="mt-1 w-full h-11 px-3.5 border rounded-xl outline-none focus:ring-2 focus:ring-blue-200"
-                              />
+                              <div className="flex items-center justify-between">
+                                <label className="text-xs font-medium text-slate-600">Location</label>
+
+                                <button
+                                  type="button"
+                                  onClick={() => setLocationModalOpen(true)}
+                                  className="text-xs font-semibold text-indigo-600"
+                                >
+                                  {location?.trim() ? "Edit" : "Set"}
+                                </button>
+                              </div>
+
+                              <div className="mt-1 rounded-xl border bg-slate-50 px-3.5 py-3 text-sm text-slate-900 break-words min-h-[44px] flex items-center">
+                                {location?.trim() ? location : "No location set"}
+                              </div>
                             </div>
                           )}
                         </div>
@@ -951,6 +974,18 @@ export default function CreateEventTypeModal({
             setAvailabilityOpen(false);
           }}
         />
+        <SetMeetingLocationModal
+          open={locationModalOpen}
+          onClose={() => setLocationModalOpen(false)}
+          initialValue={location}
+          onSave={(loc) => {
+            setLocation(loc);
+            setLocationModalOpen(false);
+          }}
+        />
+
+
+
       </div>
     </AnimatePresence>
   );

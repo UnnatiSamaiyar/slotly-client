@@ -194,7 +194,7 @@
 //         location: meetingMode === "in_person" ? normalizedLocation : null,
 //       };
 
-//       const res = await fetch("https://api.slotly.io/public/book", {
+//       const res = await fetch(" https://api.slotly.io/public/book", {
 //         method: "POST",
 //         headers: { "Content-Type": "application/json" },
 //         body: JSON.stringify(payload),
@@ -550,7 +550,7 @@ export default function PublicBookingForm({
         location: meetingMode === "in_person" ? normalizedLocation : null,
       };
 
-      const res = await fetch("https://api.slotly.io/public/book", {
+      const res = await fetch(" https://api.slotly.io/public/book", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -607,17 +607,7 @@ export default function PublicBookingForm({
           />
 
           <div className="mb-3">
-            <label className="text-sm font-medium block mb-1">
-              Meeting mode
-            </label>
-            <select
-              value={meetingMode}
-              onChange={(e) => setMeetingMode(e.target.value as any)}
-              className="p-3 border rounded-lg w-full"
-            >
-              <option value="google_meet">Google Meet</option>
-              <option value="in_person">In-person</option>
-            </select>
+          
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-700">
                 Agenda

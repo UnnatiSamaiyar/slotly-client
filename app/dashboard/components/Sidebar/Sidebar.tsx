@@ -23,7 +23,7 @@
 //   disabled?: boolean;
 // };
 // const API_BASE = (
-//   process.env.NEXT_PUBLIC_API_URL || "https://api.slotly.io"
+//   process.env.NEXT_PUBLIC_API_URL || " https://api.slotly.io"
 // ).replace(/\/$/, "");
 
 // export default function Sidebar({ open, onToggle, user }: any) {
@@ -359,17 +359,13 @@ type NavLink = {
 };
 
 const API_BASE = (
-  process.env.NEXT_PUBLIC_API_URL || "https://api.slotly.io"
+  process.env.NEXT_PUBLIC_API_URL || " https://api.slotly.io"
 ).replace(/\/$/, "");
 
 export default function Sidebar({ open, onToggle, user }: any) {
   const router = useRouter();
   const pathname = usePathname();
-
-  const userSub = useMemo(
-    () => user?.sub || user?.user_sub || user?.id || "",
-    [user]
-  );
+  const userSub = useMemo(() => user?.sub || "", [user]);
 
   const [calLoading, setCalLoading] = useState(false);
   const [calConnected, setCalConnected] = useState<boolean | null>(null);
@@ -401,23 +397,43 @@ export default function Sidebar({ open, onToggle, user }: any) {
 
   async function disconnectCalendar() {
     if (!userSub) return;
+
     try {
       setCalLoading(true);
-      await fetch(`${API_BASE}/auth/calendar-disconnect`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ user_sub: userSub }),
-      });
+
+      const res = await fetch(
+        `${API_BASE}/auth/calendar-disconnect?user_sub=${encodeURIComponent(userSub)}`,
+        {
+          method: "POST",
+        }
+      );
+
+      const data = await res.json().catch(() => null);
+
+      if (!res.ok) {
+        throw new Error(data?.detail || "Disconnect failed");
+      }
+
+      setCalConnected(false);
       await fetchCalendarStatus();
-    } catch {
-      setCalLoading(false);
-    }
+    }  catch (err) {
+      console.error("Calendar disconnect failed:", err);
+      await fetchCalendarStatus();
+    } finally {
+    setCalLoading(false);
+  }
   }
 
   useEffect(() => {
     fetchCalendarStatus();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userSub]);
+
+  useEffect(() => {
+    console.log("Sidebar user:", user);
+    console.log("Resolved userSub:", userSub);
+  }, [user, userSub]);
+
 
   // ✅ SAFE CLICK HANDLER
   const openGoogleLogin = () => {
@@ -580,15 +596,16 @@ export default function Sidebar({ open, onToggle, user }: any) {
                 </div>
 
                 <button
+                  type="button"
                   disabled={calLoading}
                   onClick={() =>
                     calConnected ? disconnectCalendar() : openGoogleLogin()
                   }
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition ${calConnected ? "bg-indigo-600" : "bg-slate-300"
-                    }`}
+                  className={`relative w-12 h-6 rounded-full transition ${calConnected ? "bg-indigo-600" : "bg-gray-300"
+                    } ${calLoading ? "opacity-60 cursor-not-allowed" : "cursor-pointer"}`}
                 >
                   <span
-                    className={`inline-block h-5 w-5 bg-white rounded-full transition ${calConnected ? "translate-x-5" : "translate-x-1"
+                    className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${calConnected ? "translate-x-6" : ""
                       }`}
                   />
                 </button>
