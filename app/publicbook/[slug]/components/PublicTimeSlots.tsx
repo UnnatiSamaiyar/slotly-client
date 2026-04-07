@@ -81,7 +81,7 @@ export default function PublicTimeSlots({
     setError(null);
 
     fetch(
-      ` https://api.slotly.io/bookings/availability/${encodeURIComponent(
+      ` https://api.slotly.io0/bookings/availability/${encodeURIComponent(
         slug
       )}?date=${date}&tz=${encodeURIComponent(resolvedViewerTz)}`
     )

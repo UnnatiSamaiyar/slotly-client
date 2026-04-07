@@ -4,17 +4,11 @@ import { useMemo, useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 
 type Props = {
-  /**
-   * login: only basic scopes (openid/email/profile)
-   * calendar: incremental consent for Calendar scopes
-   */
   variant?: "login" | "calendar";
-  /** Override button label */
   label?: string;
-  /** Compact UI for tight spaces (e.g., sidebar) */
   compact?: boolean;
-  /** Where to redirect after successful callback (encoded into OAuth state) */
   returnTo?: string;
+  fromCreateEventModal?: boolean; 
 };
 
 function safeBase64UrlEncode(input: string) {
@@ -28,6 +22,7 @@ export default function GoogleLoginButton({
   label,
   compact = false,
   returnTo,
+  fromCreateEventModal = false,
 }: Props) {
   const [hover, setHover] = useState(false);
 
@@ -36,10 +31,10 @@ export default function GoogleLoginButton({
 
   const authUrl = useMemo(() => {
     const isCalendar = variant === "calendar";
-
     const stateObj = {
       mode: isCalendar ? "calendar" : "login",
       returnTo: returnTo || "/dashboard",
+      fromCreateEventModal,
       t: Date.now(),
     };
 

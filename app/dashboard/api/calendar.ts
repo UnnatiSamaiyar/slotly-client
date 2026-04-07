@@ -1,7 +1,7 @@
 import { CalendarEvent } from "../types";
 
 const CAL_BASE =
-  process.env.NEXT_PUBLIC_CALENDAR_API || " https://api.slotly.io";
+  process.env.NEXT_PUBLIC_CALENDAR_API || "https://api.slotly.io0";
 
 export type CalendarPayload = { calendar_connected: boolean; events: any[] };
 
@@ -19,6 +19,7 @@ export async function fetchCalendarEvents(
 
   return (Array.isArray(bookings) ? bookings : []).map((b: any) => ({
     id: b.id,
+    googleEventId: b.google_event_id || null,
     summary: b.title || "Untitled",
     start: b.start_time || null,
     end: b.end_time || null,

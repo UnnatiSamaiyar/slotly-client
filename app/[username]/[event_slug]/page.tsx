@@ -2,20 +2,38 @@
 "use client";
 
 import React, { useEffect, useState, use } from "react";
+import { notFound } from "next/navigation";
 import Calendar from "@/components/booking/Calendar";
 import TimeSlots from "@/components/booking/TimeSlots";
 import BookingForm from "@/components/booking/BookingForm";
+
+const RESERVED_USERNAMES = new Set(["dashboard"]);
+const RESERVED_EVENT_SLUGS = new Set([
+  "notifications",
+  "contacts",
+  "event-types",
+  "your-schedule",
+  "settings",
+  "login",
+  "signup",
+]);
 
 export default function PublicBookingPage({
   params,
 }: {
   params:
-    | { username: string; event_slug: string }
-    | Promise<{ username: string; event_slug: string }>;
+  | { username: string; event_slug: string }
+  | Promise<{ username: string; event_slug: string }>;
 }) {
-  // ✅ Next 16 safe: params can be Promise in some cases
   const resolvedParams = (params as any)?.then ? use(params as any) : (params as any);
   const { username, event_slug } = resolvedParams || {};
+
+  if (
+    RESERVED_USERNAMES.has(String(username || "").toLowerCase()) ||
+    RESERVED_EVENT_SLUGS.has(String(event_slug || "").toLowerCase())
+  ) {
+    notFound();
+  }
 
   const [eventData, setEventData] = useState<any>(null);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
@@ -30,7 +48,7 @@ export default function PublicBookingPage({
         setError(null);
 
         const res = await fetch(
-          ` https://api.slotly.io/public/profile/${encodeURIComponent(event_slug)}`
+          `https://api.slotly.io0/public/profile/${encodeURIComponent(event_slug)}`
         );
 
         if (!res.ok) {
@@ -47,13 +65,8 @@ export default function PublicBookingPage({
     load();
   }, [event_slug]);
 
-  // if route params missing, fail gracefully
   if (!username || !event_slug) {
-    return (
-      <div className="p-10 text-center text-red-600">
-        Invalid booking link.
-      </div>
-    );
+    return <div className="p-10 text-center text-red-600">Invalid booking link.</div>;
   }
 
   if (error) {
@@ -66,7 +79,6 @@ export default function PublicBookingPage({
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center py-12 px-6">
-      {/* HEADER */}
       <div className="bg-white w-full max-w-3xl p-6 rounded-xl shadow-sm mb-10">
         <div>
           <h3 className="text-gray-700">
@@ -79,7 +91,6 @@ export default function PublicBookingPage({
         </div>
       </div>
 
-      {/* BOOKING UI */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-5xl w-full">
         <div>
           <Calendar selectedDate={selectedDate} setSelectedDate={setSelectedDate} />
@@ -99,8 +110,8 @@ export default function PublicBookingPage({
             date={selectedDate}
             time={selectedTime}
             duration={eventData.duration_minutes}
-            profile={event_slug} // 👈 IMPORTANT
-            username={username} // 👈 only for display / email
+            profile={event_slug}
+            username={username}
           />
         </div>
       </div>

@@ -53,16 +53,16 @@ npm run dev
 
 Frontend will run at:
 
-👉 https://slotly.io/
+👉  https://slotly.io/
 
 ### ✅ Environment Variables
 
 Create `.env.local` inside `/client`
 
 ```
-NEXT_PUBLIC_API_URL= https://api.slotly.io
+NEXT_PUBLIC_API_URL= https://api.slotly.io0
 NEXTAUTH_SECRET=your-secret-key
-NEXTAUTH_URL=https://slotly.io
+NEXTAUTH_URL= https://slotly.io
 ```
 
 > ⚠️ `NEXT_PUBLIC_API_URL` must match your FastAPI server.
@@ -110,7 +110,7 @@ uvicorn server.main:app --reload --port 8000
 
 Backend API docs:
 
-👉  https://api.slotly.io/docs
+👉  https://api.slotly.io0/docs
 
 ---
 

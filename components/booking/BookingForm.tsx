@@ -73,7 +73,7 @@
 // //         // Fallback to browser timezone if not set.
 // //         const viewerTz = getPreferredTimezone();
 // //         const res = await fetch(
-// //           ` https://api.slotly.io/bookings/availability?user_sub=${encodeURIComponent(
+// //           ` https://api.slotly.io0/bookings/availability?user_sub=${encodeURIComponent(
 // //             userSub
 // //           )}&date=${date}&tz=${encodeURIComponent(viewerTz)}`
 // //         );
@@ -129,7 +129,7 @@
 // //   // Meeting Link Preview
 // //   // -----------------------------
 // //   const meetingLink = useMemo(() => {
-// //     return `https://slotly.io/dashboard/book?user_sub=${encodeURIComponent(
+// //     return ` https://slotly.io/dashboard/book?user_sub=${encodeURIComponent(
 // //       userSub
 // //     )}`;
 // //   }, [userSub]);
@@ -174,7 +174,7 @@
 
 // //     try {
 // //       const res = await fetch(
-// //         ` https://api.slotly.io/bookings/create?user_sub=${encodeURIComponent(
+// //         ` https://api.slotly.io0/bookings/create?user_sub=${encodeURIComponent(
 // //           userSub
 // //         )}`,
 // //         {
@@ -565,7 +565,7 @@
 
 // //         const tz = getPreferredTimezone();
 // //         const res = await fetch(
-// //           ` https://api.slotly.io/bookings/availability?user_sub=${encodeURIComponent(
+// //           ` https://api.slotly.io0/bookings/availability?user_sub=${encodeURIComponent(
 // //             userSub
 // //           )}&date=${date}&tz=${encodeURIComponent(tz)}`
 // //         );
@@ -610,7 +610,7 @@
 
 // //     try {
 // //       const res = await fetch(
-// //         ` https://api.slotly.io/bookings/create?user_sub=${encodeURIComponent(
+// //         ` https://api.slotly.io0/bookings/create?user_sub=${encodeURIComponent(
 // //           userSub
 // //         )}`,
 // //         {
@@ -1050,7 +1050,7 @@
 
 // //         const tz = getPreferredTimezone();
 // //         const res = await fetch(
-// //           ` https://api.slotly.io/bookings/availability?user_sub=${encodeURIComponent(
+// //           ` https://api.slotly.io0/bookings/availability?user_sub=${encodeURIComponent(
 // //             userSub
 // //           )}&date=${date}&tz=${encodeURIComponent(tz)}`
 // //         );
@@ -1095,7 +1095,7 @@
 
 // //     try {
 // //       const res = await fetch(
-// //         ` https://api.slotly.io/bookings/create?user_sub=${encodeURIComponent(
+// //         ` https://api.slotly.io0/bookings/create?user_sub=${encodeURIComponent(
 // //           userSub
 // //         )}`,
 // //         {
@@ -1533,7 +1533,7 @@
 
 //         const tz = getPreferredTimezone();
 //         const res = await fetch(
-//           ` https://api.slotly.io/bookings/availability?user_sub=${encodeURIComponent(
+//           ` https://api.slotly.io0/bookings/availability?user_sub=${encodeURIComponent(
 //             userSub
 //           )}&date=${date}&duration=${duration}&tz=${encodeURIComponent(tz)}`
 //         );
@@ -1588,7 +1588,7 @@
 
 //   //   try {
 //   //     const res = await fetch(
-//   //       ` https://api.slotly.io/bookings/create?user_sub=${encodeURIComponent(
+//   //       ` https://api.slotly.io0/bookings/create?user_sub=${encodeURIComponent(
 //   //         userSub
 //   //       )}`,
 //   //       {
@@ -1638,7 +1638,7 @@
 
 //   //   try {
 //   //     const res = await fetch(
-//   //       ` https://api.slotly.io/bookings/create?user_sub=${encodeURIComponent(
+//   //       ` https://api.slotly.io0/bookings/create?user_sub=${encodeURIComponent(
 //   //         userSub
 //   //       )}`,
 //   //       {
@@ -1712,7 +1712,7 @@
 //     setShowStatus(true);
 //     try {
 //       const res = await fetch(
-//         ` https://api.slotly.io/bookings/create?user_sub=${encodeURIComponent(userSub)}`,
+//         ` https://api.slotly.io0/bookings/create?user_sub=${encodeURIComponent(userSub)}`,
 //         {
 //           method: "POST",
 //           headers: { "Content-Type": "application/json" },
@@ -2132,7 +2132,7 @@ export default function BookingForm({ userSub }: { userSub: string }) {
 
         const tz = getPreferredTimezone();
         const res = await fetch(
-          ` https://api.slotly.io/bookings/availability?user_sub=${encodeURIComponent(
+          ` https://api.slotly.io0/bookings/availability?user_sub=${encodeURIComponent(
             userSub
           )}&date=${date}&duration=${duration}&tz=${encodeURIComponent(tz)}`
         );
@@ -2205,7 +2205,7 @@ export default function BookingForm({ userSub }: { userSub: string }) {
 
     try {
       const res = await fetch(
-        ` https://api.slotly.io/bookings/create?user_sub=${encodeURIComponent(
+        ` https://api.slotly.io0/bookings/create?user_sub=${encodeURIComponent(
           userSub
         )}`,
         {

@@ -3,7 +3,7 @@
 // // import React, { useMemo, useState } from "react";
 
 // // export default function PublicEventInfo({ profile }: { profile: any }) {
-// //   const apiBase = process.env.NEXT_PUBLIC_API_URL || " https://api.slotly.io";
+// //   const apiBase = process.env.NEXT_PUBLIC_API_URL || " https://api.slotly.io0";
 // //   const hostName = profile.host_name || profile.host || "Host";
 // //   const title = profile.title || "Meeting";
 // //   const duration = profile.duration_minutes ?? profile.duration ?? 30;
@@ -100,7 +100,7 @@
 
 
 // // export default function PublicEventInfo({ profile }: { profile: any }) {
-// //   const apiBase = process.env.NEXT_PUBLIC_API_URL || " https://api.slotly.io";
+// //   const apiBase = process.env.NEXT_PUBLIC_API_URL || " https://api.slotly.io0";
 // //   const hostName = profile.host_name || profile.host || "Host";
 // //   const title = profile.title || "Meeting";
 // //   const duration = profile.duration_minutes ?? profile.duration ?? 30;
@@ -222,7 +222,7 @@
 // import { Clock } from "lucide-react";
 
 // export default function PublicEventInfo({ profile }: { profile: any }) {
-//   const apiBase = (process.env.NEXT_PUBLIC_API_URL || " https://api.slotly.io").replace(/\/$/, "");
+//   const apiBase = (process.env.NEXT_PUBLIC_API_URL || " https://api.slotly.io0").replace(/\/$/, "");
 
 //   const hostName = profile?.host_name || profile?.host || "Host";
 //   const title = profile?.title || "Meeting";
@@ -315,13 +315,13 @@ function parseLocation(location: string) {
 
   const m = s.match(/\((https?:\/\/[^)]+)\)\s*$/i);
   const url = m?.[1] || "";
-  const text = m && url ? s.replace(m[0], "").trim() : s;
+  const text = m ? s.replace(m[0], "").trim() : s;
 
   return { text, url };
 }
 
 export default function PublicEventInfo({ profile }: { profile: any }) {
-  const apiBase = process.env.NEXT_PUBLIC_API_URL || " https://api.slotly.io";
+  const apiBase = process.env.NEXT_PUBLIC_API_URL || " https://api.slotly.io0";
   const hostName = profile?.host_name || profile?.host || "Host";
   const title = profile?.title || "Meeting";
   const duration = profile?.duration_minutes ?? profile?.duration ?? 30;

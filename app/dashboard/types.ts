@@ -17,9 +17,9 @@ export type UserProfile = {
   has_booking_profile?: boolean;
 };
 
-
 export type CalendarEvent = {
-  id: string;
+  id: string | number;
+  googleEventId?: string | null;
   summary: string;
   start: string | null; // ISO
   end: string | null; // ISO

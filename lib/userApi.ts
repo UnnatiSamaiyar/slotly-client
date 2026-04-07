@@ -9,7 +9,7 @@ export type MeProfile = {
   brand_logo_url?: string | null;
 };
 
-const BASE = process.env.NEXT_PUBLIC_API_BASE || " https://api.slotly.io";
+const BASE = (process.env.NEXT_PUBLIC_API_BASE || "https://api.slotly.io0").trim();
 
 /**
  * Keep consistent with lib/eventApi.ts (do not change auth behavior).
@@ -77,5 +77,15 @@ export async function uploadBrandLogo(file: File): Promise<string> {
 
   if (!res.ok) throw await parseErr(res);
   const json = await res.json();
-  return String(json?.brand_logo_url || "");
+  const url = String(json?.brand_logo_url || "").trim();
+
+  if (!url) {
+    throw new Error("Backend did not return brand_logo_url");
+  }
+
+  if (!url.startsWith("/uploads") && !url.startsWith("http")) {
+    throw new Error(`Invalid logo URL returned: ${url}`);
+  }
+
+  return url;
 }

@@ -194,7 +194,7 @@
 //         location: meetingMode === "in_person" ? normalizedLocation : null,
 //       };
 
-//       const res = await fetch(" https://api.slotly.io/public/book", {
+//       const res = await fetch(" https://api.slotly.io0/public/book", {
 //         method: "POST",
 //         headers: { "Content-Type": "application/json" },
 //         body: JSON.stringify(payload),
@@ -479,6 +479,7 @@ export default function PublicBookingForm({
 }: any) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [agenda, setAgenda] = useState("");
   const [meetingMode, setMeetingMode] = useState<
     "google_meet" | "in_person"
   >("google_meet");
@@ -545,12 +546,13 @@ export default function PublicBookingForm({
         attendees: [email],
         start_iso: selectedSlotISO,
         title: profile?.title,
+        agenda: agenda.trim() || null,
         timezone: resolvedViewerTz,
         meeting_mode: meetingMode,
         location: meetingMode === "in_person" ? normalizedLocation : null,
       };
 
-      const res = await fetch(" https://api.slotly.io/public/book", {
+      const res = await fetch(" https://api.slotly.io0/public/book", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -616,14 +618,16 @@ export default function PublicBookingForm({
               <textarea
                 placeholder="Describe what this meeting will cover..."
                 rows={4}
+                value={agenda}
+                onChange={(e) => setAgenda(e.target.value)}
                 className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm 
-               focus:outline-none focus:ring-2 focus:ring-indigo-500 
-               focus:border-indigo-500"
+ focus:outline-none focus:ring-2 focus:ring-indigo-500 
+ focus:border-indigo-500"
               />
 
-              <p className="text-xs text-gray-500">
+              {/* <p className="text-xs text-gray-500">
                 This description will be shown on your public booking page.
-              </p>
+              </p> */}
             </div>
           </div>
 
