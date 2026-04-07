@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import GoogleLoginButton from "../auth/GoogleLoginButton";
 
-const API_BASE = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8  000").replace(/\/$/, "");
+const API_BASE = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000").replace(/\/$/, "");
 
 export default function CalendarConnectionStatus({ userSub }: { userSub: string }) {
   const [connected, setConnected] = useState<boolean | null>(null);

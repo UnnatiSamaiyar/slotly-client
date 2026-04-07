@@ -48,7 +48,7 @@ export default function PublicBookingPage({
         setError(null);
 
         const res = await fetch(
-          `https://api.slotly.io0/public/profile/${encodeURIComponent(event_slug)}`
+          `https://api.slotly.io/public/profile/${encodeURIComponent(event_slug)}`
         );
 
         if (!res.ok) {

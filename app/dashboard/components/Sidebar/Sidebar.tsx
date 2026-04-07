@@ -19,7 +19,7 @@ type NavLink = {
 };
 
 const API_BASE = (
-  process.env.NEXT_PUBLIC_API_URL || "https://api.slotly.io0"
+  process.env.NEXT_PUBLIC_API_URL || "https://api.slotly.io"
 ).replace(/\/$/, "");
 
 export default function Sidebar({ open, onToggle, user }: any) {

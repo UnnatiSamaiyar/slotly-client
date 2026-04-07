@@ -679,7 +679,7 @@ export default function EventCard({ event, onClick, variant = "timeline", userSu
     }
 
     const nextStartISO = new Date(`${editForm.date}T${editForm.time}`).toISOString();
-    const base = process.env.NEXT_PUBLIC_CALENDAR_API || "https://api.slotly.io0";
+    const base = process.env.NEXT_PUBLIC_CALENDAR_API || "https://api.slotly.io";
 
     try {
       setBusy(true);
@@ -756,7 +756,7 @@ export default function EventCard({ event, onClick, variant = "timeline", userSu
     try {
       setBusy(true);
 
-      const base = process.env.NEXT_PUBLIC_CALENDAR_API || "https://api.slotly.io0";
+      const base = process.env.NEXT_PUBLIC_CALENDAR_API || "https://api.slotly.io";
 
       const res = await fetch(
         `${base}/bookings/${encodeURIComponent(String(bookingId))}?user_sub=${encodeURIComponent(userSub)}`,

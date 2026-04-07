@@ -3,7 +3,7 @@
 // // import React, { useMemo, useState } from "react";
 
 // // export default function PublicEventInfo({ profile }: { profile: any }) {
-// //   const apiBase = process.env.NEXT_PUBLIC_API_URL || " https://api.slotly.io0";
+// //   const apiBase = process.env.NEXT_PUBLIC_API_URL || " https://api.slotly.io";
 // //   const hostName = profile.host_name || profile.host || "Host";
 // //   const title = profile.title || "Meeting";
 // //   const duration = profile.duration_minutes ?? profile.duration ?? 30;
@@ -100,7 +100,7 @@
 
 
 // // export default function PublicEventInfo({ profile }: { profile: any }) {
-// //   const apiBase = process.env.NEXT_PUBLIC_API_URL || " https://api.slotly.io0";
+// //   const apiBase = process.env.NEXT_PUBLIC_API_URL || " https://api.slotly.io";
 // //   const hostName = profile.host_name || profile.host || "Host";
 // //   const title = profile.title || "Meeting";
 // //   const duration = profile.duration_minutes ?? profile.duration ?? 30;
@@ -222,7 +222,7 @@
 // import { Clock } from "lucide-react";
 
 // export default function PublicEventInfo({ profile }: { profile: any }) {
-//   const apiBase = (process.env.NEXT_PUBLIC_API_URL || " https://api.slotly.io0").replace(/\/$/, "");
+//   const apiBase = (process.env.NEXT_PUBLIC_API_URL || " https://api.slotly.io").replace(/\/$/, "");
 
 //   const hostName = profile?.host_name || profile?.host || "Host";
 //   const title = profile?.title || "Meeting";
@@ -321,7 +321,7 @@ function parseLocation(location: string) {
 }
 
 export default function PublicEventInfo({ profile }: { profile: any }) {
-  const apiBase = process.env.NEXT_PUBLIC_API_URL || " https://api.slotly.io0";
+  const apiBase = process.env.NEXT_PUBLIC_API_URL || " https://api.slotly.io";
   const hostName = profile?.host_name || profile?.host || "Host";
   const title = profile?.title || "Meeting";
   const duration = profile?.duration_minutes ?? profile?.duration ?? 30;

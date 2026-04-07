@@ -64,7 +64,7 @@ export default function CreateEventTypeModal({
   const googleBlocked = needsGoogle && !googleConnected;
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const apiBase =
-  (process.env.NEXT_PUBLIC_API_BASE || "https://api.slotly.io0")
+  (process.env.NEXT_PUBLIC_API_BASE || "https://api.slotly.io")
     .trim()
     .replace(/\/+$/, "");
 

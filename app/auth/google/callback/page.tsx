@@ -38,7 +38,7 @@ function pickApiBase() {
       "").trim();
 
   if (envBase) return envBase.replace(/\/+$/, "");
-  return "https://api.slotly.io0";
+  return "https://api.slotly.io";
 }
 
 function GoogleCallbackInner() {
@@ -245,7 +245,7 @@ export default function GoogleCallbackPage() {
 //       "").trim();
 
 //   if (envBase) return envBase.replace(/\/+$/, "");
-//   return "https://api.slotly.io0";
+//   return "https://api.slotly.io";
 // }
 
 // function WritingToast({

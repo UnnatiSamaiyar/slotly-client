@@ -112,7 +112,7 @@
 // //       setLoading(true);
 // //       try {
 // //         const res = await fetch(
-// //           ` https://api.slotly.io0/public/profile/${encodeURIComponent(slug)}`
+// //           ` https://api.slotly.io/public/profile/${encodeURIComponent(slug)}`
 // //         );
 // //         if (!res.ok) throw new Error(await res.text());
 // //         const payload = await res.json();
@@ -544,7 +544,7 @@ export default function PublicBookingPage() {
   const router = useRouter();
   const slug = String(params?.slug || "");
   const { toast } = useToast();
-  const apiBase = " https://api.slotly.io0";
+  const apiBase = " https://api.slotly.io";
 
   const [profile, setProfile] = useState<any | null>(null);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);

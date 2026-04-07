@@ -1,6 +1,6 @@
 // lib/api.ts
 export const API_BASE =
-  (process.env.NEXT_PUBLIC_API_BASE || "https://api.slotly.io0").trim();
+  (process.env.NEXT_PUBLIC_API_BASE || "https://api.slotly.io").trim();
 export type CalendarEvent = {
   id: string;
   summary: string;

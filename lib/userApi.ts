@@ -9,7 +9,7 @@ export type MeProfile = {
   brand_logo_url?: string | null;
 };
 
-const BASE = (process.env.NEXT_PUBLIC_API_BASE || "https://api.slotly.io0").trim();
+const BASE = (process.env.NEXT_PUBLIC_API_BASE || "https://api.slotly.io").trim();
 
 /**
  * Keep consistent with lib/eventApi.ts (do not change auth behavior).
