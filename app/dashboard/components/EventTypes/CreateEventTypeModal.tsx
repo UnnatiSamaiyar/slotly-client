@@ -6,11 +6,28 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Plus,
-  MapPin,
-  Video,
+
   X,
   Image as ImageIcon,
   CheckCircle2,
+} from "lucide-react";
+import {
+  Calendar,
+  Video,
+  Phone,
+  MapPin,
+  Briefcase,
+  Handshake,
+  User,
+  BarChart,
+  Brain,
+  Target,
+  FileText,
+  School,
+  Users,
+  Zap,
+  Search,
+  MessageCircle,
 } from "lucide-react";
 import AvailabilityEditorModal from "../Schedule/AvailabilityEditorModal";
 import TimezonePicker from "../TimezonePicker";
@@ -20,7 +37,28 @@ import BookingForm from "@/components/booking/BookingForm";
 import SetMeetingLocationModal from "@/components/shared/SetMeetingLocationModal";
 import GoogleLoginButton from "@/components/auth/GoogleLoginButton";
 type MeetingMode = "google_meet" | "in_person";
+const EVENT_ICON_OPTIONS = [
+  { key: "calendar", icon: Calendar },
+  { key: "video", icon: Video },
+  { key: "phone", icon: Phone },
+  { key: "pin", icon: MapPin },
+  { key: "briefcase", icon: Briefcase },
+  { key: "handshake", icon: Handshake },
+  { key: "user", icon: User },
+  { key: "chart", icon: BarChart },
+  { key: "brain", icon: Brain },
+  { key: "target", icon: Target },
+  { key: "file", icon: FileText },
+  { key: "home", icon: School },
+  { key: "users", icon: Users },
+  { key: "zap", icon: Zap },
+  { key: "search", icon: Search },
+  { key: "message", icon: MessageCircle },
+];
 
+const getEventIcon = (key: string | null | undefined) => {
+  return EVENT_ICON_OPTIONS.find((item) => item.key === key)?.icon ?? null;
+};
 export default function CreateEventTypeModal({
   open,
   onClose,
@@ -30,16 +68,18 @@ export default function CreateEventTypeModal({
 }: {
   open: boolean;
   onClose: () => void;
-  onCreate: (payload: {
-    title: string;
-    meeting_mode: MeetingMode;
-    location?: string;
-    availability_json?: string;
-    duration_minutes?: number;
-    timezone?: string | null;
-    brand_logo_url?: string | null;
-  
-  }) => Promise<void>;
+    onCreate: (payload: {
+      title: string;
+      meeting_mode: MeetingMode;
+      location?: string;
+      availability_json?: string;
+      duration_minutes?: number;
+      timezone?: string | null;
+      brand_logo_url?: string | null;
+      icon?: string | null;
+      is_public?: boolean;
+      description?: string;
+    }) => Promise<void>;
   userSub: string | null;
 }) {
   const [title, setTitle] = useState("");
@@ -50,7 +90,7 @@ export default function CreateEventTypeModal({
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isPublic, setIsPublic] = useState(true);
-
+ 
 
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [logoUploading, setLogoUploading] = useState(false);
@@ -59,14 +99,18 @@ export default function CreateEventTypeModal({
   const [availabilityJson, setAvailabilityJson] = useState<string>("{}");
   const [availabilityOpen, setAvailabilityOpen] = useState(false);
   const [locationModalOpen, setLocationModalOpen] = useState(false);
+  const [description, setDescription] = useState("");
+  const [selectedEventIcon, setSelectedEventIcon] = useState<string | null>(null);
+  const [iconPickerOpen, setIconPickerOpen] = useState(false);
+  const iconPickerRef = useRef<HTMLDivElement | null>(null);
   const needsLocation = meetingMode === "in_person";
   const needsGoogle = meetingMode === "google_meet";
   const googleBlocked = needsGoogle && !googleConnected;
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const apiBase =
-  (process.env.NEXT_PUBLIC_API_BASE || "https://api.slotly.io")
-    .trim()
-    .replace(/\/+$/, "");
+    (process.env.NEXT_PUBLIC_API_BASE || "https://api.slotly.io")
+      .trim()
+      .replace(/\/+$/, "");
 
   const showGoogleConnectPill =
     meetingMode === "google_meet" && !checkingGoogle && !googleConnected;
@@ -117,10 +161,15 @@ export default function CreateEventTypeModal({
     setLocationModalOpen(false);
     setSaving(false);
     setLogoUrl(null);
+    setDescription("");
+    setSelectedEventIcon(null);
+    setIconPickerOpen(false);
     setLogoUploading(false);
     setIsPublic(true);
   }, [open, userSub]);
 
+
+ 
   useEffect(() => {
     if (!open) return;
 
@@ -147,13 +196,46 @@ export default function CreateEventTypeModal({
     setLocation("");
   }, [meetingMode, open]);
 
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        iconPickerRef.current &&
+        !iconPickerRef.current.contains(event.target as Node)
+      ) {
+        setIconPickerOpen(false);
+      }
+    }
 
+    if (iconPickerOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
 
-  const icon = useMemo(
-    () => (meetingMode === "google_meet" ? <Video className="w-5 h-5" /> : <MapPin className="w-5 h-5" />),
-    [meetingMode]
-  );
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [iconPickerOpen]);
+  useEffect(() => {
+    if (!open) return;
 
+    const prevBody = document.body.style.overflow;
+    const prevHtml = document.documentElement.style.overflow;
+
+    document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = prevBody;
+      document.documentElement.style.overflow = prevHtml;
+    };
+  }, [open]);
+  const titleIcon = useMemo(() => {
+    const icon = getEventIcon(selectedEventIcon);
+  
+    if (icon) return icon;
+
+    return meetingMode === "google_meet" ? Video : MapPin;
+  }, [meetingMode, selectedEventIcon]);
+  const Icon = titleIcon;
   const effectiveLogo = logoUrl || null;
   const logoSrc = (() => {
     if (!effectiveLogo) return null;
@@ -203,6 +285,9 @@ export default function CreateEventTypeModal({
         duration_minutes: durationMinutes,
         timezone,
         brand_logo_url: logoUrl || null,
+        icon: selectedEventIcon || null,
+        is_public: isPublic,           // ← ADD THIS
+        description: description.trim(),
       });
       onClose();
     } catch (err: any) {
@@ -213,7 +298,10 @@ export default function CreateEventTypeModal({
   }
 
   if (!open) return null;
-
+  const descriptionWordCount = description
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean).length;
   return (
     <AnimatePresence>
       <div className="fixed inset-0 z-50">
@@ -249,20 +337,21 @@ export default function CreateEventTypeModal({
                 </div>
 
                 <div className="min-w-0 flex-1">
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     {/* Title */}
                     <h2 className="text-base sm:text-xl font-semibold text-slate-900">
                       Create Event
                     </h2>
 
                     {/* Toggle + Close */}
-                    <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-4">
-                      {/* Segmented Toggle */}
-                      <div className="flex bg-slate-100 rounded-full p-1 w-fit">
+                    <div className="flex items-center justify-end gap-3 sm:gap-4">
+                      <div className="inline-flex h-10 items-center rounded-full bg-slate-100 p-1 shrink-0">
                         <button
                           type="button"
                           onClick={() => setIsPublic(false)}
-                          className={`px-3 sm:px-4 py-1.5 text-xs sm:text-sm rounded-full transition ${!isPublic ? "bg-white shadow font-medium text-slate-900" : "text-slate-500"
+                          className={`inline-flex h-8 min-w-[78px] items-center justify-center rounded-full px-4 text-xs sm:text-sm transition ${!isPublic
+                              ? "bg-white font-medium text-slate-900 shadow-sm"
+                              : "text-slate-500"
                             }`}
                         >
                           Private
@@ -271,21 +360,22 @@ export default function CreateEventTypeModal({
                         <button
                           type="button"
                           onClick={() => setIsPublic(true)}
-                          className={`px-3 sm:px-4 py-1.5 text-xs sm:text-sm rounded-full transition ${isPublic ? "bg-white shadow font-medium text-slate-900" : "text-slate-500"
+                          className={`inline-flex h-8 min-w-[78px] items-center justify-center rounded-full px-4 text-xs sm:text-sm transition ${isPublic
+                              ? "bg-white font-medium text-slate-900 shadow-sm"
+                              : "text-slate-500"
                             }`}
                         >
                           Public
                         </button>
                       </div>
 
-                      {/* Close */}
                       <button
                         type="button"
                         onClick={onClose}
-                        className="w-10 h-10 rounded-xl hover:bg-slate-100 flex items-center justify-center text-slate-600"
+                        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-slate-600 transition hover:bg-slate-100"
                         aria-label="Close"
                       >
-                        <X className="w-5 h-5" />
+                        <X className="h-5 w-5" />
                       </button>
                     </div>
                   </div>
@@ -308,28 +398,103 @@ export default function CreateEventTypeModal({
                       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-6">
                         {/* LEFT */}
                         <div className="space-y-4">
-                          <div>
-                            <label className="text-xs font-medium text-slate-600">Title</label>
-                            <input
-                              value={title}
-                              onChange={(e) => setTitle(e.target.value)}
-                              className="mt-1 w-full h-11 px-3.5 border rounded-xl focus:ring-2 focus:ring-blue-200 outline-none"
-                              placeholder="e.g. Intro Call"
-                            />
+                          <div className="relative" ref={iconPickerRef}>
+                            <label className="text-xs font-medium text-slate-600">
+                              Title
+                            </label>
+
+                            <div className="mt-1 flex items-center gap-2">
+                              <button
+                                type="button"
+                                onClick={() => setIconPickerOpen((prev) => !prev)}
+                                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border bg-white transition hover:bg-slate-50 focus:outline-none"
+                                aria-label="Choose event icon"
+                              >
+                                <Icon className="w-4 h-4 text-slate-600" />
+                              </button>
+
+                              <input
+                                value={title}
+                                onChange={(e) => setTitle(e.target.value)}
+                                className="w-full h-11 px-3.5 border rounded-xl focus:ring-2 focus:ring-blue-200 outline-none"
+                                placeholder="e.g. Intro Call"
+                              />
+                            </div>
+
+                            {iconPickerOpen && (
+                              <div className="absolute left-0 top-[52px] z-50 w-[280px] rounded-2xl border bg-[#2f2f32] shadow-2xl p-3">
+                                <div className="grid grid-cols-6 gap-3">
+                                  {EVENT_ICON_OPTIONS.map((item) => {
+                                    const Icon = item.icon;   // ✅ move here
+
+                                    return (
+                                      <button
+                                        key={item.key}
+                                        type="button"
+                                        onClick={() => {
+                                          setSelectedEventIcon(item.key);
+                                          setIconPickerOpen(false);
+                                        }}
+                                        className="w-9 h-9 rounded-xl text-white hover:bg-white/10 flex items-center justify-center transition"
+                                      >
+                                        <Icon size={20} />
+                                      </button>
+                                    );
+                                  })}
+                                </div>
+
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setSelectedEventIcon(null);
+                                    setIconPickerOpen(false);
+                                  }}
+                                  className="mt-3 w-full h-9 rounded-lg bg-white/10 text-sm font-medium text-white hover:bg-white/15 transition"
+                                >
+                                  Reset to default
+                                </button>
+                              </div>
+                            
+                            )}
                           </div>
 
+                          {/* <div>
+                            <label className="text-xs font-medium text-slate-600">Description</label>
+                            <div className="relative mt-1">
+                              <textarea
+                                value={description}
+                                onChange={(e) => {
+                                  const words = e.target.value.trim().split(/\s+/).filter(Boolean);
+                                  if (words.length <= 50) setDescription(e.target.value);
+                                }}
+                                rows={3}
+                                className="w-full px-3.5 py-2.5 border rounded-xl focus:ring-2 focus:ring-blue-200 outline-none resize-none text-sm"
+                                placeholder="Brief description of this event…"
+                              />
+                              <span className="absolute bottom-2 right-3 text-xs text-slate-400">
+                                {description.trim() === ""
+                                  ? 0
+                                  : description.trim().split(/\s+/).filter(Boolean).length}
+                                /50 words
+                              </span>
+                            </div>
+                          </div> */}
+
                           <div>
-                            <label className="text-xs font-medium text-slate-600">Meeting type</label>
+                            <label className="text-xs font-medium text-slate-600">
+                              Meeting type
+                            </label>
+
                             <div className="mt-1 flex flex-col gap-2">
                               <div className="flex items-center gap-2">
                                 <div className="w-11 h-11 rounded-xl border flex items-center justify-center shrink-0">
-                                  {icon}
+                                  {Icon ? <Icon className="w-5 h-5" /> : null}
                                 </div>
 
                                 <select
                                   value={meetingMode}
                                   onChange={(e) => setMeetingMode(e.target.value as MeetingMode)}
-                                  className="w-full h-11 px-3.5 border rounded-xl outline-none"
+                                  className="h-11 min-w-0 flex-1 px-3.5 border rounded-xl outline-none bg-white"
                                 >
                                   <option value="google_meet">Google Meet</option>
                                   <option value="in_person">In-person meeting</option>
@@ -337,22 +502,22 @@ export default function CreateEventTypeModal({
                               </div>
 
                               {showGoogleConnectPill && (
-                                <div className="mt-2">
-                                  <div className="flex items-center justify-between rounded-full border bg-slate-100 p-1">
-                                    <div className="px-3 text-xs sm:text-sm font-medium text-slate-700">
+                                <div className="w-full rounded-2xl border border-slate-200 bg-slate-100 p-2">
+                                  <div className="flex items-center justify-between gap-3">
+                                    <div className="text-xs sm:text-sm font-medium text-slate-700">
                                       Google Calendar not connected
                                     </div>
+
                                     <GoogleLoginButton
                                       variant="calendar"
-                                      returnTo="/dashboard/event-types"
-                                      fromCreateEventModal
+                                      compact
+                                      returnTo="/dashboard/event-types?create_event=1"
                                     />
                                   </div>
                                 </div>
                               )}
                             </div>
                           </div>
-
                           <div>
                             <label className="text-xs font-medium text-slate-600">Duration</label>
                             <select
@@ -399,7 +564,29 @@ export default function CreateEventTypeModal({
                         {/* RIGHT */}
                         <div className="space-y-5 sm:space-y-6">
                           {/* Brand logo */}
-                          <div className="rounded-2xl border p-4 sm:p-5 bg-white">
+                          <div>
+                            <label className="text-xs font-medium text-slate-600">Description</label>
+                            <div className="relative mt-1">
+                              <textarea
+                                value={description}
+                                onChange={(e) => {
+                                  const nextValue = e.target.value;
+                                  const nextWordCount = nextValue.trim().split(/\s+/).filter(Boolean).length;
+
+                                  if (nextWordCount <= 50) {
+                                    setDescription(nextValue);
+                                  }
+                                }}
+                                rows={2}
+                                className="w-full min-h-[0px] px-1 py-1.5 border rounded-xl focus:ring-2 focus:ring-blue-200 outline-none resize-none text-sm leading-5"
+                                placeholder="Brief description of this event…"
+                              />
+                              <span className="absolute bottom-2 right-3 text-xs text-slate-400">
+                                {descriptionWordCount}/50 words
+                              </span>
+                            </div>
+                          </div>
+                          <div className="rounded-2xl border p-3 sm:p-4 bg-white">
                             <div className="flex justify-between items-start gap-3">
                               <div>
                                 <div className="text-sm font-semibold">Brand logo</div>
@@ -465,7 +652,7 @@ export default function CreateEventTypeModal({
                           </div>
 
                           {/* Availability */}
-                          <div className="rounded-2xl border p-4 sm:p-5">
+                          <div className="rounded-2xl border p-2 sm:p-3">
                             <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                               <div>
                                 <div className="text-sm font-semibold">Availability</div>
@@ -527,8 +714,8 @@ export default function CreateEventTypeModal({
                       type="submit"
                       disabled={saving || logoUploading || checkingGoogle || googleBlocked}
                       className={`w-full sm:w-auto h-11 sm:h-10 px-4 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white transition ${googleBlocked
-                          ? "cursor-not-allowed opacity-50"
-                          : "cursor-pointer hover:opacity-90"
+                        ? "cursor-not-allowed opacity-50"
+                        : "cursor-pointer hover:opacity-90"
                         }`}
                     >
                       {saving ? "Creating…" : "Create"}
@@ -544,6 +731,7 @@ export default function CreateEventTypeModal({
                     )}
                   </div>
                 </div>
+                
               )}
             </form>
           </motion.div>

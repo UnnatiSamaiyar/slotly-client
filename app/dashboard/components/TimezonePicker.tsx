@@ -1307,10 +1307,16 @@ export default function TimezonePicker({
   const apply = (next: string) => {
     if (!isValidTimezone(next)) return;
 
-    if (controlled) onChange?.(next);
-    else {
+    if (controlled) {
+      onChange?.(next);
+    } else {
       setPreferredTimezone(next);
       setInternalTz(next);
+    }
+
+    if (typeof window !== "undefined") {
+      localStorage.setItem("slotly_timezone", next);
+      window.dispatchEvent(new Event("slotly-timezone-change"));
     }
 
     setActiveQuick(inferQuickFromTz(next));

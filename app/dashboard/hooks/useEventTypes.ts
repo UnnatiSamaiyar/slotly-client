@@ -72,6 +72,7 @@ export function useEventTypes(userSub: string | null) {
   const create = useCallback(
     async (payload: {
       title: string;
+      description?: string;
       meeting_mode: "google_meet" | "in_person";
       location?: string;
       availability_json?: string;
@@ -95,6 +96,7 @@ export function useEventTypes(userSub: string | null) {
       id: number,
       payload: Partial<{
         title: string;
+        description: string;
         meeting_mode: "google_meet" | "in_person";
         location: string;
         availability_json: string;

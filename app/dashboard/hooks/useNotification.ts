@@ -1,15 +1,19 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 
-type NotificationType = {
-    id: number | string;
+export type NotificationItem = {
+    id: number;
     type?: string;
     title: string;
-    message: string;
-    created_at: string;
-    is_read: boolean;
-    action_url?: string | null;
+    description?: string;
+    message?: string;
+    read: boolean;
+    is_read?: boolean;
+    time?: string;
+    day?: string;
+    created_at?: string;
+    action_url?: string;
 };
 
 const API_BASE = (
@@ -18,149 +22,140 @@ const API_BASE = (
 
 function getUserSub(): string | null {
     try {
-        const keys = ["slotly_user", "user", "auth_user", "slotlyUser"];
-
-        for (const key of keys) {
-            const raw = localStorage.getItem(key);
-            if (!raw) continue;
-
-            try {
-                const parsed = JSON.parse(raw);
-                if (parsed?.sub) return parsed.sub;
-                if (parsed?.user?.sub) return parsed.user.sub;
-            } catch {
-                continue;
-            }
-        }
-
-        return null;
+        const raw = localStorage.getItem("slotly_user");
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        return parsed?.sub || null;
     } catch {
         return null;
     }
 }
 
-function normalizeNotifications(items: any[]): NotificationType[] {
-    const uniqueMap = new Map<number | string, NotificationType>();
+function getDay(created_at?: string): "today" | "yesterday" | "earlier" {
+    if (!created_at) return "earlier";
+    const d = new Date(created_at);
+    const now = new Date();
+    const yesterday = new Date();
+    yesterday.setDate(now.getDate() - 1);
 
-    for (const item of items) {
-        if (!item?.id) continue;
+    if (
+        d.getDate() === now.getDate() &&
+        d.getMonth() === now.getMonth() &&
+        d.getFullYear() === now.getFullYear()
+    ) return "today";
 
-        uniqueMap.set(item.id, {
-            id: item.id,
-            type: item.type,
-            title: item.title || "Notification",
-            message: item.message || "",
-            created_at: item.created_at || "",
-            is_read: Boolean(item.is_read),
-            action_url: item.action_url ?? null,
-        });
-    }
+    if (
+        d.getDate() === yesterday.getDate() &&
+        d.getMonth() === yesterday.getMonth() &&
+        d.getFullYear() === yesterday.getFullYear()
+    ) return "yesterday";
 
-    return Array.from(uniqueMap.values()).sort((a, b) => {
-        const aTime = a.created_at ? new Date(a.created_at).getTime() : 0;
-        const bTime = b.created_at ? new Date(b.created_at).getTime() : 0;
-        return bTime - aTime;
+    return "earlier";
+}
+
+function getTimeLabel(created_at?: string): string {
+    if (!created_at) return "";
+    const diff = Date.now() - new Date(created_at).getTime();
+    const minute = 60 * 1000;
+    const hour = 60 * minute;
+    const day = 24 * hour;
+    if (diff < minute) return "Just now";
+    if (diff < hour) return `${Math.floor(diff / minute)}m ago`;
+    if (diff < day) return `${Math.floor(diff / hour)}h ago`;
+    return new Date(created_at).toLocaleDateString(undefined, {
+        month: "short",
+        day: "numeric",
     });
 }
 
-export default function useNotifications() {
-    const [notifications, setNotifications] = useState<NotificationType[]>([]);
+function normalize(item: any): NotificationItem {
+    return {
+        id: item.id,
+        type: item.type || "booking",
+        title: item.title || "Notification",
+        description: item.message || item.description || "",
+        message: item.message || item.description || "",
+        read: Boolean(item.is_read),
+        is_read: Boolean(item.is_read),
+        time: getTimeLabel(item.created_at),
+        day: getDay(item.created_at),
+        created_at: item.created_at,
+        action_url: item.action_url,
+    };
+}
+
+export function useNotifications() {
+    const [notifications, setNotifications] = useState<NotificationItem[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
     const fetchNotifications = useCallback(async () => {
         const userSub = getUserSub();
-
-        if (!userSub) {
-            setNotifications([]);
-            return;
-        }
+        if (!userSub) return;
 
         setLoading(true);
-        setError(null);
-
         try {
             const res = await fetch(
                 `${API_BASE}/notifications?user_sub=${encodeURIComponent(userSub)}`,
-                {
-                    method: "GET",
-                    cache: "no-store",
-                }
+                { cache: "no-store" }
             );
-
             const data = await res.json().catch(() => null);
-
-            if (!res.ok) {
-                throw new Error(data?.detail || "Failed to fetch notifications");
-            }
-
-            const items = Array.isArray(data?.items) ? data.items : [];
-            setNotifications(normalizeNotifications(items));
+            const items = Array.isArray(data)
+                ? data
+                : Array.isArray(data?.items)
+                    ? data.items
+                    : Array.isArray(data?.notifications)
+                        ? data.notifications
+                        : [];
+            setNotifications(items.map(normalize));
         } catch (err: any) {
-            setError(err.message || "Failed to fetch notifications");
-            setNotifications([]);
+            setError(err.message);
         } finally {
             setLoading(false);
         }
     }, []);
 
-    const markAsRead = useCallback(async (id: number | string) => {
+    const markAsRead = useCallback(async (id: number) => {
         const userSub = getUserSub();
         if (!userSub) return;
 
+        setNotifications((prev) =>
+            prev.map((n) => (n.id === id ? { ...n, read: true, is_read: true } : n))
+        );
+
         try {
-            const res = await fetch(
+            await fetch(
                 `${API_BASE}/notifications/mark-read?user_sub=${encodeURIComponent(userSub)}`,
                 {
                     method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
+                    headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ id }),
                 }
             );
-
-            const data = await res.json().catch(() => null);
-
-            if (!res.ok) {
-                throw new Error(data?.detail || "Failed to mark notification as read");
-            }
-
-            setNotifications((prev) =>
-                prev.map((n) =>
-                    n.id === id ? { ...n, is_read: true } : n
-                )
-            );
-        } catch (err: any) {
-            setError(err.message || "Failed to mark notification as read");
-        }
+        } catch { }
     }, []);
 
-    const markAllRead = useCallback(async () => {
+    const markAllAsRead = useCallback(async () => {
         const userSub = getUserSub();
         if (!userSub) return;
 
+        setNotifications((prev) =>
+            prev.map((n) => ({ ...n, read: true, is_read: true }))
+        );
+
         try {
-            const res = await fetch(
+            await fetch(
                 `${API_BASE}/notifications/mark-all-read?user_sub=${encodeURIComponent(userSub)}`,
-                {
-                    method: "POST",
-                }
+                { method: "POST" }
             );
-
-            const data = await res.json().catch(() => null);
-
-            if (!res.ok) {
-                throw new Error(data?.detail || "Failed to mark all as read");
-            }
-
-            setNotifications((prev) =>
-                prev.map((n) => ({ ...n, is_read: true }))
-            );
-        } catch (err: any) {
-            setError(err.message || "Failed to mark all as read");
-        }
+        } catch { }
     }, []);
+
+    useEffect(() => {
+        fetchNotifications();
+    }, [fetchNotifications]);
+
+    const unreadCount = notifications.filter((n) => !n.read).length;
 
     return {
         notifications,
@@ -168,6 +163,7 @@ export default function useNotifications() {
         error,
         fetchNotifications,
         markAsRead,
-        markAllRead,
+        markAllAsRead,
+        unreadCount,
     };
 }

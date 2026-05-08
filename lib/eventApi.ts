@@ -6,6 +6,7 @@ export type EventType = {
   id: number;
   title: string;
   slug: string;
+  is_active?: boolean;
 
   meeting_mode: MeetingMode;
   location?: string | null;
@@ -16,6 +17,9 @@ export type EventType = {
   // Optional logo shown on public page.
   brand_logo_url?: string | null;
 
+
+  description?: string | null;
+
   // Per-event duration (minutes). Stored server-side on BookingProfile keyed by slug.
   duration_minutes?: number | null;
 
@@ -23,8 +27,7 @@ export type EventType = {
   user_id?: number | null;
 };
 
-const BASE = process.env.NEXT_PUBLIC_API_BASE || " https://api.slotly.io";
-
+const BASE = process.env.NEXT_PUBLIC_API_BASE || "https://api.slotly.io";
 /**
  * IMPORTANT:
  * Backend routes for event-types require `user_sub` query param.
@@ -108,6 +111,7 @@ export async function getEventType(id: number): Promise<EventType | null> {
  */
 export async function createEventType(payload: {
   title: string;
+  description?: string;
   meeting_mode: MeetingMode;
   location?: string;
   availability_json?: string;
@@ -133,12 +137,14 @@ export async function updateEventType(
   id: number,
   patch: Partial<{
     title: string;
+    description: string;
     meeting_mode: MeetingMode;
     location: string;
     availability_json: string;
     duration_minutes: number;
     timezone: string | null;
     brand_logo_url: string | null;
+    is_active: boolean;
   }>
 ): Promise<EventType> {
   const user_sub = getUserSub();

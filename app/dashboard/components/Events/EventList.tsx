@@ -66,28 +66,8 @@ export default function EventList({
       </div>
     );
   }
-
   if (count === 0) {
-    return (
-      <div className="rounded-2xl border border-gray-100 bg-white p-5 sm:p-6">
-        <div className="flex items-center justify-between gap-3">
-          <div className="min-w-0">
-            <div className="text-sm font-semibold text-slate-900">No meetings scheduled</div>
-            <div className="text-xs text-gray-500 mt-0.5 truncate">{prettyDate(selectedDate)}</div>
-          </div>
-          <span className="shrink-0 text-xs font-semibold px-2.5 py-1 rounded-full bg-gray-100 text-gray-700">
-            0
-          </span>
-        </div>
-
-        <div className="mt-4 rounded-2xl border border-dashed border-gray-200 bg-gray-50 p-4">
-          <div className="text-sm font-semibold text-slate-900">Nothing for this day</div>
-          <div className="text-sm text-gray-600 mt-1 leading-relaxed">
-            Try another date, or share your booking link to get scheduled.
-          </div>
-        </div>
-      </div>
-    );
+    return null;
   }
 
   return (

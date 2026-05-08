@@ -99,7 +99,7 @@
 // //             animate={{ opacity: 1, y: 0, scale: 1 }}
 // //             exit={{ opacity: 0, y: 18, scale: 0.99 }}
 // //             transition={{ type: "spring", stiffness: 380, damping: 30 }}
-// //             className="relative w-full sm:max-w-[640px] bg-white sm:rounded-2xl rounded-t-2xl shadow-2xl max-h-[95dvh] overflow-hidden"
+// //             className="relative w-full sm:max-w-[640px] 2xl:max-w-[800px] bg-white sm:rounded-2xl rounded-t-2xl shadow-2xl max-h-[95dvh] overflow-hidden"
 // //           >
 // //             <div className="px-5 sm:px-6 pt-5 sm:pt-6 pb-4 border-b bg-white">
 // //               <div className="flex items-center justify-between gap-3">
@@ -303,7 +303,7 @@
 //             animate={{ opacity: 1, y: 0, scale: 1 }}
 //             exit={{ opacity: 0, y: 18, scale: 0.99 }}
 //             transition={{ type: "spring", stiffness: 380, damping: 30 }}
-//             className="relative max-h-[95dvh] w-full overflow-hidden rounded-t-2xl bg-white shadow-2xl sm:max-w-[640px] sm:rounded-2xl"
+//             className="relative max-h-[95dvh] w-full overflow-hidden rounded-t-2xl bg-white shadow-2xl sm:max-w-[640px] 2xl:max-w-[800px] sm:rounded-2xl"
 //           >
 //             <div className="border-b bg-white px-5 pb-4 pt-5 sm:px-6 sm:pt-6">
 //               <div className="flex items-center justify-between gap-3">
