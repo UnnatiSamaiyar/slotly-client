@@ -124,7 +124,7 @@ export default function DashboardPage() {
  
 
   return (
-    <div className="flex w-full flex-col gap-3 pb-6">
+    <div data-tour="dashboard-overview" className="flex w-full flex-col gap-3 pb-6">
 
       <div className="shrink-0">
         <EventTypesPanel userSub={userSub} />

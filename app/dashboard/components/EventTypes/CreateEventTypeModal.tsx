@@ -458,27 +458,7 @@ export default function CreateEventTypeModal({
                             )}
                           </div>
 
-                          {/* <div>
-                            <label className="text-xs font-medium text-slate-600">Description</label>
-                            <div className="relative mt-1">
-                              <textarea
-                                value={description}
-                                onChange={(e) => {
-                                  const words = e.target.value.trim().split(/\s+/).filter(Boolean);
-                                  if (words.length <= 50) setDescription(e.target.value);
-                                }}
-                                rows={3}
-                                className="w-full px-3.5 py-2.5 border rounded-xl focus:ring-2 focus:ring-blue-200 outline-none resize-none text-sm"
-                                placeholder="Brief description of this event…"
-                              />
-                              <span className="absolute bottom-2 right-3 text-xs text-slate-400">
-                                {description.trim() === ""
-                                  ? 0
-                                  : description.trim().split(/\s+/).filter(Boolean).length}
-                                /50 words
-                              </span>
-                            </div>
-                          </div> */}
+                          
 
                           <div>
                             <label className="text-xs font-medium text-slate-600">

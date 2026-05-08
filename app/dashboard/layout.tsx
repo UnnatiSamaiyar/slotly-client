@@ -11,6 +11,7 @@ import { Menu } from "lucide-react";
 import { useUserProfile } from "./hooks/useUserProfile";
 import { createEventType } from "@/lib/eventApi";
 import { useToast } from "@/hooks/use-toast";
+import DashboardTourProvider from "./components/Tour/DashboardTourProvider";
 
 type DashboardUserContextType = {
     user: any;
@@ -108,6 +109,7 @@ export default function DashboardLayout({
 
     return (
         <DashboardUserContext.Provider value={{ user, userSub }}>
+            <DashboardTourProvider>
             <div className="min-h-screen h-screen bg-white flex overflow-hidden">
                 {isDesktop && (
                     <Sidebar
@@ -134,6 +136,7 @@ export default function DashboardLayout({
                             {!isDesktop && (
                                 <button
                                     onClick={() => setSidebarOpen(true)}
+                                    data-tour="mobile-sidebar-toggle"
                                     className="absolute left-4 top-4 sm:left-6 h-10 w-10 rounded-xl border border-slate-200 bg-white shadow-sm lg:hidden flex items-center justify-center"
                                 >
                                     <Menu className="h-5 w-5" />
@@ -156,6 +159,7 @@ export default function DashboardLayout({
                         <div className="shrink-0 px-4 pt-4 sm:px-6 flex items-center">
                             <button
                                 onClick={() => setSidebarOpen(true)}
+                                data-tour="mobile-sidebar-toggle"
                                 className="h-10 w-10 rounded-xl border border-slate-200 bg-white shadow-sm lg:hidden flex items-center justify-center"
                             >
                                 <Menu className="h-5 w-5" />
@@ -175,6 +179,7 @@ export default function DashboardLayout({
                     onCreate={handleCreateEventType}
                 />
             </div>
+            </DashboardTourProvider>
         </DashboardUserContext.Provider>
     );
 }

@@ -13,6 +13,7 @@ type Props = {
   compact?: boolean;
   badge?: string;
   showDot?: boolean;
+  dataTour?: string;
 };
 
 export default function NavItem({
@@ -25,6 +26,7 @@ export default function NavItem({
   compact,
   badge,
   showDot,
+  dataTour,
 }: Props) {
   const base =
     "group relative w-full flex items-center rounded-xl transition-all duration-200 select-none outline-none focus-visible:ring-2 focus-visible:ring-indigo-200";
@@ -84,7 +86,13 @@ export default function NavItem({
 
   if (href && !disabled) {
     return (
-      <Link href={href} className={className} onClick={onClick} title={compact ? label : undefined}>
+      <Link
+        href={href}
+        className={className}
+        onClick={onClick}
+        title={compact ? label : undefined}
+        data-tour={dataTour}
+      >
         {content}
       </Link>
     );
@@ -101,6 +109,7 @@ export default function NavItem({
       }}
       aria-disabled={disabled}
       title={compact ? label : undefined}
+      data-tour={dataTour}
     >
       {content}
     </div>

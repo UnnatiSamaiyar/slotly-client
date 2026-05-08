@@ -395,7 +395,7 @@ export default function SettingsPage() {
      
 
       {/* ── Profile card ── */}
-      <section className="rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <section data-tour="settings-profile" className="rounded-2xl border border-slate-200 bg-white shadow-sm">
         <div className="flex items-center gap-3 border-b border-slate-100 px-5 py-4">
           <User className="h-4 w-4 text-slate-400" />
           <h2 className="text-sm font-semibold text-slate-700">Profile</h2>

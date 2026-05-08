@@ -1,4 +1,5 @@
-//@ts-nocheck
+// @ts-nocheck
+
 "use client";
 
   import React, { useEffect, useMemo, useRef, useState } from "react";
@@ -100,6 +101,15 @@
       btn?.click();
     };
 
+    const navTourTargets: Record<string, string> = {
+      Dashboard: "sidebar-dashboard",
+      Schedule: "sidebar-schedule",
+      People: "sidebar-contacts",
+      "Event Types": "sidebar-event-types",
+      Notifications: "topbar-notifications",
+      Settings: "sidebar-settings",
+    };
+
     const nav: NavLink[] = [
       {
         label: "Dashboard",
@@ -160,6 +170,7 @@
         )}
 
         <aside
+          data-tour="sidebar-navigation"
           className={[
             "fixed left-0 top-0 z-50 flex h-screen shrink-0 flex-col overflow-hidden md:relative",
             "border-r border-slate-200/80 bg-white/95 shadow-[16px_0_50px_rgba(15,23,42,0.04)] backdrop-blur-xl",
@@ -238,6 +249,7 @@
                     : undefined
                 }
                 showDot={n.label === "Notifications" && unreadCount > 0 && !open}
+                dataTour={navTourTargets[n.label]}
               />
             ))}
           </nav>
@@ -321,6 +333,7 @@
             ].join(" ")}
           >
             <div
+              data-tour="settings-profile"
               className={[
                 "flex min-w-0 items-center rounded-2xl transition-colors",
                 open ? "gap-2.5" : "justify-center",

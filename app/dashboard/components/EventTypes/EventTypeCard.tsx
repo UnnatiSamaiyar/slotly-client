@@ -1,4 +1,5 @@
-//@ts-nocheck
+// @ts-nocheck
+
 "use client";
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
@@ -85,7 +86,6 @@ export default function EventTypeCard({
   }, [menuOpen]);
 
   const Icon = resolveEventIcon({
-    userIcon: item.icon,
     locationType: item.meeting_mode,
   });
 

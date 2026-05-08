@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { CheckCheck, LogOut, PlusCircle, Search, UserPlus, X } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { UserProfile } from "../../types";
+import DashboardTourButton from "../Tour/DashboardTourButton";
 
 const TOPBAR_ROUTES = [
   { href: "/dashboard/your-schedule", title: "Schedule" },
@@ -273,7 +274,7 @@ export default function Topbar({
   const TopbarActionIcon = topbarAction.Icon;
 
   return (
-    <header className="w-full border-b border-slate-200/70 bg-white/80 px-3 py-1.5 backdrop-blur-xl sm:px-4 lg:px-5">
+    <header data-tour="topbar-area" className="w-full border-b border-slate-200/70 bg-white/80 px-3 py-1.5 backdrop-blur-xl sm:px-4 lg:px-5">
       <div className="flex min-w-0 items-center justify-between gap-3">
         <div className="min-w-0 flex-1">
           <h1 className="mt-0.5 truncate text-[15px] font-semibold leading-5 tracking-[-0.01em] text-slate-900 sm:text-[17px]">
@@ -282,6 +283,7 @@ export default function Topbar({
         </div>
 
         <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+          <DashboardTourButton />
           {searchConfig ? (
             <button
               type="button"
@@ -345,6 +347,7 @@ export default function Topbar({
             <button
               type="button"
               onClick={handleTopbarAction}
+              data-tour={topbarAction.key === "create-event-type" ? "topbar-create-event-type" : undefined}
               className={`inline-flex h-8 items-center gap-1.5 whitespace-nowrap rounded-xl px-2.5 text-[12px] font-semibold transition active:scale-[0.97] sm:px-3 ${topbarAction.className}`}
             >
               <TopbarActionIcon className="h-3.5 w-3.5 shrink-0" />
