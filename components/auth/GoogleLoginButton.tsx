@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { FcGoogle } from "react-icons/fc";
 
 type Props = {
@@ -8,9 +8,8 @@ type Props = {
   label?: string;
   compact?: boolean;
   returnTo?: string;
-  fromCreateEventModal?: boolean; 
+  userSub?: string;
 };
-
 function safeBase64UrlEncode(input: string) {
   // btoa expects latin1; we only encode JSON with ASCII keys/values.
   const base64 = typeof window !== "undefined" ? window.btoa(input) : "";
@@ -22,9 +21,8 @@ export default function GoogleLoginButton({
   label,
   compact = false,
   returnTo,
-  fromCreateEventModal = false,
+  userSub,
 }: Props) {
-  const [hover, setHover] = useState(false);
 
   const redirect = process.env.NEXT_PUBLIC_REDIRECT_URI!;
   const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!;
@@ -34,10 +32,9 @@ export default function GoogleLoginButton({
     const stateObj = {
       mode: isCalendar ? "calendar" : "login",
       returnTo: returnTo || "/dashboard",
-      fromCreateEventModal,
+      userSub: isCalendar ? userSub : undefined,
       t: Date.now(),
     };
-
     const params = new URLSearchParams({
       client_id: clientId,
       redirect_uri: redirect,
@@ -66,7 +63,7 @@ export default function GoogleLoginButton({
     }
 
     return "https://accounts.google.com/o/oauth2/v2/auth?" + params.toString();
-  }, [clientId, redirect, returnTo, variant]);
+  }, [clientId, redirect, returnTo, userSub, variant]);
 
   const handleLogin = () => {
     window.location.href = authUrl;

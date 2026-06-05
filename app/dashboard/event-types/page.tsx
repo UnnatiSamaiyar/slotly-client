@@ -240,7 +240,20 @@ export default function DashboardEventTypes() {
   const [togglingId, setTogglingId] = useState<number | null>(null);
   const { user, userSub } = useDashboardUser();
   const [createOpen, setCreateOpen] = useState(false);
+  useEffect(() => {
+    const openCreateFromTopbar = () => {
+      setOpenMenuId(null);
+      setEditOpen(false);
+      setEditItem(null);
+      setCreateOpen(true);
+    };
 
+    window.addEventListener("slotly-open-create-event", openCreateFromTopbar);
+
+    return () => {
+      window.removeEventListener("slotly-open-create-event", openCreateFromTopbar);
+    };
+  }, []);
   const [role, setRole] = useState<"all" | "hosted" | "invited">("all");
   const [meetingQ, setMeetingQ] = useState("");
   const [selected, setSelected] = useState<any | null>(null);
@@ -596,7 +609,7 @@ export default function DashboardEventTypes() {
         </div>
       </div>
 
-      {editOpen && editItem ? (
+      {/* {editOpen && editItem ? (
         <EventTypeEditModal
           open={editOpen}
           item={editItem}
@@ -610,8 +623,29 @@ export default function DashboardEventTypes() {
             );
           }}
         />
-      ) : null}
+      ) : null} */}
+      {editOpen && editItem ? (
+        <CreateEventTypeModal
+          open={editOpen}
+          mode="edit"
+          item={editItem}
+          userSub={userSub}
+          onClose={() => {
+            setEditOpen(false);
+            setEditItem(null);
+          }}
+          onUpdate={async (id, payload) => {
+            const updated = await updateEventType(id, payload as any);
+            setItems((prev) => prev.map((x) => (x.id === updated.id ? updated : x)));
 
+            toast({
+              title: "Saved",
+              description: "Event type updated successfully.",
+              variant: "success",
+            });
+          }}
+        />
+      ) : null}
       <div className="mt-4 sm:mt-6">
         {tab === "event_types" ? (
           <>
@@ -640,7 +674,11 @@ export default function DashboardEventTypes() {
                     <div className="mt-4">
                       <button
                         type="button"
-                        onClick={() => setCreateOpen(true)}
+                            onClick={() => {
+                              setEditOpen(false);
+                              setEditItem(null);
+                              setCreateOpen(true);
+                            }}
                         className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold shadow-sm transition"
                       >
                         Create Event Type
@@ -933,7 +971,11 @@ export default function DashboardEventTypes() {
                   })}
                   <button
                     type="button"
-                    onClick={() => setCreateOpen(true)}
+                          onClick={() => {
+                            setEditOpen(false);
+                            setEditItem(null);
+                            setCreateOpen(true);
+                          }}
                     className="group flex min-h-[220px] items-center justify-center rounded-3xl border border-dashed border-gray-300 bg-white shadow-sm transition-all duration-200 hover:border-indigo-300 hover:shadow-lg sm:min-h-[230px]"
                     aria-label="Create event type"
                   >

@@ -90,7 +90,20 @@
     useEffect(() => {
       fetchCalendarStatus();
     }, [userSub, pathname]);
+    useEffect(() => {
+      const refresh = () => {
+        fetchCalendarStatus();
+      };
 
+      window.addEventListener("slotly-calendar-changed", refresh);
+      window.addEventListener("focus", refresh);
+
+      return () => {
+        window.removeEventListener("slotly-calendar-changed", refresh);
+        window.removeEventListener("focus", refresh);
+      };
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [userSub]);
     useEffect(() => {
       console.log("Sidebar user:", user);
       console.log("Resolved userSub:", userSub);
@@ -322,6 +335,7 @@
                 compact
                 label="Connect"
                 returnTo={safeReturnTo}
+                userSub={userSub}
               />
             </div>
           )}

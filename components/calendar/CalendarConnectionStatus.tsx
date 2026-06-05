@@ -3,8 +3,7 @@
 import { useEffect, useState } from "react";
 import GoogleLoginButton from "../auth/GoogleLoginButton";
 
-const API_BASE = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8  000").replace(/\/$/, "");
-
+const API_BASE = (process.env.NEXT_PUBLIC_API_URL || "https://api.slotly.io").replace(/\/$/, "");
 export default function CalendarConnectionStatus({ userSub }: { userSub: string }) {
   const [connected, setConnected] = useState<boolean | null>(null);
 
@@ -31,7 +30,12 @@ export default function CalendarConnectionStatus({ userSub }: { userSub: string 
       ) : (
         <div className="flex flex-col gap-3">
           <p className="text-red-600 font-medium">✗ Not Connected</p>
-          <GoogleLoginButton variant="calendar" label="Connect Google Calendar" returnTo="/dashboard" />
+            <GoogleLoginButton
+              variant="calendar"
+              label="Connect Google Calendar"
+              returnTo="/dashboard"
+              userSub={userSub}
+            />
           <p className="text-xs text-slate-500">
             Google may show a warning because verification is in progress. Connect only if you need calendar sync.
           </p>

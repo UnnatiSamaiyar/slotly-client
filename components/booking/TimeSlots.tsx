@@ -3,11 +3,13 @@
 import { useEffect, useState } from "react";
 
 export default function TimeSlots({
+  slug,
   date,
   duration,
   timezone,
   onSelectTime,
 }: {
+  slug: string;
   date: string | null;
   duration: number;
   timezone: string;
@@ -16,18 +18,26 @@ export default function TimeSlots({
   const [slots, setSlots] = useState<string[]>([]);
 
   useEffect(() => {
-    if (!date) return;
+    if (!date || !slug) {
+      setSlots([]);
+      return;
+    }
 
     const loadSlots = async () => {
       const res = await fetch(
-        ` https://api.slotly.io/booking/slots?date=${date}&duration=${duration}&timezone=${timezone}`
+        `https://api.slotly.io/bookings/availability/${encodeURIComponent(
+          slug
+        )}?date=${date}&duration=${duration}&timezone=${encodeURIComponent(
+          timezone
+        )}`
       );
+
       const data = await res.json();
       setSlots(data.slots || []);
     };
 
     loadSlots();
-  }, [date]);
+  }, [slug, date, duration, timezone]);
 
   return (
     <div className="bg-white p-6 rounded-xl shadow-md">

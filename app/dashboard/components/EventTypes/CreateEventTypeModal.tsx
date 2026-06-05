@@ -37,6 +37,32 @@ import BookingForm from "@/components/booking/BookingForm";
 import SetMeetingLocationModal from "@/components/shared/SetMeetingLocationModal";
 import GoogleLoginButton from "@/components/auth/GoogleLoginButton";
 type MeetingMode = "google_meet" | "in_person";
+type EventTypeModalPayload = {
+  title: string;
+  meeting_mode: MeetingMode;
+  location?: string;
+  availability_json?: string | null;
+  duration_minutes?: number;
+  timezone?: string | null;
+  brand_logo_url?: string | null;
+  icon?: string | null;
+  is_public?: boolean;
+  description?: string;
+};
+
+type EditableEventType = {
+  id: number;
+  title?: string | null;
+  meeting_mode?: string | null;
+  location?: string | null;
+  availability_json?: string | null;
+  duration_minutes?: number | null;
+  timezone?: string | null;
+  brand_logo_url?: string | null;
+  icon?: string | null;
+  is_public?: boolean | null;
+  description?: string | null;
+};
 const EVENT_ICON_OPTIONS = [
   { key: "calendar", icon: Calendar },
   { key: "video", icon: Video },
@@ -59,29 +85,70 @@ const EVENT_ICON_OPTIONS = [
 const getEventIcon = (key: string | null | undefined) => {
   return EVENT_ICON_OPTIONS.find((item) => item.key === key)?.icon ?? null;
 };
+
+function normalizeAvailabilityForPayload(value: string | null | undefined): string | null {
+  const raw = String(value || "").trim();
+
+  if (!raw || raw === "{}") {
+    return null;
+  }
+
+  try {
+    const parsed = JSON.parse(raw);
+
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+      return null;
+    }
+
+    const week = parsed.week || parsed.weekly || parsed.rules;
+    const overrides = parsed.overrides;
+    const ranges = parsed.ranges;
+    const bookingWindow = parsed.booking_window || parsed.window;
+
+    const hasWeek =
+      week &&
+      typeof week === "object" &&
+      Object.values(week).some((value) => Array.isArray(value) && value.length > 0);
+
+    const hasOverrides =
+      overrides &&
+      typeof overrides === "object" &&
+      Object.keys(overrides).length > 0;
+
+    const hasRanges = Array.isArray(ranges) && ranges.length > 0;
+
+    const hasBookingWindow =
+      bookingWindow &&
+      typeof bookingWindow === "object" &&
+      Boolean(bookingWindow.enabled);
+
+    if (!hasWeek && !hasOverrides && !hasRanges && !hasBookingWindow) {
+      return null;
+    }
+
+    return JSON.stringify(parsed);
+  } catch {
+    return null;
+  }
+}
 export default function CreateEventTypeModal({
   open,
   onClose,
   onCreate,
+  onUpdate,
   userSub,
-
+  mode = "create",
+  item = null,
 }: {
   open: boolean;
   onClose: () => void;
-    onCreate: (payload: {
-      title: string;
-      meeting_mode: MeetingMode;
-      location?: string;
-      availability_json?: string;
-      duration_minutes?: number;
-      timezone?: string | null;
-      brand_logo_url?: string | null;
-      icon?: string | null;
-      is_public?: boolean;
-      description?: string;
-    }) => Promise<void>;
+  onCreate?: (payload: EventTypeModalPayload) => Promise<void>;
+  onUpdate?: (id: number, payload: EventTypeModalPayload) => Promise<void>;
   userSub: string | null;
+  mode?: "create" | "edit";
+  item?: EditableEventType | null;
 }) {
+  const isEdit = mode === "edit";
   const [title, setTitle] = useState("");
   const [meetingMode, setMeetingMode] = useState<MeetingMode>("google_meet");
   const [location, setLocation] = useState("");
@@ -93,10 +160,11 @@ export default function CreateEventTypeModal({
  
 
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [existingLogoUrl, setExistingLogoUrl] = useState<string | null>(null);
   const [logoUploading, setLogoUploading] = useState(false);
   const [googleConnected, setGoogleConnected] = useState(false);
   const [checkingGoogle, setCheckingGoogle] = useState(false);
-  const [availabilityJson, setAvailabilityJson] = useState<string>("{}");
+  const [availabilityJson, setAvailabilityJson] = useState<string>("");
   const [availabilityOpen, setAvailabilityOpen] = useState(false);
   const [locationModalOpen, setLocationModalOpen] = useState(false);
   const [description, setDescription] = useState("");
@@ -105,7 +173,7 @@ export default function CreateEventTypeModal({
   const iconPickerRef = useRef<HTMLDivElement | null>(null);
   const needsLocation = meetingMode === "in_person";
   const needsGoogle = meetingMode === "google_meet";
-  const googleBlocked = needsGoogle && !googleConnected;
+  const googleBlocked = !isEdit && needsGoogle && !googleConnected;
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const apiBase =
     (process.env.NEXT_PUBLIC_API_BASE || "https://api.slotly.io")
@@ -148,53 +216,77 @@ export default function CreateEventTypeModal({
   }
   useEffect(() => {
     if (!open) return;
+
     fetchGoogleCalendarStatus();
     setError(null);
+    setAvailabilityOpen(false);
+    setLocationModalOpen(false);
+    setSaving(false);
+    setLogoUrl(null);
+    setLogoUploading(false);
+    setIconPickerOpen(false);
+
+    if (isEdit && item) {
+      setTitle(String(item.title || ""));
+      setMeetingMode(
+        String(item.meeting_mode || "google_meet") === "in_person"
+          ? "in_person"
+          : "google_meet"
+      );
+      setLocation(String(item.location || ""));
+      setDurationMinutes(Number(item.duration_minutes || 15));
+      setTimezone(String(item.timezone || getPreferredTimezone() || getBrowserTimezone()));
+      setAvailabilityJson(String(item.availability_json || ""));
+      setExistingLogoUrl(item.brand_logo_url || null);
+      setDescription(String(item.description || ""));
+      setSelectedEventIcon(item.icon || null);
+      setIsPublic(true);
+      return;
+    }
 
     setTitle("");
     setMeetingMode("google_meet");
     setLocation("");
     setDurationMinutes(15);
     setTimezone(getPreferredTimezone() || getBrowserTimezone());
-    setAvailabilityJson("{}");
-    setAvailabilityOpen(false);
-    setLocationModalOpen(false);
-    setSaving(false);
-    setLogoUrl(null);
+    setAvailabilityJson("");
+    setExistingLogoUrl(null);
     setDescription("");
     setSelectedEventIcon(null);
-    setIconPickerOpen(false);
-    setLogoUploading(false);
     setIsPublic(true);
-  }, [open, userSub]);
+  }, [open, userSub, isEdit, item]);
 
 
  
   useEffect(() => {
     if (!open) return;
 
-    const handleFocus = () => {
+    const refresh = () => {
       fetchGoogleCalendarStatus();
     };
 
-    window.addEventListener("focus", handleFocus);
+    window.addEventListener("focus", refresh);
+    window.addEventListener("slotly-calendar-changed", refresh);
 
     return () => {
-      window.removeEventListener("focus", handleFocus);
+      window.removeEventListener("focus", refresh);
+      window.removeEventListener("slotly-calendar-changed", refresh);
     };
   }, [open, userSub]);
 
   useEffect(() => {
     if (!open) return;
 
-    if (meetingMode === "in_person") {
+    if (meetingMode === "in_person" && !location.trim()) {
       const t = setTimeout(() => setLocationModalOpen(true), 120);
       return () => clearTimeout(t);
     }
 
-    setLocationModalOpen(false);
-    setLocation("");
-  }, [meetingMode, open]);
+    if (meetingMode !== "in_person") {
+      setLocationModalOpen(false);
+      setLocation("");
+    }
+  }, [meetingMode, open, location]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -236,7 +328,7 @@ export default function CreateEventTypeModal({
     return meetingMode === "google_meet" ? Video : MapPin;
   }, [meetingMode, selectedEventIcon]);
   const Icon = titleIcon;
-  const effectiveLogo = logoUrl || null;
+  const effectiveLogo = logoUrl || existingLogoUrl || null;
   const logoSrc = (() => {
     if (!effectiveLogo) return null;
 
@@ -251,9 +343,8 @@ export default function CreateEventTypeModal({
     return null;
   })();
   const availabilityMeta = useMemo(() => {
-    const len = String(availabilityJson || "{}").length;
-    const isSet = availabilityJson && availabilityJson !== "{}" && len > 2;
-    return { len, isSet };
+    const normalized = normalizeAvailabilityForPayload(availabilityJson);
+    return { isSet: Boolean(normalized) };
   }, [availabilityJson]);
 
   async function submit(e?: React.FormEvent) {
@@ -277,18 +368,27 @@ export default function CreateEventTypeModal({
     }
     setSaving(true);
     try {
-      await onCreate({
+      const payload: EventTypeModalPayload = {
         title: cleanTitle,
         meeting_mode: meetingMode,
         location: needsLocation ? cleanLocation : "",
-        availability_json: availabilityJson,
+        availability_json: normalizeAvailabilityForPayload(availabilityJson),
         duration_minutes: durationMinutes,
         timezone,
-        brand_logo_url: logoUrl || null,
+        brand_logo_url: logoUrl || existingLogoUrl || null,
         icon: selectedEventIcon || null,
-        is_public: isPublic,           // ← ADD THIS
+        is_public: isEdit ? true : isPublic,
         description: description.trim(),
-      });
+      };
+
+      if (isEdit) {
+        if (!item?.id || !onUpdate) throw new Error("Missing update handler");
+        await onUpdate(Number(item.id), payload);
+      } else {
+        if (!onCreate) throw new Error("Missing create handler");
+        await onCreate(payload);
+      }
+
       onClose();
     } catch (err: any) {
       setError(err?.message || String(err));
@@ -340,11 +440,12 @@ export default function CreateEventTypeModal({
                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     {/* Title */}
                     <h2 className="text-base sm:text-xl font-semibold text-slate-900">
-                      Create Event
+                      {isEdit ? "Edit Event" : "Create Event"}
                     </h2>
 
                     {/* Toggle + Close */}
                     <div className="flex items-center justify-end gap-3 sm:gap-4">
+                      {!isEdit && (
                       <div className="inline-flex h-10 items-center rounded-full bg-slate-100 p-1 shrink-0">
                         <button
                           type="button"
@@ -368,7 +469,7 @@ export default function CreateEventTypeModal({
                           Public
                         </button>
                       </div>
-
+                      )}
                       <button
                         type="button"
                         onClick={onClose}
@@ -491,7 +592,9 @@ export default function CreateEventTypeModal({
                                     <GoogleLoginButton
                                       variant="calendar"
                                       compact
+                                      label="Connect"
                                       returnTo="/dashboard/event-types?create_event=1"
+                                      userSub={userSub || undefined}
                                     />
                                   </div>
                                 </div>
@@ -655,7 +758,7 @@ export default function CreateEventTypeModal({
                                   Availability configured
                                 </>
                               ) : (
-                                <span className="text-slate-500">No availability set</span>
+                                  <span className="text-slate-500">Inherits your schedule</span>
                               )}
                             </div>
                           </div>
@@ -698,7 +801,7 @@ export default function CreateEventTypeModal({
                         : "cursor-pointer hover:opacity-90"
                         }`}
                     >
-                      {saving ? "Creating…" : "Create"}
+                      {saving ? (isEdit ? "Saving…" : "Creating…") : isEdit ? "Save changes" : "Create"}
                     </button>
 
                     {googleBlocked && (
@@ -718,11 +821,12 @@ export default function CreateEventTypeModal({
         </div>
 
         <AvailabilityEditorModal
-          open={availabilityOpen}
-          initialAvailabilityJson={availabilityJson !== "{}" ? availabilityJson : null}
+     
+  open={availabilityOpen}
+          initialAvailabilityJson={normalizeAvailabilityForPayload(availabilityJson)}
           onClose={() => setAvailabilityOpen(false)}
           onSave={(json) => {
-            setAvailabilityJson(json || "{}");
+            setAvailabilityJson(normalizeAvailabilityForPayload(json) || "");
             setAvailabilityOpen(false);
           }}
         />

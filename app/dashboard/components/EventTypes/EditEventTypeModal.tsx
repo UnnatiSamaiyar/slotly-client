@@ -9,6 +9,51 @@ import { useToast } from "@/hooks/use-toast";
 import AvailabilityEditorModal from "../Schedule/AvailabilityEditorModal";
 
 type MeetingMode = "google_meet" | "in_person";
+function normalizeAvailabilityForPayload(value: string | null | undefined): string | null {
+  const raw = String(value || "").trim();
+
+  if (!raw || raw === "{}") {
+    return null;
+  }
+
+  try {
+    const parsed = JSON.parse(raw);
+
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+      return null;
+    }
+
+    const week = parsed.week || parsed.weekly || parsed.rules;
+    const overrides = parsed.overrides;
+    const ranges = parsed.ranges;
+    const bookingWindow = parsed.booking_window || parsed.window;
+
+    const hasWeek =
+      week &&
+      typeof week === "object" &&
+      Object.values(week).some((value) => Array.isArray(value) && value.length > 0);
+
+    const hasOverrides =
+      overrides &&
+      typeof overrides === "object" &&
+      Object.keys(overrides).length > 0;
+
+    const hasRanges = Array.isArray(ranges) && ranges.length > 0;
+
+    const hasBookingWindow =
+      bookingWindow &&
+      typeof bookingWindow === "object" &&
+      Boolean(bookingWindow.enabled);
+
+    if (!hasWeek && !hasOverrides && !hasRanges && !hasBookingWindow) {
+      return null;
+    }
+
+    return JSON.stringify(parsed);
+  } catch {
+    return null;
+  }
+}
 
 export default function EditEventTypeModal({
   open,
@@ -26,7 +71,7 @@ export default function EditEventTypeModal({
       title: string;
       meeting_mode: MeetingMode;
       location: string;
-      availability_json: string;
+      availability_json: string | null;
       duration_minutes: number;
     }>
   ) => Promise<void>;
@@ -61,7 +106,7 @@ export default function EditEventTypeModal({
   const [durationMinutes, setDurationMinutes] = useState<number>(15);
   const [saving, setSaving] = useState(false);
   // Event-type scoped availability
-  const [availabilityJson, setAvailabilityJson] = useState<string>("{}");
+  const [availabilityJson, setAvailabilityJson] = useState<string>("");
   const [availabilityOpen, setAvailabilityOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -74,7 +119,7 @@ export default function EditEventTypeModal({
       setMeetingMode((item.meeting_mode as MeetingMode) || "google_meet");
       setLocation(item.location || "");
       setDurationMinutes(Number((item as any).duration_minutes || 15));
-      setAvailabilityJson(String(item.availability_json || "{}"));
+      setAvailabilityJson(normalizeAvailabilityForPayload(item.availability_json as any) || "");
     }
   }, [item]);
 
@@ -103,7 +148,7 @@ export default function EditEventTypeModal({
         meeting_mode: meetingMode,
         location: needsLocation ? cleanLocation : "",
         duration_minutes: durationMinutes,
-        availability_json: availabilityJson,
+        availability_json: normalizeAvailabilityForPayload(availabilityJson),
       });
       toast({ title: "Saved", description: "Event type updated successfully.", variant: "success" });
       onClose();
@@ -194,7 +239,7 @@ export default function EditEventTypeModal({
               <label className="text-xs text-slate-600">Availability</label>
               <div className="mt-1 flex flex-col items-stretch gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <div className="text-xs text-slate-500">
-                  Override weekly hours for this event type.
+                  Leave empty to inherit your main schedule.
                 </div>
                 <button
                   type="button"
@@ -251,10 +296,10 @@ export default function EditEventTypeModal({
 
       <AvailabilityEditorModal
         open={availabilityOpen}
-        initialAvailabilityJson={availabilityJson}
+        initialAvailabilityJson={normalizeAvailabilityForPayload(availabilityJson)}
         onClose={() => setAvailabilityOpen(false)}
         onSave={(json) => {
-          setAvailabilityJson(json);
+          setAvailabilityJson(normalizeAvailabilityForPayload(json) || "");
           setAvailabilityOpen(false);
         }}
       />

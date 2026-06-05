@@ -75,7 +75,7 @@ export function useEventTypes(userSub: string | null) {
       description?: string;
       meeting_mode: "google_meet" | "in_person";
       location?: string;
-      availability_json?: string;
+      availability_json?: string | null;
       duration_minutes?: number;
       timezone?: string | null;
     }) => {
@@ -99,7 +99,7 @@ export function useEventTypes(userSub: string | null) {
         description: string;
         meeting_mode: "google_meet" | "in_person";
         location: string;
-        availability_json: string;
+        availability_json: string | null;
         duration_minutes: number;
         timezone: string | null;
       }>

@@ -5,8 +5,9 @@ import { useRouter } from "next/navigation";
 import { Plus } from "lucide-react";
 import EventTypeCard from "./EventTypeCard";
 import CreateEventTypeModal from "./CreateEventTypeModal";
-import EditEventTypeModal from "./EditEventTypeModal";
+// import EditEventTypeModal from "./EditEventTypeModal";
 import { useEventTypes } from "../../hooks/useEventTypes";
+
 import { EventType } from "../../types";
 
 function CreateEventTypeCard({ onClick }: { onClick: () => void }) {
@@ -37,6 +38,20 @@ export default function EventTypesPanel({ userSub }: { userSub: string | null })
   const [createOpen, setCreateOpen] = useState(false);
   const [editing, setEditing] = useState<EventType | null>(null);
 
+  useEffect(() => {
+    const openCreateFromTopbar = () => {
+      setEditing(null);
+      setCreateOpen(true);
+    };
+
+    window.addEventListener("slotly-open-create-event", openCreateFromTopbar);
+
+    return () => {
+      window.removeEventListener("slotly-open-create-event", openCreateFromTopbar);
+    };
+  }, []);
+
+
   const sorted = useMemo(() => {
     return [...items].sort((a, b) => (a.title || "").localeCompare(b.title || ""));
   }, [items]);
@@ -47,11 +62,11 @@ export default function EventTypesPanel({ userSub }: { userSub: string | null })
 
   const shouldShowCreateCard = !loading && !error && sorted.length < 3;
 
-  useEffect(() => {
-    const handler = () => setCreateOpen(true);
-    window.addEventListener("slotly-open-create-event", handler);
-    return () => window.removeEventListener("slotly-open-create-event", handler);
-  }, []);
+  // useEffect(() => {
+  //   const handler = () => setCreateOpen(true);
+  //   window.addEventListener("slotly-open-create-event", handler);
+  //   return () => window.removeEventListener("slotly-open-create-event", handler);
+  // }, []);
 
   return (
     <section data-tour="dashboard-event-types" className="mb-0 overflow-hidden rounded-[24px] border border-slate-200/80 bg-white shadow-[0_18px_50px_rgba(15,23,42,0.06)]">
@@ -107,12 +122,20 @@ export default function EventTypesPanel({ userSub }: { userSub: string | null })
               <EventTypeCard
                 key={it.id}
                 item={it}
-                onEdit={(i) => setEditing(i)}
+                onEdit={(i) => {
+                  setCreateOpen(false);
+                  setEditing(i);
+                }}
               />
             ))}
 
             {shouldShowCreateCard && (
-              <CreateEventTypeCard onClick={() => setCreateOpen(true)} />
+              <CreateEventTypeCard
+  onClick={() => {
+    setEditing(null);
+    setCreateOpen(true);
+  }}
+/>
             )}
           </div>
         )}
@@ -127,15 +150,15 @@ export default function EventTypesPanel({ userSub }: { userSub: string | null })
           }}
         />
 
-        <EditEventTypeModal
+        <CreateEventTypeModal
           open={!!editing}
+          mode="edit"
           item={editing}
+          userSub={userSub}
           onClose={() => setEditing(null)}
           onUpdate={async (id, payload) => {
             await update(id, payload);
-          }}
-          onDelete={async (id) => {
-            await remove(id);
+            setEditing(null);
           }}
         />
       </div>

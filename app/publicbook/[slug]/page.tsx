@@ -347,7 +347,11 @@ export default function PublicBookingPage() {
   const router = useRouter();
   const slug = String(params?.slug || "");
   const { toast } = useToast();
-  const apiBase = "https://api.slotly.io";
+  // const apiBase = "https://api.slotly.io";
+  const apiBase =
+    process.env.NEXT_PUBLIC_API_URL ||
+    process.env.NEXT_PUBLIC_API_BASE_URL ||
+    "https://api.slotly.io";
 
   const [profile, setProfile] = useState<any | null>(null);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
@@ -540,6 +544,7 @@ export default function PublicBookingPage() {
                 <PublicCalendar
                   slug={slug}
                   bookingWindow={profile?.booking_window}
+                  activeWeekdays={profile?.active_weekdays}
                   selectedDate={selectedDate}
                   onSelectDate={(d) => {
                     setSelectedDate(d);

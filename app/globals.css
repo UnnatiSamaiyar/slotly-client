@@ -302,3 +302,31 @@ body {
     padding: 16px;
   }
 }
+
+
+body.slotly-schedule-edit-mode [data-slotly-sidebar],
+body.slotly-schedule-edit-mode [data-slotly-topbar] {
+  display: none !important;
+}
+
+body.slotly-schedule-edit-mode [data-slotly-main] {
+  margin-left: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+main,
+section,
+div {
+  min-width: 0;
+}

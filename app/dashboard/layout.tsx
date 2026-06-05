@@ -61,21 +61,56 @@ export default function DashboardLayout({
     const [hydrated, setHydrated] = useState(false);
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [isDesktop, setIsDesktop] = useState(false);
+    const [scheduleFocusMode, setScheduleFocusMode] = useState(false);
+ 
     const [createEventTypeOpen, setCreateEventTypeOpen] = useState(false);
 
     useEffect(() => {
         setUserSub(getUserSub());
         setHydrated(true);
     }, []);
+    useEffect(() => {
+        if (typeof document === "undefined") return;
 
+        const syncScheduleFocusMode = () => {
+            const enabled = document.body.classList.contains(
+                "slotly-schedule-edit-mode"
+            );
+
+            setScheduleFocusMode(enabled);
+
+            if (enabled) {
+                setSidebarOpen(false);
+            } else if (window.innerWidth >= 1024) {
+                setSidebarOpen(true);
+            }
+        };
+
+        syncScheduleFocusMode();
+
+        const observer = new MutationObserver(syncScheduleFocusMode);
+
+        observer.observe(document.body, {
+            attributes: true,
+            attributeFilter: ["class"],
+        });
+
+        return () => observer.disconnect();
+    }, []);
     useEffect(() => {
         const apply = () => {
             const desktop = window.innerWidth >= 1024;
+            const focusMode = document.body.classList.contains(
+                "slotly-schedule-edit-mode"
+            );
+
             setIsDesktop(desktop);
-            setSidebarOpen(desktop);
+            setSidebarOpen(desktop && !focusMode);
         };
+
         apply();
         window.addEventListener("resize", apply);
+
         return () => window.removeEventListener("resize", apply);
     }, []);
 
@@ -108,77 +143,73 @@ export default function DashboardLayout({
     }
 
     return (
+        
         <DashboardUserContext.Provider value={{ user, userSub }}>
             <DashboardTourProvider>
-            <div className="min-h-screen h-screen bg-white flex overflow-hidden">
-                {isDesktop && (
-                    <Sidebar
-                        open={sidebarOpen}
-                        onToggle={() => setSidebarOpen((s) => !s)}
-                        user={user}
-                    />
-                )}
-
-                {!isDesktop && sidebarOpen && (
-                    <div className="fixed inset-0 z-50 flex">
-                        <div
-                            className="absolute inset-0 bg-black/35"
-                            onClick={() => setSidebarOpen(false)}
+                <div className="h-screen bg-white flex overflow-hidden">
+                    {isDesktop && (
+                        <Sidebar
+                            open={scheduleFocusMode ? false : sidebarOpen}
+                            onToggle={() => {
+                                if (scheduleFocusMode) return;
+                                setSidebarOpen((s) => !s);
+                            }}
+                            user={user}
                         />
-                        <Sidebar open user={user} onToggle={() => setSidebarOpen(false)} />
-                    </div>
-                )}
+                    )}
 
-                <main className="flex-1 min-w-0 flex flex-col overflow-hidden">
-                    {showTopbar && (
-                        <div className="relative shrink-0 px-3 sm:px-3 lg:px-3 xl:px-3 2xl:px-3 pt-3 sm:pt-3 2xl:pt-3">
-                            {/* Hamburger — absolutely positioned, only on non-desktop */}
-                            {!isDesktop && (
-                                <button
-                                    onClick={() => setSidebarOpen(true)}
-                                    data-tour="mobile-sidebar-toggle"
-                                    className="absolute left-4 top-4 sm:left-6 h-10 w-10 rounded-xl border border-slate-200 bg-white shadow-sm lg:hidden flex items-center justify-center"
-                                >
-                                    <Menu className="h-5 w-5" />
-                                </button>
-                            )}
+                    {!isDesktop && sidebarOpen && !scheduleFocusMode && (
+                        <div className="fixed inset-0 z-50 flex">
+                            <div
+                                className="absolute inset-0 bg-black/35"
+                                onClick={() => setSidebarOpen(false)}
+                            />
+                            <Sidebar open user={user} onToggle={() => setSidebarOpen(false)} />
+                        </div>
+                    )}
 
-                            {/* Topbar — always has left padding to clear the hamburger on non-desktop */}
-                            <div className={!isDesktop ? "pl-12" : ""}>
-                                <Topbar
-                                    user={user}
-                                    searchQuery=""
-                                    onSearchQueryChange={() => { }}
-                                    onCreateEventTypeClick={() => setCreateEventTypeOpen(true)}
-                                />
+                    <main className="flex-1 min-w-0 flex flex-col overflow-hidden">
+                        {showTopbar && !scheduleFocusMode && (
+                            <div className="relative shrink-0 bg-white">
+                                {!isDesktop && (
+                                    <button
+                                        type="button"
+                                        onClick={() => setSidebarOpen(true)}
+                                        data-tour="mobile-sidebar-toggle"
+                                        aria-label="Open sidebar"
+                                        className="absolute left-4 top-2 z-20 flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-900 shadow-sm lg:hidden"
+                                    >
+                                        <Menu className="h-5 w-5" />
+                                    </button>
+                                )}
+
+                                <div className={!isDesktop ? "pl-14 sm:pl-0" : ""}>
+                                    <Topbar
+                                        user={user}
+                                        searchQuery=""
+                                        onSearchQueryChange={() => { }}
+                                        onCreateEventTypeClick={() => setCreateEventTypeOpen(true)}
+                                    />
+                                </div>
                             </div>
+                        )}
+                        <div
+                            className={
+                                scheduleFocusMode
+                                    ? "flex-1 overflow-y-auto px-0 pb-0 pt-0"
+                                    : "flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 pb-8 pt-4"
+                            }
+                        >
+                            {children}
                         </div>
-                    )}
-
-                    {!showTopbar && !isDesktop && (
-                        <div className="shrink-0 px-4 pt-4 sm:px-6 flex items-center">
-                            <button
-                                onClick={() => setSidebarOpen(true)}
-                                data-tour="mobile-sidebar-toggle"
-                                className="h-10 w-10 rounded-xl border border-slate-200 bg-white shadow-sm lg:hidden flex items-center justify-center"
-                            >
-                                <Menu className="h-5 w-5" />
-                            </button>
-                        </div>
-                    )}
-                    <div
-                        className={`flex-1 min-h-0 flex flex-col overflow-y-auto px-3 sm:px-4 lg:px-5 xl:px-6 2xl:px-8 pb-4 ${showTopbar ? "pt-4" : "pt-4 sm:pt-6"}`}>
-                        {children}
-                    </div>
-                </main>
-
-                <CreateEventTypeModal
-                    open={createEventTypeOpen}
-                    onClose={() => setCreateEventTypeOpen(false)}
-                    userSub={userSub}
-                    onCreate={handleCreateEventType}
-                />
-            </div>
+                    </main>
+                    <CreateEventTypeModal
+                        open={createEventTypeOpen}
+                        onClose={() => setCreateEventTypeOpen(false)}
+                        userSub={userSub}
+                        onCreate={handleCreateEventType}
+                    />
+                </div>
             </DashboardTourProvider>
         </DashboardUserContext.Provider>
     );
